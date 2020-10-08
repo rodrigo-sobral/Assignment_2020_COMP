@@ -1,7 +1,11 @@
 %{
     /********************************NOTAS*********************************************
     [EDUARDO]:
-
+        O que fiz até agora foi apenas incluir alguns dos tokens e dar o respetivo print de acordo com o pedido no enunciado. 
+        Em relação ao INTLIT vou enviar ao prof um mail a perguntar se é suposto aceitar
+            apenas numeros decimais ou se os hexadecimais e os octa tb contam..
+        
+        Faltam incluir: CHRLIT REALLIT
     ===================================================================================
     [RODRIGO]:
 
