@@ -4,10 +4,11 @@
         O que fiz até agora foi apenas incluir alguns dos tokens e dar o respetivo print de acordo com o pedido no enunciado. 
         Em relação ao INTLIT vou enviar ao prof um mail a perguntar se é suposto aceitar
             apenas numeros decimais ou se os hexadecimais e os octa tb contam..
-        
-        Faltam incluir: CHRLIT REALLIT
+        Testar o REALLINT só para verificar q está a funcionar bem....
+        Faltam incluir: CHRLIT 
     ===================================================================================
-    [RODRIGO]:
+    [RODRIGO]: Vê se o uso do signal (onde foi usado nas regras), faz sentido
+    
 
     ***********************************************************************************/
     //COMPILADORES 2020
@@ -20,7 +21,9 @@
 %}
 letter  [A-Za-z_]
 digit   [0-9]
+digits  digit+
 signal  [+-]?
+exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"float"|"goto"|"long"|"register"|"return"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"inline"|"inline"|"_Bool"|"_Complex"|"_Imaginary"
 id  letter(letter|digit)*
 %%
@@ -59,7 +62,9 @@ return  {if(printFlag){printf("RETURN\n");}}
 "/" {if(printFlag){printf("DIV\n");}}
 "%" {if(printFlag){printf("MOD\n");}}
 
-{signal}{digit}+    {printf("INTLIT(%s)\n",yytext);}
+
+({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {printf("REALLIT(%s)\n",yytext);}
+{signal}{digits}    {printf("INTLIT(%s)\n",yytext);}
 {id}    {printf("ID(%s)\n",yytext);}    
 
 %%
