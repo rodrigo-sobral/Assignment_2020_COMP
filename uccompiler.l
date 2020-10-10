@@ -83,13 +83,14 @@ return  {if(printFlag){printf("RETURN\n");}}
 "//".*$    {;}
 "/*"    {BEGIN COMMENT;}
 <COMMENT>"*/"   {BEGIN 0;}
-<COMMENT>\n {colNum=1;lineNum++;}
+<COMMENT>\r?\n {colNum=1;lineNum++;}
 <COMMENT><<EOF>>    {BEGIN 0; printf("Line <num linha>, col <num coluna>: unterminated comment\n");}
+<COMMENT>.  {;}
 
 {ws}    {;}
-.   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
-\n  {colNum=1;lineNum++;}
+\r?\n  {colNum=1;lineNum++;}
 <<EOF>> {return 0;}
+.   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
 %%
 int main(int argc, char *argv[]){
     if(argc==2){
