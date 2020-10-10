@@ -70,8 +70,8 @@ return  {if(printFlag){printf("RETURN\n");}}
 "%" {if(printFlag){printf("MOD\n");}}
  
 \'(\n|.)?\'  {printf("CHRLIT(%s)\n",yytext);}
-\'(\n|.)(\n|.)+\'   {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n")}
-\"(\n|.)*\" {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n")} 
+\'(\n|.)(\n|.)+\'   {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");}
+\"(\n|.)*\" {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");} 
 \'[^']* {printf("Line <num linha>, col <num coluna>: unterminated char constant\n");}
 
 ({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {printf("REALLIT(%s)\n",yytext);}
