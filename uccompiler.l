@@ -1,16 +1,10 @@
 %{
     /********************************NOTAS*********************************************
     [EDUARDO]:
-        O que fiz até agora foi apenas incluir os tokens e dar o respetivo print de
-        acordo com o pedido no enunciado. 
         ws == whitespaces..tabs e/ou espaços..nao incluí o newline pq o newline é preciso ser interpretado separadamente para dar reset ao contador de colunas colNum
-        Em relação ao INTLIT vou enviar ao prof um mail a perguntar se é suposto aceitar
-            apenas numeros decimais ou se os hexadecimais e os octa tb contam..
-        Testar o REALLINT e CHRLIT só para verificar q está a funcionar bem....
-        Testar CHRLIT para o caso em q o char tem \t ou \n, escritos..
-        PARTE MAIS COMPLICADA: deteçao e controlo dos erros lexicais
         Atençao: na linguagem UC nao existem arrays logo nao existem strings! "a" tem de ser
             interpretado como invalid char constant..assim como 'abc'
+        TESTAR TESTAR TESTAR TESTAR
     ===================================================================================
     [RODRIGO]:
     
@@ -22,7 +16,8 @@
     #include <string.h>
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
-    int lineNum=1,colNum=1; //contador de linha, contador de coluna
+    int lineNum=1,colNum=1; //line counter, collumn counter
+    int aux;    //to save aux values (i.e. line where comment starts)
 %}
 %X COMMENT
 letter  [A-Za-z_]
@@ -36,61 +31,61 @@ ws  [\t ]+
 esc ("\\n"|"\\t"|"\\"|"\\\'"|"\\\""|"\\ooo")
 char ([^']|{esc})    
 %%
-char    {if(printFlag){printf("CHAR\n");}}
-int {if(printFlag){printf("INT\n");}}
-short   {if(printFlag){printf("SHORT\n");}}
-double  {if(printFlag){printf("DOUBLE\n");}}
-void    {if(printFlag){printf("VOID\n");}}
-if  {if(printFlag){printf("IF\n");}}
-else    {if(printFlag){printf("ELSE\n");}}
-while   {if(printFlag){printf("WHILE\n");}}
-return  {if(printFlag){printf("RETURN\n");}}
-{reserved}  {if(printFlag){printf("RESERVED(%s)\n",yytext);}}
-"(" {if(printFlag){printf("LPAR\n");}}
-")" {if(printFlag){printf("RPAR\n");}}
-"{" {if(printFlag){printf("LBRACE\n");}}
-"}" {if(printFlag){printf("RBRACE\n");}}
-";" {if(printFlag){printf("SEMI\n");}} 
-"," {if(printFlag){printf("COMMA\n");}} 
-"&&"    {if(printFlag){printf("AND\n");}}
-"||"    {if(printFlag){printf("OR\n");}}
-"&" {if(printFlag){printf("BITWISEAND\n");}}
-"|" {if(printFlag){printf("BITWISEOR\n");}}
-"^" {if(printFlag){printf("BITWISEXOR\n");}}
-"!="    {if(printFlag){printf("NE\n");}}
-"=="    {if(printFlag){printf("EQ\n");}}
-">="    {if(printFlag){printf("GE\n");}}
-">" {if(printFlag){printf("GT\n");}}
-"<="    {if(printFlag){printf("LE\n");}}
-"<" {if(printFlag){printf("LT\n");}}
-"!" {if(printFlag){printf("NOT\n");}}
-"=" {if(printFlag){printf("ASSIGN\n");}}
-"*" {if(printFlag){printf("MUL\n");}}
-"+" {if(printFlag){printf("PLUS\n");}}
-"-" {if(printFlag){printf("MINUS\n");}}
-"/" {if(printFlag){printf("DIV\n");}}
-"%" {if(printFlag){printf("MOD\n");}}
+char    {if(printFlag){printf("CHAR\n");} colNum+=yyleng;}
+int {if(printFlag){printf("INT\n");} colNum+=yyleng;}
+short   {if(printFlag){printf("SHORT\n");} colNum+=yyleng;}
+double  {if(printFlag){printf("DOUBLE\n");} colNum+=yyleng;}
+void    {if(printFlag){printf("VOID\n");} colNum+=yyleng;}
+if  {if(printFlag){printf("IF\n");} colNum+=yyleng;}
+else    {if(printFlag){printf("ELSE\n");} colNum+=yyleng;}
+while   {if(printFlag){printf("WHILE\n");} colNum+=yyleng;}
+return  {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
+{reserved}  {if(printFlag){printf("RESERVED(%s)\n",yytext);} colNum+=yyleng;}
+"(" {if(printFlag){printf("LPAR\n");} colNum++;}
+")" {if(printFlag){printf("RPAR\n");} colNum++;}
+"{" {if(printFlag){printf("LBRACE\n");} colNum++;}
+"}" {if(printFlag){printf("RBRACE\n");} colNum++;}
+";" {if(printFlag){printf("SEMI\n");} colNum++;} 
+"," {if(printFlag){printf("COMMA\n");} colNum++;} 
+"&&"    {if(printFlag){printf("AND\n");} colNum+=yyleng;}
+"||"    {if(printFlag){printf("OR\n");} colNum+=yyleng;}
+"&" {if(printFlag){printf("BITWISEAND\n");} colNum++;}
+"|" {if(printFlag){printf("BITWISEOR\n");} colNum++;}
+"^" {if(printFlag){printf("BITWISEXOR\n");} colNum++;}
+"!="    {if(printFlag){printf("NE\n");} colNum+=yyleng;}
+"=="    {if(printFlag){printf("EQ\n");} colNum+=yyleng;}
+">="    {if(printFlag){printf("GE\n");} colNum+=yyleng;}
+">" {if(printFlag){printf("GT\n");} colNum++;}
+"<="    {if(printFlag){printf("LE\n");} colNum+=yyleng;}
+"<" {if(printFlag){printf("LT\n");} colNum++;}
+"!" {if(printFlag){printf("NOT\n");} colNum++;}
+"=" {if(printFlag){printf("ASSIGN\n");} colNum++;}
+"*" {if(printFlag){printf("MUL\n");} colNum++;}
+"+" {if(printFlag){printf("PLUS\n");} colNum++;}
+"-" {if(printFlag){printf("MINUS\n");} colNum++;}
+"/" {if(printFlag){printf("DIV\n");} colNum++;}
+"%" {if(printFlag){printf("MOD\n");} colNum++;}
  
-\'{char}\'  {if(printFlag){printf("CHRLIT(%s)\n",yytext);}}
-\'{char}{char}+\'   {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");}
-\"{char}*\" {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");} 
-\'{char}* {printf("Line <num linha>, col <num coluna>: unterminated char constant\n");}
+\'{char}\'  {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
+\'{char}{char}+\'   {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+\"{char}*\" {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
+\'{char}* {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
 
-({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);}}
-{signal}{digits}    {if(printFlag){printf("INTLIT(%s)\n",yytext);}}
-{id}    {if(printFlag){printf("ID(%s)\n",yytext);}} 
+({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
+{signal}{digits}    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
+{id}    {if(printFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng;} 
  
 "//".*$    {;}
-"/*"    {BEGIN COMMENT;}
-<COMMENT>"*/"   {BEGIN 0;}
+"/*"    {BEGIN COMMENT; aux=lineNum; colNum+=yyleng;}
+<COMMENT>"*/"   {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n {colNum=1;lineNum++;}
-<COMMENT><<EOF>>    {BEGIN 0; printf("Line <num linha>, col <num coluna>: unterminated comment\n");}
-<COMMENT>.  {;}
+<COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",aux,colNum); colNum+=yyleng;}
+<COMMENT>.  {colNum++;}
 
-{ws}    {;}
+{ws}    {colNum+=yyleng;}
 \r?\n  {colNum=1;lineNum++;}
 <<EOF>> {return 0;}
-.   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
+.   {printf("Line %d, col %d: illegal character (%s)\n",lineNum,colNum,yytext); colNum++;}
 %%
 int main(int argc, char *argv[]){
     if(argc==2){
