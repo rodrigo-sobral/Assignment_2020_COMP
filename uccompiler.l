@@ -71,14 +71,14 @@ return  {if(printFlag){printf("RETURN\n");}}
 "/" {if(printFlag){printf("DIV\n");}}
 "%" {if(printFlag){printf("MOD\n");}}
  
-\'{char}\'  {printf("CHRLIT(%s)\n",yytext);}
+\'{char}\'  {if(printFlag){printf("CHRLIT(%s)\n",yytext);}}
 \'{char}{char}+\'   {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");}
 \"{char}*\" {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n");} 
 \'{char}* {printf("Line <num linha>, col <num coluna>: unterminated char constant\n");}
 
-({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {printf("REALLIT(%s)\n",yytext);}
-{signal}{digits}    {printf("INTLIT(%s)\n",yytext);}
-{id}    {printf("ID(%s)\n",yytext);} 
+({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);}}
+{signal}{digits}    {if(printFlag){printf("INTLIT(%s)\n",yytext);}}
+{id}    {if(printFlag){printf("ID(%s)\n",yytext);}} 
  
 "//".*$    {;}
 "/*"    {BEGIN COMMENT;}
