@@ -27,11 +27,11 @@
 %X COMMENT
 letter  [A-Za-z_]
 digit   [0-9]
-digits  digit+
+digits  {digit}+
 signal  [+-]?
 exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"float"|"goto"|"long"|"register"|"return"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"inline"|"inline"|"_Bool"|"_Complex"|"_Imaginary"
-id  letter(letter|digit)*
+id  {letter}({letter}|{digit})*
 ws  [\t ]+
 %%
 char    {if(printFlag){printf("CHAR\n");}}
@@ -76,7 +76,7 @@ return  {if(printFlag){printf("RETURN\n");}}
 
 ({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {printf("REALLIT(%s)\n",yytext);}
 {signal}{digits}    {printf("INTLIT(%s)\n",yytext);}
-{id}    {printf("ID(%s)\n",yytext);}    
+{id}    {printf("ID(%s)\n",yytext);} 
  
 "//".*$    {;}
 "/*"    {BEGIN COMMENT;}
@@ -87,7 +87,7 @@ return  {if(printFlag){printf("RETURN\n");}}
 {ws}    {printf("ws == whitespaces..tabs e/ou espaços..nao incluí o newline pq o newline é preciso ser interpretado separadamente para dar reset ao contador de colunas colNum");}
 .   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
 \n  {colNum=0;lineNum++;}
-<<EOF>> {;}
+<<EOF>> {return 0;}
 %%
 int main(int argc, char *argv[]){
     if(argc==2){
