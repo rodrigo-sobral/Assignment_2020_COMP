@@ -68,9 +68,9 @@ return  {if(printFlag){printf("RETURN\n");}}
 {id}    {printf("ID(%s)\n",yytext);}    
 
 %%
-int main(int argc, char** argv){
+int main(int argc, char *argv[]){
     if(argc==2){
-        if(strcmp(argv[1],"-l")==0||strcmp(argv[1],"-e1")==0){
+        if(strcmp(argv[1],"-l")==0){
             printFlag=1; //stdout print tokens and error_messages
         }
     }
