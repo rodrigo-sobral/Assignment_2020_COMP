@@ -1,13 +1,16 @@
 %{
     /********************************NOTAS*********************************************
     [EDUARDO]:
-        O que fiz até agora foi apenas incluir alguns dos tokens e dar o respetivo print de acordo com o pedido no enunciado. 
+        O que fiz até agora foi apenas incluir os tokens e dar o respetivo print de
+        acordo com o pedido no enunciado. 
         Em relação ao INTLIT vou enviar ao prof um mail a perguntar se é suposto aceitar
             apenas numeros decimais ou se os hexadecimais e os octa tb contam..
-        Testar o REALLINT só para verificar q está a funcionar bem....
-        Faltam incluir: CHRLIT 
+        Testar o REALLINT e CHRLIT só para verificar q está a funcionar bem....
+        Testar CHRLIT para o caso em q o char tem \t ou \n, escritos..acho q vai ser preciso
+        desenvolver + essa parte para q aceite escape_characters 
+        PARTE MAIS COMPLICADA: deteçao e controlo dos erros lexicais
     ===================================================================================
-    [RODRIGO]: Vê se o uso do signal (onde foi usado nas regras), faz sentido
+    [RODRIGO]:
     
 
     ***********************************************************************************/
@@ -17,7 +20,7 @@
     #include <string.h>
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
-    int lineNum=0,colNum=0;
+    int lineNum=0,colNum=0; //contador de linha, contador de coluna
 %}
 %X COMMENT
 letter  [A-Za-z_]
@@ -27,7 +30,7 @@ signal  [+-]?
 exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"float"|"goto"|"long"|"register"|"return"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"inline"|"inline"|"_Bool"|"_Complex"|"_Imaginary"
 id  letter(letter|digit)*
-
+ws  [\t ]+
 %%
 char    {if(printFlag){printf("CHAR\n");}}
 int {if(printFlag){printf("INT\n");}}
@@ -79,6 +82,7 @@ return  {if(printFlag){printf("RETURN\n");}}
 <COMMENT>\n {colNum=0;lineNum++;}
 <COMMENT><<EOF>>    {BEGIN 0; printf("Line <num linha>, col <num coluna>: unterminated comment\n");}
 
+{ws}    {printf("ws == whitespaces..tabs e/ou espaços..nao incluí o newline pq o newline é preciso ser interpretado separadamente para dar reset ao contador de colunas colNum");}
 .   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
 \n  {colNum=0;lineNum++;}
 <<EOF>> {;}
