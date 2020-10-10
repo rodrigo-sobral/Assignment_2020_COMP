@@ -9,6 +9,8 @@
         Testar CHRLIT para o caso em q o char tem \t ou \n, escritos..acho q vai ser preciso
         desenvolver + essa parte para q aceite escape_characters 
         PARTE MAIS COMPLICADA: deteçao e controlo dos erros lexicais
+        Atençao: na linguagem UC nao existem arrays logo nao existem strings! "a" tem de ser
+            interpretado como invalid char constant..assim como 'abc'
     ===================================================================================
     [RODRIGO]:
     
