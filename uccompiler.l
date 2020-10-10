@@ -11,14 +11,15 @@
     
 
     ***********************************************************************************/
-    //COMPILADORES 2020
+    //PL5_COMPILADORES@2020
     //Eduardo Filipe Ferreira Cruz  2018285164
     //Rodrigo ... Sobral    ...
     #include <string.h>
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
-
+    int lineNum=0,colNum=0;
 %}
+%X COMMENT
 letter  [A-Za-z_]
 digit   [0-9]
 digits  digit+
@@ -26,6 +27,7 @@ signal  [+-]?
 exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"float"|"goto"|"long"|"register"|"return"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"inline"|"inline"|"_Bool"|"_Complex"|"_Imaginary"
 id  letter(letter|digit)*
+
 %%
 char    {if(printFlag){printf("CHAR\n");}}
 int {if(printFlag){printf("INT\n");}}
@@ -61,12 +63,25 @@ return  {if(printFlag){printf("RETURN\n");}}
 "-" {if(printFlag){printf("MINUS\n");}}
 "/" {if(printFlag){printf("DIV\n");}}
 "%" {if(printFlag){printf("MOD\n");}}
-
+ 
+\'(\n|.)?\'  {printf("CHRLIT(%s)\n",yytext);}
+\'(\n|.)(\n|.)+\'   {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n")}
+\"(\n|.)*\" {printf("Line <num linha>, col <num coluna>: invalid char constant (<c>)\n")} 
+\'[^']* {printf("Line <num linha>, col <num coluna>: unterminated char constant\n");}
 
 ({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {printf("REALLIT(%s)\n",yytext);}
 {signal}{digits}    {printf("INTLIT(%s)\n",yytext);}
 {id}    {printf("ID(%s)\n",yytext);}    
+ 
+"//".*$    {;}
+"/*"    {BEGIN COMMENT;}
+<COMMENT>"*/"   {BEGIN 0;}
+<COMMENT>\n {colNum=0;lineNum++;}
+<COMMENT><<EOF>>    {BEGIN 0; printf("Line <num linha>, col <num coluna>: unterminated comment\n");}
 
+.   {printf("Line <num linha>, col <num coluna>: illegal character (<c>)\n");}
+\n  {colNum=0;lineNum++;}
+<<EOF>> {;}
 %%
 int main(int argc, char *argv[]){
     if(argc==2){
