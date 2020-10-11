@@ -1,7 +1,7 @@
 %{
     //PL5_COMPILADORES@2020
     //Eduardo Filipe Ferreira Cruz  2018285164
-    //Rodrigo ... Sobral    2018298209
+    //Rodrigo Fernando Henriques Sobral    2018298209
     #include <string.h>
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
