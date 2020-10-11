@@ -6,7 +6,7 @@
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
     int lineNum=1,colNum=1; //line counter, collumn counter
-    int aux;    //to save aux values (i.e. line where comment starts)
+    int auxL,auxC;    //to save aux values 
 %}
 %X COMMENT
 letter  [A-Za-z_]
@@ -65,10 +65,10 @@ return  {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 {id}    {if(printFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng;} 
  
 "//".*$    {;}
-"/*"    {BEGIN COMMENT; aux=lineNum; colNum+=yyleng;}
-<COMMENT>"*/"   {BEGIN 0; colNum+=yyleng;}
+"/*"    {BEGIN COMMENT; auxL=lineNum; colNum+=yyleng;}
+<COMMENT>"*/"   {BEGIN 0; auxC=colNum; colNum+=yyleng;}
 <COMMENT>\r?\n {colNum=1;lineNum++;}
-<COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",aux,colNum); colNum+=yyleng;}
+<COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",auxL,auxC); colNum+=yyleng;}
 <COMMENT>.  {colNum++;}
 
 {ws}    {colNum+=yyleng;}
