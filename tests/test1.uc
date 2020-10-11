@@ -10,7 +10,7 @@ double        main(void )    {
     putchar(ch); putchar(c_1h);
     _nameVar_i=i-_nameVar_i;
     //just testing arround...//no problem here
-    /*ops esqueci-me de fechar este comentario..espero que o analisador lexical se aperceba :(
+    i=1000;$/*ops esqueci-me de fechar este comentario..espero que o analisador lexical se aperceba :(
     
     return    .234e-5;
 }
