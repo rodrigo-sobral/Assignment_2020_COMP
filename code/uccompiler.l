@@ -66,7 +66,7 @@ return  {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
  
 "//".*$    {;}
 "/*"    {BEGIN COMMENT; auxL=lineNum; colNum+=yyleng;}
-<COMMENT>"*/"   {BEGIN 0; auxC=colNum; colNum+=yyleng;}
+<COMMENT>"*/"   {BEGIN 0; auxC=colNum+1; colNum+=yyleng;}
 <COMMENT>\r?\n {colNum=1;lineNum++;}
 <COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",auxL,auxC); colNum+=yyleng;}
 <COMMENT>.  {colNum++;}
