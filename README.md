@@ -2,9 +2,14 @@
 
 ## **NOTAS**
 
-### EDUARDO
+- Como correr o compilador?
+    
+    1) Selecionar, no `makefile`, o nome do ficheiro que se pretende compilar alterando a variável `RUNNING_FILE_NAME`
 
-### RODRIGO
+    2) Escrever `make`na consola para correr
+
+    3) Escrever `make clear` na consola para limpar as diretorias
+
 
 ## **CRÉDITOS**
 

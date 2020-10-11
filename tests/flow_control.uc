@@ -1,4 +1,4 @@
-/* Neste teste analizamos
+/* Neste teste analisamos
     os
     *controlos de fluxo* dos programas      aqui
 // inseridos
