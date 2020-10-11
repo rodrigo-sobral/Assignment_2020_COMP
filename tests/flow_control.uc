@@ -6,7 +6,7 @@
 
 
 
-short main      () {
+short main      (void) {
     chr letra_abc_1= 'a';
 
     whil (1) {
@@ -19,7 +19,7 @@ short main      () {
 }
     
 
-void teste() {
+void teste(void) {
     int a_b=0;
     short lim3=50;
     
