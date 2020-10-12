@@ -3,4 +3,6 @@ char teste='\t';
 char teste='\ooo';
 char teste='\oooo';
 char teste='\oo;
+
+
 char teste=''';
