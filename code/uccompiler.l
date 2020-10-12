@@ -16,10 +16,10 @@ digit   [0-9]
 digits  {digit}+
 signal  [+-]?
 exp [Ee]{signal}{digits}
-reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"float"|"goto"|"long"|"register"|"return"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"inline"|"inline"|"_Bool"|"_Complex"|"_Imaginary"
+reserved    ("++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"inline"|"long"|"register"|"restrict"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"_Bool"|"_Complex"|"_Imaginary")                 
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
-esc ("\\n"|"\\t"|"\\"|"\\\'"|"\\\""|"\\ooo")
+esc ("\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\ooo"|"\\oo"|"\\o")
 char ([^'\n]|{esc})     
 
 
@@ -59,11 +59,11 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "/"         {if(printFlag){printf("DIV\n");} colNum++;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
-\'{char}\'          {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
-\'\'\'              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-\'[^']*\'           {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-\".*\"              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
-\'{char}?           {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
+L?\'{char}\'          {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
+L?\'\'\'              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+L?\'[^']*\'           {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+L?\".*\"              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
+L?\'{char}?           {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
