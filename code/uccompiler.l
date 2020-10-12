@@ -16,11 +16,11 @@ digit   [0-9]
 digits  {digit}+
 signal  [+-]?
 exp [Ee]{signal}{digits}
-reserved    ("++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"inline"|"long"|"register"|"restrict"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"_Bool"|"_Complex"|"_Imaginary")                 
+reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"inline"|"long"|"register"|"restrict"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"_Bool"|"_Complex"|"_Imaginary"                
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
-esc ("\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\ooo"|"\\oo"|"\\o")
-char ([^'\n]|{esc})     
+esc "\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\ooo"|"\\oo"|"\\o"
+char [^'\n]|{esc}     
 
 
 %%
