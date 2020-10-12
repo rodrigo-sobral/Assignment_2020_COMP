@@ -65,8 +65,8 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 \"{char}*\"         {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
 \'{char}?           {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
 
-({signal}{digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
-{signal}{digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
+({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
+{digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
 {id}                                                                {if(printFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng;} 
  
 "//".*$             {;}
