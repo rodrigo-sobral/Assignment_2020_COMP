@@ -19,7 +19,7 @@ exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"inline"|"long"|"register"|"restrict"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"_Bool"|"_Complex"|"_Imaginary"                
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
-esc "\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\ooo"|"\\oo"|"\\o"
+esc "\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\"[0-7]{1,3}
 char [^'\n]|{esc}     
 
 
@@ -60,10 +60,10 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
 L?\'{char}\'          {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
-L?\'\'\'              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+L?\'{char}\'$          {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
 L?\'{char}*\'           {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
 L?\"{char}*\"              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
-L?\'[^']*$            {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
+L?\'([^']|"\\'")*$            {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;}
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
