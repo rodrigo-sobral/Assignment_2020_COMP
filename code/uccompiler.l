@@ -10,7 +10,7 @@
 %}
 
 
-%X COMMENT
+%X COMMENT CHAR
 letter  [A-Za-z_]
 digit   [0-9]
 digits  {digit}+
@@ -59,10 +59,13 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "/"         {if(printFlag){printf("DIV\n");} colNum++;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
-L?\'{char}\'          {if(printFlag){printf("CHRLIT(%s)\n",yytext);} colNum+=yyleng;}
-L?\'{char}*\'           {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-L?\"{char}*\"              {printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
-L?\'"\\'"?([^']|[^'\\]"\\'")*[$<<EOF>>]      {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
+L?\'                      {BEGIN CHAR; colNum+=yyleng;}
+<CHAR>\\\'              {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+<CHAR>{char}\'            {BEGIN 0; if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng;}
+<CHAR>{char}*(\'|\")      {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
+<CHAR>\\\'|\r?\n       {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
+<CHAR><<EOF>>           {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
+<CHAR>.                     ; 
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
