@@ -69,6 +69,7 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 {id}                                                        {if(printFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng;} 
 
 "//".*$             ;
+"//".*             ;
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n|\r      {colNum=1;lineNum++;}
