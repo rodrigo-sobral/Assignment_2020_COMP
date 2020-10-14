@@ -10,7 +10,7 @@
 %}
 
 
-%X COMMENT CHAR
+%X COMMENT
 letter  [A-Za-z_]
 digit   [0-9]
 digits  {digit}+
@@ -19,8 +19,8 @@ exp [Ee]{signal}{digits}
 reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"inline"|"long"|"register"|"restrict"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"volatile"|"_Bool"|"_Complex"|"_Imaginary"                
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
-esc "\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\"[0-7]{1,3}
-char [^'\n\t\\]|{esc} 
+esc \\n|\\t|\\\\|\\\'|\\\"|\\[0-7]{1,3}
+char [^\n\'\\]|{esc} 
 
 
 %%
@@ -59,10 +59,10 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "/"         {if(printFlag){printf("DIV\n");} colNum++;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
-L?'                    {BEGIN CHAR; colNum+=yyleng;}
-<CHAR>{char}'          {BEGIN 0; if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng;}
-<CHAR>[^']*|(\r?\n)    {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;lineNum++;}
-<CHAR>.*'              {BEGIN 0; printf("Line %d, col %d: invalid char constant (\'%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
+'{char}'		        {if(printFlag) printf("CHRLIT(%s)\n", yytext); colNum+=yyleng;}
+'([^\n\'\\]|\\.)*'		{printf("Line %d, col %d: invalid char constant (%s)\n", lineNum, colNum, yytext); colNum+=yyleng;}
+'([^\n\'\\]|\\.)*(\\)?	{printf("Line %d, col %d: unterminated char constant\n", lineNum, colNum); colNum+=yyleng;}
+
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
