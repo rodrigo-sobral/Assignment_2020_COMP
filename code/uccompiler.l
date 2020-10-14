@@ -71,12 +71,12 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "//".*$             ;
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
-<COMMENT>\r?\n      {colNum=1;lineNum++;}
+<COMMENT>\r?\n|\r      {colNum=1;lineNum++;}
 <COMMENT><<EOF>>    {printf("Line %d, col %d: unterminated comment\n",auxL,auxC); return 0;}
 <COMMENT>.          {colNum++;}
 
 {ws}        {colNum+=yyleng;}
-\r?\n       {colNum=1;lineNum++;}
+\r?\n|\r       {colNum=1;lineNum++;}
 <<EOF>>     {return 0;}
 .           {printf("Line %d, col %d: illegal character (%s)\n",lineNum,colNum,yytext); colNum++;}
 
