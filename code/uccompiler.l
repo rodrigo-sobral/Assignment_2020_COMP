@@ -6,7 +6,7 @@
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
     int lineNum=1,colNum=1; //line counter, collumn counter
-    int auxL,auxC;    //to save aux values 
+    int auxL,auxC,auxLen,charFlag=0;    //to save aux values 
 %}
 
 
@@ -59,13 +59,14 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "/"         {if(printFlag){printf("DIV\n");} colNum++;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
-L?\'                      {BEGIN CHAR; colNum+=yyleng;}
-<CHAR>\\\'              {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-<CHAR>{char}\'            {BEGIN 0; if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng;}
-<CHAR>{char}*(\'|\")      {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-<CHAR>\\\'|\r?\n       {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
-<CHAR><<EOF>>           {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
-<CHAR>.                     ; 
+
+L?\'    {BEGIN CHAR; auxLen=yyleng; charFlag=0;}
+<CHAR>"\\\'"?([^'\n]|([^'\\]"\\\'"))*         {printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); charFlag=1;}
+<CHAR>{char}\'          {if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng+auxLen; charFlag=1; BEGIN 0;}
+<CHAR>{char}*\'           {printf("Line %d, col %d: invalid char constant (\'%s)\n",lineNum,colNum,yytext); colNum+=yyleng+auxLen; charFlag=1; BEGIN 0;}
+<CHAR>\r?\n     {if(charFlag==0){printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum);} colNum=1; lineNum++; BEGIN 0;}
+<CHAR><<EOF>>   {return 0;}
+L?\"{char}*\"              {printf("Line %d, col %d: invalid char constant (\'%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
@@ -75,7 +76,7 @@ L?\'                      {BEGIN CHAR; colNum+=yyleng;}
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n      {colNum=1;lineNum++;}
-<COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",auxL,auxC); colNum+=yyleng;}
+<COMMENT><<EOF>>    {printf("Line %d, col %d: unterminated comment\n",auxL,auxC); return 0;}
 <COMMENT>.          {colNum++;}
 
 {ws}        {colNum+=yyleng;}
