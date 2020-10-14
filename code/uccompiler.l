@@ -6,7 +6,7 @@
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
     int lineNum=1,colNum=1; //line counter, collumn counter
-    int auxL,auxC;    //to save aux values 
+    int auxL,auxC,auxLen,charFlag=0;    //to save aux values 
 %}
 
 
@@ -72,7 +72,7 @@ L?'                    {BEGIN CHAR; colNum+=yyleng;}
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n      {colNum=1;lineNum++;}
-<COMMENT><<EOF>>    {BEGIN 0; printf("Line %d, col %d: unterminated comment\n",auxL,auxC); colNum+=yyleng;}
+<COMMENT><<EOF>>    {printf("Line %d, col %d: unterminated comment\n",auxL,auxC); return 0;}
 <COMMENT>.          {colNum++;}
 
 {ws}        {colNum+=yyleng;}
