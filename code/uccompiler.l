@@ -20,7 +20,7 @@ reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
 esc "\\n"|"\\t"|"\\\\"|"\\\'"|"\\\""|"\\"[0-7]{1,3}
-char [^'\n]|{esc}     
+char [^'\n\t\\]|{esc} 
 
 
 %%
@@ -59,19 +59,16 @@ return      {if(printFlag){printf("RETURN\n");} colNum+=yyleng;}
 "/"         {if(printFlag){printf("DIV\n");} colNum++;}
 "%"         {if(printFlag){printf("MOD\n");} colNum++;}
  
-L?\'                      {BEGIN CHAR; colNum+=yyleng;}
-<CHAR>\\\'              {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-<CHAR>{char}\'            {BEGIN 0; if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng;}
-<CHAR>{char}*(\'|\")      {BEGIN 0; printf("Line %d, col %d: invalid char constant (%s)\n",lineNum,colNum,yytext); colNum+=yyleng;}
-<CHAR>\\\'|\r?\n       {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
-<CHAR><<EOF>>           {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum=1; lineNum++;}
-<CHAR>.                     ; 
+L?'                    {BEGIN CHAR; colNum+=yyleng;}
+<CHAR>{char}'          {BEGIN 0; if(printFlag){printf("CHRLIT(\'%s)\n",yytext);} colNum+=yyleng;}
+<CHAR>[^']*|(\r?\n)    {BEGIN 0; printf("Line %d, col %d: unterminated char constant\n",lineNum,colNum); colNum+=yyleng;lineNum++;}
+<CHAR>.*'              {BEGIN 0; printf("Line %d, col %d: invalid char constant (\'%s)\n",lineNum,colNum,yytext); colNum+=yyleng;} 
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng;}
 {digits}                                                    {if(printFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng;}
 {id}                                                        {if(printFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng;} 
 
-"//".*$             {;}
+"//".*$             ;
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n      {colNum=1;lineNum++;}
