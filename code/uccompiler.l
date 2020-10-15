@@ -6,7 +6,7 @@
 
     int printFlag=0; //if 0(default), print error_messages only; else print all tokens and error_messages
     int lineNum=1,colNum=1; //line counter, collumn counter
-    int auxL,auxC,auxLen,charFlag=0;    //to save aux values 
+    int auxL,auxC;    //to save aux values 
 %}
 
 
