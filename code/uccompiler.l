@@ -20,7 +20,7 @@ reserved    "++"|"--"|"["|"]"|"auto"|"break"|"case"|"const"|"continue"|"default"
 id  {letter}({letter}|{digit})*
 ws  [\t ]+
 esc \\n|\\t|\\\\|\\\'|\\\"|\\[0-7]{1,3}
-char [^\n\"\'\\]|{esc} 
+char [^\n\'\\]|{esc} 
 
 
 %%
