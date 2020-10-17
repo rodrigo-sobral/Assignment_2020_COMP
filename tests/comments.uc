@@ -12,4 +12,6 @@ ch//ar a = '' iwjqrqr;
 
 iqokfoqij/1418//eiwtjww
 mgiemgeimheh
-//
+
+//ya, isto é um comentario
+//mas se isto começar a dar ids é pra corrigir
