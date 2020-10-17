@@ -1,0 +1,291 @@
+SHORT
+ID(main)
+LPAR
+VOID
+RPAR
+LBRACE
+CHAR
+ID(letra_abc_1)
+ASSIGN
+CHRLIT('a')
+SEMI
+WHILE
+LPAR
+INTLIT(1)
+RPAR
+LBRACE
+WHILE
+LPAR
+ID(letra_abc_1)
+LT
+CHRLIT('z')
+RPAR
+LBRACE
+IF
+LPAR
+ID(letra_abc_1)
+EQ
+CHRLIT('j')
+RPAR
+RESERVED(break)
+SEMI
+ID(letra_abc_1)
+RESERVED(++)
+SEMI
+RBRACE
+RETURN
+INTLIT(0)
+SEMI
+RBRACE
+VOID
+ID(check_err0s)
+LPAR
+VOID
+RPAR
+LBRACE
+CHAR
+ID(a)
+ASSIGN
+Line 22, col 13: invalid char constant ('')
+Line 22, col 15: unterminated char constant
+INT
+ID(i)
+SEMI
+DOUBLE
+ID(j)
+SEMI
+ID(a)
+ASSIGN
+Line 24, col 7: unterminated char constant
+ID(a)
+ASSIGN
+Line 25, col 7: unterminated char constant
+ID(a)
+ASSIGN
+ID(a)
+Line 26, col 8: unterminated char constant
+ID(a)
+ASSIGN
+Line 27, col 7: unterminated char constant
+ID(a)
+ASSIGN
+Line 28, col 7: invalid char constant ('')
+SEMI
+ID(a)
+ASSIGN
+Line 29, col 7: invalid char constant ('ola')
+SEMI
+ID(a)
+ASSIGN
+CHRLIT('\t')
+SEMI
+ID(a)
+ASSIGN
+Line 31, col 7: invalid char constant ('')
+Line 31, col 9: invalid char constant ('')
+Line 31, col 11: invalid char constant ('')
+Line 31, col 13: invalid char constant ('')
+Line 31, col 15: invalid char constant ('')
+Line 31, col 17: invalid char constant ('')
+Line 31, col 19: invalid char constant ('')
+Line 31, col 21: invalid char constant ('')
+Line 31, col 23: invalid char constant ('')
+SEMI
+ID(a)
+ASSIGN
+Line 32, col 7: illegal character (\)
+CHRLIT('c')
+SEMI
+ID(a)
+ASSIGN
+Line 33, col 7: invalid char constant ('ch')
+ID(a)
+ASSIGN
+Line 34, col 7: invalid char constant ('20')
+SEMI
+ID(a)
+ASSIGN
+Line 35, col 7: unterminated char constant
+ID(a)
+ASSIGN
+Line 36, col 7: invalid char constant ('\999')
+SEMI
+ID(a)
+ASSIGN
+Line 37, col 7: invalid char constant ('==')
+SEMI
+ID(a)
+ASSIGN
+Line 38, col 7: invalid char constant ('\\20')
+SEMI
+ID(a)
+ASSIGN
+CHRLIT('\0')
+SEMI
+ID(a)
+ASSIGN
+Line 40, col 7: invalid char constant ('\\n')
+SEMI
+ID(a)
+ASSIGN
+CHRLIT('\n')
+SEMI
+ID(a)
+ASSIGN
+CHRLIT('?')
+SEMI
+ID(a)
+ASSIGN
+Line 43, col 7: invalid char constant ('\'\'')
+SEMI
+ID(a)
+ASSIGN
+Line 44, col 7: invalid char constant ('\\\t\\\\')
+SEMI
+ID(a)
+ASSIGN
+Line 45, col 7: unterminated char constant
+ID(a)
+ASSIGN
+Line 46, col 7: illegal character (\)
+Line 46, col 8: invalid char constant ('\'\'\'\'')
+Line 46, col 18: illegal character (\)
+Line 46, col 19: invalid char constant ('')
+Line 46, col 21: invalid char constant ('\'\'\'\'\\\\')
+SEMI
+Line 46, col 37: illegal character (\)
+Line 46, col 38: illegal character (\)
+ID(check)
+ID(i)
+ASSIGN
+INTLIT(000)
+SEMI
+ID(i)
+ASSIGN
+INTLIT(60)
+SEMI
+ID(i)
+ASSIGN
+INTLIT(060)
+SEMI
+ID(i)
+ASSIGN
+INTLIT(0123456789)
+IF
+LPAR
+ID(i)
+NE
+ID(i)
+RPAR
+LBRACE
+ID(putchar)
+LPAR
+CHRLIT('\\')
+Line 53, col 21: unterminated char constant
+RBRACE
+ID(j)
+ASSIGN
+REALLIT(.0)
+SEMI
+ID(j)
+ASSIGN
+Line 56, col 7: illegal character (.)
+PLUS
+REALLIT(1e0123456789)
+SEMI
+ID(j)
+ASSIGN
+REALLIT(.123)
+MINUS
+ID(E)
+SEMI
+ID(j)
+ASSIGN
+MINUS
+REALLIT(1.)
+MINUS
+INTLIT(1)
+SEMI
+ID(j)
+ASSIGN
+REALLIT(123.456)
+SEMI
+ID(j)
+ASSIGN
+REALLIT(02.02e+02)
+SEMI
+RETURN
+VOID
+SEMI
+MUL
+MUL
+MUL
+MUL
+MUL
+MUL
+MUL
+MUL
+MUL
+MUL
+NE
+EQ
+AND
+BITWISEAND
+RESERVED(++)
+RESERVED(--)
+RESERVED([)
+RESERVED(])
+RESERVED(auto)
+RESERVED(break)
+RESERVED(case)
+RESERVED(const)
+RESERVED(continue)
+MUL
+MUL
+RESERVED(default)
+RESERVED(do)
+RESERVED(enum)
+MUL
+MUL
+RESERVED(extern)
+RESERVED(for)
+RESERVED(inline)
+RESERVED(volatile)
+MUL
+MUL
+RESERVED(_Bool)
+RESERVED(_Complex)
+Line 62, col 131: illegal character (")
+MUL
+MUL
+CHRLIT('\t')
+Line 63, col 1: invalid char constant ('\\t')
+CHRLIT('\\')
+Line 63, col 12: invalid char constant ('ll')
+CHRLIT('o')
+Line 63, col 19: invalid char constant (' o')
+Line 63, col 23: invalid char constant ('\\\\')
+BITWISEAND
+BITWISEOR
+BITWISEXOR
+AND
+ASSIGN
+MUL
+COMMA
+DIV
+EQ
+GE
+GT
+LBRACE
+LE
+LPAR
+RPAR
+LT
+MINUS
+MOD
+NE
+NOT
+OR
+PLUS
+RBRACE
+Line 65, col 2: unterminated comment
