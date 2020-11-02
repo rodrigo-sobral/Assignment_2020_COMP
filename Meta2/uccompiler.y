@@ -6,11 +6,14 @@
     #include <stdio.h>
     #include "y.tab.h"
 
+    int yylex (void);
+    void yyerror(char* s);
     /*The extern keywor, in C, is used to tell the compiler that the
      variable that we are declaring was defined elsewhere.*/
-    extern int lineNum,colNum; //verificar se yyleng n precisa de ser declarado como extern
+    extern int lineNum,colNum, yyleng; 
+    extern char* yytext;
     int errorFlag=0; 
-
+    //nota: shift/reduce conflict:  conflict will be resolved by preferring shift over reduce
 %}
 
 %union{
@@ -63,8 +66,13 @@
 %%
 program:    functionsAndDeclarations    {}
     ;
-functionsAndDeclarations:   functionsAndDeclarations functionDefinition {}
-    |   functionsAndDeclarations functionDeclaration    {}
+functionsAndDeclarations:   functionDefinition functionsAndDeclarationsAux {}
+    |   functionDeclaration functionsAndDeclarationsAux    {}
+    |   declaration functionsAndDeclarationsAux {}
+    ;
+functionsAndDeclarationsAux: /*empty*/  {}
+    |   functionsAndDeclarationsAux functionDefinition {}
+    |   functionsAndDeclarationsAux functionDeclaration {}
     |   functionsAndDeclarations declaration    {}
     ;
 functionDefinition: typeSpec functionDeclarator functionBody    {}
