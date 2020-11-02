@@ -59,21 +59,24 @@
 %right  ASSIGN
 %left   OR   
 %left   AND
-%left   NE  EQ  GE  GT  LE  LT   
+%left   BITWISEOR
+%left   BITWISEXOR
+%left   BITWISEAND
+%left   NE  EQ
+%left   GE  GT  LE  LT   
+%left   PLUS MINUS
 %left   MOD DIV MUL
 %right  NOT
 
 %%
 program:    functionsAndDeclarations    {}
     ;
-functionsAndDeclarations:   functionDefinition functionsAndDeclarationsAux {}
-    |   functionDeclaration functionsAndDeclarationsAux    {}
-    |   declaration functionsAndDeclarationsAux {}
-    ;
-functionsAndDeclarationsAux: /*empty*/  {}
-    |   functionsAndDeclarationsAux functionDefinition {}
-    |   functionsAndDeclarationsAux functionDeclaration {}
-    |   functionsAndDeclarations declaration    {}
+functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {}
+    |   functionsAndDeclarations functionDeclaration     {}
+    |   functionsAndDeclarations declaration  {}
+    |   functionDefinition  {}
+    |   functionDeclaration     {}
+    |   declaration  {}
     ;
 functionDefinition: typeSpec functionDeclarator functionBody    {}
     ;
