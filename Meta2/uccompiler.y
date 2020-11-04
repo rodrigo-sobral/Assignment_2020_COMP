@@ -21,7 +21,7 @@
 
 %union{
     char* str;
-    node* n;
+    struct node* n;
 };
 
 %token CHAR
@@ -86,11 +86,11 @@ functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1;
 functionDefinition: typeSpec functionDeclarator functionBody    {$$=createNode("FuncDefinition"); addChild($$,$1);addChild($$,$2);addChild($$,$3);}
     ;
 functionBody:   LBRACE RBRACE   {$$=createNode("FuncBody");}
-    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2);}
+    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2); statCount=0;}
     ;
-declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($1,$2); statCount=0;}
+declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($1,$2); statCount++;}
     |   declaration declarationsAndStatements   {$$=$1; addNext($1,$2);}
-    |   statement   {$$=$1; statCount=0;}
+    |   statement   {$$=$1; statCount++;}
     |   declaration {$$=$1;}
     ;
 functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration");addChild($$,$1);addChild($$,$2);}
@@ -100,7 +100,7 @@ functionDeclarator: ID LPAR parameterList RPAR  {$$=$3;}
 parameterList:  parameterDeclaration parametersAux   {$$=createNode("ParamList"); addChild($$,$1); if($2!=NULL){addChild($$,$2);}}
     ;
 parametersAux:  /*epsilon*/     {$$=NULL;}
-    |   parametersAux COMMA parameterDeclaration {if($1!=NULL){$$=$1; addNext($$,$3)} else{$$=$3;}}
+    |   parametersAux COMMA parameterDeclaration {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
     ;
 parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,$1);}
     |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2); addChild($$,createNode(buffer));}
@@ -108,8 +108,8 @@ parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,
 declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addChild($$,$3);} }
     |   error SEMI  {$$=NULL;}
     ;
-declaratorsAux: /*epsilon*/     {$$=NULL}
-    |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3)} else{$$=$3;}}
+declaratorsAux: /*epsilon*/     {$$=NULL;}
+    |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
     ;
 typeSpec:   CHAR    {$$=createNode("Char");}
     |   INT {$$=createNode("Int");}

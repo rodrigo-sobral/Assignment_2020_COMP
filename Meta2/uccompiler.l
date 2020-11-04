@@ -4,6 +4,7 @@
     //Rodrigo Fernando Henriques Sobral     2018298209
     #include <string.h>
     #include "y.tab.h"
+    #include "astree.h"
     int printTokenFlag=0; //if 0(default) print error_messages from lexical_analysis only; else print all tokens and error_messages from lexical_analysis
     int parseFlag=1; //if 1(default) execute parser
     int lineNum=1,colNum=1; //line counter, collumn counter
@@ -103,12 +104,9 @@ int main(int argc, char *argv[]){
             yyparse();   
             
             if(!errorFlag){ //if no syntax error occurred 
-                //PRINT SINTAX TREE
-
+                printTree();
             }
-
-            //dont forget to free up memory!
-            
+            freeAll();//dont forget to free up memory!            
         }
         else if(strcmp(argv[1],"-e2")==0){
             yyparse(); //stdout lexical and sintax errors
