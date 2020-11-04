@@ -36,7 +36,7 @@ if          {if(printTokenFlag){printf("IF\n");} colNum+=yyleng; if(parseFlag){r
 else        {if(printTokenFlag){printf("ELSE\n");} colNum+=yyleng; if(parseFlag){return ELSE;}}
 while       {if(printTokenFlag){printf("WHILE\n");} colNum+=yyleng; if(parseFlag){return WHILE;}}
 return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFlag){return RETURN;}}
-{reserved}  {if(printTokenFlag){printf("RESERVED(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = strdup(yytext); return RESERVED;}}
+{reserved}  {if(printTokenFlag){printf("RESERVED(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = (char*)strdup(yytext); return RESERVED;}}
 "("         {if(printTokenFlag){printf("LPAR\n");} colNum++; if(parseFlag){return LPAR;}}
 ")"         {if(printTokenFlag){printf("RPAR\n");} colNum++; if(parseFlag){return RPAR;}}
 "{"         {if(printTokenFlag){printf("LBRACE\n");} colNum++; if(parseFlag){return LBRACE;}}
@@ -62,13 +62,13 @@ return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFla
 "/"         {if(printTokenFlag){printf("DIV\n");} colNum++; if(parseFlag){return DIV;}}
 "%"         {if(printTokenFlag){printf("MOD\n");} colNum++; if(parseFlag){return MOD;}}
  
-'{char}'		        {if(printTokenFlag) printf("CHRLIT(%s)\n", yytext); colNum+=yyleng; if(parseFlag){yylval.str = strdup(yytext); return CHRLIT;}}
+'{char}'		        {if(printTokenFlag) printf("CHRLIT(%s)\n", yytext); colNum+=yyleng; if(parseFlag){yylval.str = (char*)strdup(yytext); return CHRLIT;}}
 '([^\n\'\\]|\\.)*'		{printf("Line %d, col %d: invalid char constant (%s)\n", lineNum, colNum, yytext); colNum+=yyleng;}
 '([^\n\'\\]|\\.)*(\\)?	{printf("Line %d, col %d: unterminated char constant\n", lineNum, colNum); colNum+=yyleng;}
 
-({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printTokenFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = strdup(yytext); return REALLIT;}}
-{digits}                                                    {if(printTokenFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = strdup(yytext); return INTLIT;}}
-{id}                                                        {if(printTokenFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = strdup(yytext); return ID;}} 
+({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printTokenFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = (char*)strdup(yytext); return REALLIT;}}
+{digits}                                                    {if(printTokenFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = (char*)strdup(yytext); return INTLIT;}}
+{id}                                                        {if(printTokenFlag){printf("ID(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.str = (char*)strdup(yytext); return ID;}} 
 
 "//".*$             ;
 "//".*              ;
