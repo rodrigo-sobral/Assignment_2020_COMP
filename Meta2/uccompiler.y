@@ -15,7 +15,7 @@
     extern char* yytext;
     int errorFlag=0; 
     char buffer[100]; //aux
-    int statCount=0;
+    int statFlag=0;
     //nota:  no error semi meter yyerrok; ? n entendo bem o q faz
 %}
 
@@ -86,16 +86,16 @@ functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1;
 functionDefinition: typeSpec functionDeclarator functionBody    {$$=createNode("FuncDefinition"); addChild($$,$1);addChild($$,$2);addChild($$,$3);}
     ;
 functionBody:   LBRACE RBRACE   {$$=createNode("FuncBody");}
-    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2); statCount=0;}
+    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2);}
     ;
-declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($1,$2); statCount++;}
+declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($1,$2);}
     |   declaration declarationsAndStatements   {$$=$1; addNext($1,$2);}
-    |   statement   {$$=$1; statCount++;}
+    |   statement   {$$=$1;}
     |   declaration {$$=$1;}
     ;
 functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration");addChild($$,$1);addChild($$,$2);}
     ;
-functionDeclarator: ID LPAR parameterList RPAR  {$$=$3;}
+functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
     ;
 parameterList:  parameterDeclaration parametersAux   {$$=createNode("ParamList"); addChild($$,$1); if($2!=NULL){addChild($$,$2);}}
     ;
@@ -118,23 +118,34 @@ typeSpec:   CHAR    {$$=createNode("Char");}
     |   DOUBLE  {$$=createNode("Double");}
     ;
 declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
-    |   ID ASSIGN expr  {$$=createNode("Store"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer)); addChild($$,$3);}
+    |   ID ASSIGN expr  { sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
     ;
 statement:  SEMI    {}  
-    |   expr SEMI {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,$1);} else{$$=$1;}}
+    |   expr SEMI {$$=$1;}
     |   error SEMI  {$$=NULL;}
-    |   LBRACE statementsAux RBRACE   {statCount++;if($2!=NULL){if(statCount==2){$$=createNode("StatList");} else{$$=$2;}} else{$$=NULL;}}
+    |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=$2;} else{$$=NULL;}}
     |   LBRACE error RBRACE {$$=NULL;}
-    |   IF LPAR expr RPAR statement   {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,createNode("If"));} else{$$=createNode("If");} addChild($$,$3); addChild($$,$5);}
-    |   IF LPAR expr RPAR statement ELSE statement   {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,createNode("If"));} else{$$=createNode("If");} addChild($$,$3); addChild($$,$5); addChild($$,$7);}
-    |   WHILE LPAR expr RPAR statement   {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,createNode("While"));} else{$$=createNode("While");} addChild($$,$3); addChild($$,$5);}
-    |   RETURN SEMI {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,createNode("Return"));} else{$$=createNode("Return");}}
-    |   RETURN expr SEMI    {statCount++; if(statCount==2){$$=createNode("StatList"); addChild($$,createNode("Return"));} else{$$=createNode("Return");} addChild($$,$2);}
+    |   IF LPAR expr RPAR statement   {$$=createNode("If"); addChild($$,$3); addChild($$,$5);}
+    |   IF LPAR expr RPAR statement ELSE statement   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
+    |   WHILE LPAR expr RPAR statement   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
+    |   RETURN SEMI {$$=createNode("Return");}
+    |   RETURN expr SEMI    { $$=createNode("Return"); addChild($$,$2);}
     ;
 statementsAux:  /*epsilon*/   {$$=NULL;}
-    |   statementsAux statement {statCount++; if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
+    |   statementsAux statement {
+                                    if($1!=NULL){
+                                        if(statFlag==0){
+                                            $$=createNode("StatList"); addChild($$,$1); addChild($$,$2);
+                                            statFlag=1;
+                                        }
+                                        else{
+                                            $$=$1; addNext($$,$2);
+                                        }                                        
+                                    }
+                                    else{$$=$2; statFlag=0;}                               
+                                }
     ;
-expr:   expr ASSIGN expr    {$$= createNode("Assign"); addChild($$,$1); addChild($$,$3); }
+expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild($$,$3); }
     |   expr COMMA expr {$$= createNode("Comma"); addChild($$,$1); addChild($$,$3); }
     |   expr PLUS expr   {$$= createNode("Add"); addChild($$,$1); addChild($$,$3); }
     |   expr MINUS expr   {$$= createNode("Sub"); addChild($$,$1); addChild($$,$3); }
