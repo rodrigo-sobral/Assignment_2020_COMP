@@ -2,8 +2,8 @@
 //Eduardo Filipe Ferreira Cruz          2018285164
 //Rodrigo Fernando Henriques Sobral     2018298209
 
-#ifndef ASTREE_H 
-#define ASTREE_H
+#ifndef AST_H 
+#define AST_H
 
 /*Structures [linked lists tree]*/
 typedef struct node{

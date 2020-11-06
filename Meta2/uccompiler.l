@@ -4,7 +4,7 @@
     //Rodrigo Fernando Henriques Sobral     2018298209
     #include <string.h>
     #include "y.tab.h"
-    #include "astree.h"
+    #include "ast.h"
     int printTokenFlag=0; //if 0(default) print error_messages from lexical_analysis only; else print all tokens and error_messages from lexical_analysis
     int parseFlag=1; //if 1(default) execute parser
     int lineNum=1,colNum=1; //line counter, collumn counter

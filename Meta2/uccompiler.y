@@ -5,7 +5,7 @@
     #include <stdlib.h>
     #include <stdio.h>
     #include "y.tab.h"
-    #include "astree.h"
+    #include "ast.h"
 
     int yylex (void);
     void yyerror(char* s);

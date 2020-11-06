@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "astree.h"
+#include "ast.h"
 
 //Abstract Syntax Tree Root
 static node *root;
