@@ -89,13 +89,15 @@ static void freeAll_(node *n)
 void listStatements(node* funcBody){
     /*percorrer a lista de filhos do nó funcBody (q apenas contém statements e/ou declarations)
      e caso encontre grupos de statements (>=2) criar nós statList e atualizar lista ligada de filhos de funcBody*/
-    int count = 0;
+    int count = 0,flag=0;
     node *aux=funcBody->child; //nó inicial da lista ligada de filhos de funcBody 
     node *dec=NULL; //para guardar ultimo nó Declaration
     node *statList;
     if(aux!=NULL){
         if(strcmp(aux->str,"Declaration")!=0){ //se for diferente de Declaration
             count++;
+            //caso em q o 1º filho de funcBody é um nó Statement
+            flag=1;
         }
         else{
             dec=aux;
@@ -107,13 +109,21 @@ void listStatements(node* funcBody){
             }
             else{
                 if(count>=2){
-                    statList=createNode("StatList");
-                    statList->child=(dec->next);
-                    dec->next=statList;
+                    statList=createNode("StatList");                    
+                    if(flag){ //para o caso do 1º filho de funcBody ser nó Statement
+                        statList->child=(funcBody->child);
+                        funcBody->child=statList;
+                        flag=0;
+                    }
+                    else{ 
+                        statList->child=(dec->next);
+                        dec->next=statList;
+                    }                    
                     statList->next=aux->next;
                     aux->next=NULL;
                     aux=statList;                    
                 }
+                flag=0;
                 count=0;
                 dec=aux->next;
             } 
