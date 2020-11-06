@@ -88,7 +88,7 @@ functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1;
 functionDefinition: typeSpec functionDeclarator functionBody    {$$=createNode("FuncDefinition"); addChild($$,$1);addChild($$,$2);addChild($$,$3);}
     ;
 functionBody:   LBRACE RBRACE   {$$=createNode("FuncBody");}
-    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2);}
+    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2); listStatements($$);}
     ;
 declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($$,$2);}
     |   declaration declarationsAndStatements   {$$=$1; addNext($$,$2);}

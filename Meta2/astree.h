@@ -21,5 +21,6 @@ static void preOrder_(node *n, int h);
 void printTree(void);
 static void freeAll_(node *n); 
 void freeAll(void);
+void listStatements(node* funcBody);
 
 #endif
