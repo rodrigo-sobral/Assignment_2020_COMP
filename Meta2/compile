@@ -1,3 +1,0 @@
-lex $1.l 
-yacc -d -v $1.y
-gcc -o $1 y.tab.c lex.yy.c ast.c
