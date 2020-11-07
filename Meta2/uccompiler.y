@@ -16,7 +16,6 @@
     int errorFlag=0; 
     char buffer[100]; //aux
     int statFlag=0;
-    //nota:  no error semi meter yyerrok; ? n entendo bem o q faz
 %}
 
 %union{
@@ -103,13 +102,13 @@ functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1); 
     ;
 parameterList:  parameterDeclaration parametersAux   {$$=createNode("ParamList"); addChild($$,$1); if($2!=NULL){addChild($$,$2);}}
     ;
-parametersAux:  /*epsilon*/     {$$=NULL;}
+parametersAux:      {$$=NULL;}
     |   parametersAux COMMA parameterDeclaration {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
-    ;
+    ; 
 parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,$1);}
     |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2); addChild($$,createNode(buffer));}
     ;
-declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addChild($$,$3);}}
+declaration:  typeSpec declarator declaratorsAux SEMI    {struct node *n; $$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
     ;
 declaratorsAux: /*epsilon*/     {$$=NULL;}
     |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
@@ -121,7 +120,7 @@ typeSpec:   CHAR    {$$=createNode("Char");}
     |   DOUBLE  {$$=createNode("Double");}
     ;
 declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
-    |   ID ASSIGN expr  { sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
+    |   ID ASSIGN expr  { $$=createNode("Store"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer)); addChild($$,$3);}
     ;
 statement:  SEMI    {}  
     |   expr SEMI {$$=$1;}

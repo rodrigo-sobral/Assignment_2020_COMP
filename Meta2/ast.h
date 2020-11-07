@@ -15,6 +15,8 @@ typedef struct node{
 /*Function Declaration*/
 void initTree(node* n);
 node *createNode(char *str);
+node *getCopyNode(node *n);
+node *getDeclarationNodes(node* n,node *typeSpecNode);
 void addNext(node *n, node *next);
 void addChild(node *n, node *child);
 static void preOrder_(node *n, int h);
