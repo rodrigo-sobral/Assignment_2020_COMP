@@ -75,7 +75,8 @@
 
 %type <n> program functionsAndDeclarations functionDefinition functionBody declarationsAndStatements functionDeclaration functionDeclarator parameterList parametersAux parameterDeclaration declaration declaratorsAux typeSpec declarator statement expr statementsAux functionCall 
 %%
-program:    functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
+program: /*epsilon*/     {$$=createNode("Program"); initTree($$); addChild($$,createNode("Null"));}    
+    |   functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
     ;
 functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1; addNext($$,$2);}
     |   functionsAndDeclarations functionDeclaration     {$$=$1; addNext($$,$2);}
@@ -108,7 +109,7 @@ parametersAux:      {$$=NULL;}
 parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,$1);}
     |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2); addChild($$,createNode(buffer));}
     ;
-declaration:  typeSpec declarator declaratorsAux SEMI    {struct node *n; $$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
+declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
     ;
 declaratorsAux: /*epsilon*/     {$$=NULL;}
     |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
@@ -122,7 +123,7 @@ typeSpec:   CHAR    {$$=createNode("Char");}
 declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
     |   ID ASSIGN expr  { $$=createNode("Store"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer)); addChild($$,$3);}
     ;
-statement:  SEMI    {}  
+statement:  SEMI    {$$=NULL;}  
     |   expr SEMI {$$=$1;}
     |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=$2;} else{$$=NULL;}}
     |   LBRACE error RBRACE {$$=NULL;}
