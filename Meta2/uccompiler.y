@@ -75,8 +75,7 @@
 
 %type <n> program functionsAndDeclarations functionDefinition functionBody declarationsAndStatements functionDeclaration functionDeclarator parameterList parametersAux parameterDeclaration declaration declaratorsAux typeSpec declarator statement expr statementsAux functionCall 
 %%
-program: /*epsilon*/     {$$=createNode("Program"); initTree($$); addChild($$,createNode("Null"));}    
-    |   functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
+program:    functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
     ;
 functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1; addNext($$,$2);}
     |   functionsAndDeclarations functionDeclaration     {$$=$1; addNext($$,$2);}
@@ -121,7 +120,7 @@ typeSpec:   CHAR    {$$=createNode("Char");}
     |   DOUBLE  {$$=createNode("Double");}
     ;
 declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
-    |   ID ASSIGN expr  { $$=createNode("Store"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer)); addChild($$,$3);}
+    |   ID ASSIGN expr  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
     ;
 statement:  SEMI    {$$=NULL;}  
     |   expr SEMI {$$=$1;}
