@@ -78,9 +78,9 @@
 %%
 program:    functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
     ;
-functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1; addNext($1,$2);}
-    |   functionsAndDeclarations functionDeclaration     {$$=$1; addNext($1,$2);}
-    |   functionsAndDeclarations declaration  {$$=$1; addNext($1,$2);}
+functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1; addNext($$,$2);}
+    |   functionsAndDeclarations functionDeclaration     {$$=$1; addNext($$,$2);}
+    |   functionsAndDeclarations declaration  {$$=$1; addNext($$,$2);}
     |   functionDefinition  {$$=$1;}
     |   functionDeclaration     {$$=$1;}
     |   declaration  {$$=$1;}
@@ -97,9 +97,9 @@ declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext(
     |   error SEMI  {$$=NULL;}
     |   error SEMI declarationsAndStatements {$$=NULL;}
     ;
-functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration");addChild($$,$1);addChild($$,$2);}
+functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration"); addChild($$,$1); addChild($$,$2);}
     ;
-functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
+functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);} 
     ;
 parameterList:  parameterDeclaration parametersAux   {$$=createNode("ParamList"); addChild($$,$1); if($2!=NULL){addChild($$,$2);}}
     ;
@@ -131,7 +131,7 @@ statement:  SEMI    {}
     |   IF LPAR expr RPAR statement ELSE statement   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
     |   WHILE LPAR expr RPAR statement   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
     |   RETURN SEMI {$$=createNode("Return");}
-    |   RETURN expr SEMI    { $$=createNode("Return"); addChild($$,$2);}
+    |   RETURN expr SEMI    {$$=createNode("Return"); addChild($$,$2);}
     ;
 statementsAux:  /*epsilon*/   {$$=NULL;}
     |   statementsAux statement {
@@ -166,7 +166,7 @@ expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild(
     |   expr LT expr   {$$= createNode("Lt"); addChild($$,$1); addChild($$,$3); }
     |   expr GT expr   {$$= createNode("Gt"); addChild($$,$1); addChild($$,$3); }
     |   PLUS expr %prec NOT   {$$= createNode("Plus"); addChild($$,$2); }
-    |   MINUS expr %prec NOT    {$$= createNode("Minus"); addChild($$,$2); }
+    |   MINUS expr %prec NOT    {$$= createNode("Minus"); addChild($$,$2); }   
     |   NOT expr   {$$= createNode("Not"); addChild($$,$2); }
     |   functionCall    {$$=$1;}
     |   ID   {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
@@ -179,7 +179,7 @@ expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild(
 functionCall: ID LPAR RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer));}
     |   ID LPAR expr RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1); addChild($$,createNode(buffer)); addChild($$,$3);}
     |   ID LPAR error RPAR  {$$=NULL;}
-
+    ;
 
 %%
 
