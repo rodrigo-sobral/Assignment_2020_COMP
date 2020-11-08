@@ -108,7 +108,7 @@ parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,
     |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2); addChild($$,createNode(buffer));}
     ;
 declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
-    |   error SEMI {$$=NULL; printf("UHLALA\n");}
+    |   error SEMI {$$=NULL;}
     ;
 declaratorsAux: /*epsilon*/     {$$=NULL;}
     |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
@@ -131,7 +131,7 @@ statement:  SEMI    {$$=NULL;}
     |   WHILE LPAR expr RPAR statement   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
     |   RETURN SEMI {$$=createNode("Return");}
     |   RETURN expr SEMI    {$$=createNode("Return"); addChild($$,$2);}
-    |   error SEMI {$$=NULL; printf("LALALA\n");}
+    |   error SEMI {$$=NULL;}
     ;
 statementsAux:  /*epsilon*/   {$$=NULL;}
     |   statementsAux statement {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
