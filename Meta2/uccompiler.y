@@ -15,7 +15,6 @@
     extern char* yytext;
     int errorFlag=0; 
     char buffer[100]; //aux
-    int statFlag=0;
 %}
 
 %union{
@@ -70,7 +69,9 @@
 %left   PLUS MINUS
 %left   MOD DIV MUL
 %right  NOT
-%right THEN ELSE
+
+%nonassoc THEN
+%nonassoc ELSE
 
 
 %type <n> program functionsAndDeclarations functionDefinition functionBody declarationsAndStatements functionDeclaration functionDeclarator parameterList parametersAux parameterDeclaration declaration declaratorsAux typeSpec declarator statement expr statementsAux functionCall 
@@ -87,14 +88,12 @@ functionsAndDeclarations:   functionsAndDeclarations functionDefinition  {$$=$1;
 functionDefinition: typeSpec functionDeclarator functionBody    {$$=createNode("FuncDefinition"); addChild($$,$1);addChild($$,$2);addChild($$,$3);}
     ;
 functionBody:   LBRACE RBRACE   {$$=createNode("FuncBody");}
-    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2); /*listStatements($$);*/}
+    |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2);}
     ;
 declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($$,$2);}
     |   declaration declarationsAndStatements   {$$=$1; addNext($$,$2);}
     |   statement   {$$=$1;}
     |   declaration {$$=$1;}
-    |   error SEMI  {$$=NULL;}
-    |   error SEMI declarationsAndStatements {$$=NULL;}
     ;
 functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration"); addChild($$,$1); addChild($$,$2);}
     ;
@@ -109,6 +108,7 @@ parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,
     |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2); addChild($$,createNode(buffer));}
     ;
 declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
+    |   error SEMI {$$=NULL; printf("UHLALA\n");}
     ;
 declaratorsAux: /*epsilon*/     {$$=NULL;}
     |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
@@ -124,27 +124,17 @@ declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
     ;
 statement:  SEMI    {$$=NULL;}  
     |   expr SEMI {$$=$1;}
-    |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=$2;} else{$$=NULL;}}
+    |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=listStatements($2);} else{$$=NULL;}}
     |   LBRACE error RBRACE {$$=NULL;}
     |   IF LPAR expr RPAR statement %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5);}
     |   IF LPAR expr RPAR statement ELSE statement   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
     |   WHILE LPAR expr RPAR statement   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
     |   RETURN SEMI {$$=createNode("Return");}
     |   RETURN expr SEMI    {$$=createNode("Return"); addChild($$,$2);}
+    |   error SEMI {$$=NULL; printf("LALALA\n");}
     ;
 statementsAux:  /*epsilon*/   {$$=NULL;}
-    |   statementsAux statement {
-                                    if($1!=NULL){
-                                        if(statFlag==0){
-                                            $$=createNode("StatList"); addChild($$,$1); addChild($$,$2);
-                                            statFlag=1;
-                                        }
-                                        else{
-                                            $$=$1; addChild($$,$2); /*add child to StatList node*/
-                                        }                                        
-                                    }
-                                    else{$$=$2; statFlag=0;}                               
-                                }
+    |   statementsAux statement {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
     ;
 expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild($$,$3); }
     |   expr COMMA expr {$$= createNode("Comma"); addChild($$,$1); addChild($$,$3);}
