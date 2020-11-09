@@ -126,14 +126,15 @@ statement:  SEMI    {$$=NULL;}
     |   exprComplete SEMI {$$=$1;}
     |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=listStatements($2);} else{$$=NULL;}}
     |   LBRACE error RBRACE {$$=NULL;}
+    |   LBRACE RBRACE   {$$=NULL;}
     |   IF LPAR exprComplete RPAR statementError %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5);}
     |   IF LPAR exprComplete RPAR statementError ELSE statementError   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
     |   WHILE LPAR exprComplete RPAR statementError   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
     |   RETURN SEMI {$$=createNode("Return");}
     |   RETURN exprComplete SEMI    {$$=createNode("Return"); addChild($$,$2);}
     ;
-statementsAux:  /*epsilon*/   {$$=NULL;}
-    |   statementsAux statement {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
+statementsAux:  statementError   {$$=$1;}
+    |   statementsAux statementError {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
     ;
 statementError:  SEMI    {$$=NULL;}  
     |   exprComplete SEMI {$$=$1;}
