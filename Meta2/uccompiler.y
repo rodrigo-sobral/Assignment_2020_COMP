@@ -74,7 +74,7 @@
 %nonassoc ELSE
 
 
-%type <n> program functionsAndDeclarations functionDefinition functionBody declarationsAndStatements functionDeclaration functionDeclarator parameterList parametersAux parameterDeclaration declaration declaratorsAux typeSpec declarator statement expr statementsAux exprList exprComplete statementError functionCall 
+%type <n> program functionsAndDeclarations functionDefinition functionBody declarationsAndStatements functionDeclaration functionDeclarator parameterList parametersAux parameterDeclaration declaration declaratorsAux typeSpec declarator statement expr statementsAux exprList exprComplete functionCall 
 %%
 program:    functionsAndDeclarations    {$$=createNode("Program"); initTree($$); addChild($$,$1);}
     ;
@@ -122,30 +122,19 @@ typeSpec:   CHAR    {$$=createNode("Char");}
 declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
     |   ID ASSIGN exprComplete  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer); addNext($$,$3);}
     ;
-statement:  SEMI    {$$=NULL;}  
+statement:  SEMI    {$$=createNode("Null");}   
     |   exprComplete SEMI {$$=$1;}
     |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=listStatements($2);} else{$$=NULL;}}
     |   LBRACE error RBRACE {$$=NULL;}
-    |   LBRACE RBRACE   {$$=NULL;}
-    |   IF LPAR exprComplete RPAR statementError %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5);}
-    |   IF LPAR exprComplete RPAR statementError ELSE statementError   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
-    |   WHILE LPAR exprComplete RPAR statementError   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
-    |   RETURN SEMI {$$=createNode("Return");}
+    |   LBRACE RBRACE   {$$=createNode("Null");}
+    |   IF LPAR exprComplete RPAR statement %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,createNode("Null"));}
+    |   IF LPAR exprComplete RPAR statement ELSE statement   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
+    |   WHILE LPAR exprComplete RPAR statement   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
+    |   RETURN SEMI {$$=createNode("Return"); addChild($$,createNode("Null"));}
     |   RETURN exprComplete SEMI    {$$=createNode("Return"); addChild($$,$2);}
     ;
-statementsAux:  statementError   {$$=$1;}
-    |   statementsAux statementError {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
-    ;
-statementError:  SEMI    {$$=NULL;}  
-    |   exprComplete SEMI {$$=$1;}
-    |   LBRACE statementsAux RBRACE   {if($2!=NULL){$$=listStatements($2);} else{$$=NULL;}}
-    |   LBRACE error RBRACE {$$=NULL;}
-    |   IF LPAR exprComplete RPAR statementError %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5);}
-    |   IF LPAR exprComplete RPAR statementError ELSE statementError   {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
-    |   WHILE LPAR exprComplete RPAR statementError   {$$=createNode("While"); addChild($$,$3); addChild($$,$5);}
-    |   RETURN SEMI {$$=createNode("Return");}
-    |   RETURN exprComplete SEMI    {$$=createNode("Return"); addChild($$,$2);}
-    |   error SEMI {$$=NULL;}
+statementsAux:  statement   {$$=$1;}
+    |   statementsAux statement {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
     ;
 
 expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild($$,$3); }
