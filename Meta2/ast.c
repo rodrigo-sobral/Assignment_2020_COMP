@@ -36,23 +36,17 @@ node *getCopyNode(node *n){
 node *getDeclarationNodes(node* n,node *typeSpecNode){
     //recebe o 1º nó d'uma lista ligada de declarator's
     //e recebe o nó com o typespec da declaration
-    node *aux=n;
-    node *aux1=aux->next;
-    node *d=createNode("Declaration");
-    node *declaration=d;
-    addChild(declaration,getCopyNode(typeSpecNode));
-    aux->next=NULL;
-    addChild(declaration,aux);
-    while(aux1!=NULL){
-        declaration=createNode("Declaration");
-        addChild(declaration,getCopyNode(typeSpecNode));
-        aux=aux1;
-        aux1->next=NULL;
-        addChild(declaration,aux);
-        addNext(d,declaration);
-        aux1=aux->next;
+    node *decAux=n;
+    node *aux;
+    while(decAux!=NULL){
+        aux=decAux->child;
+        decAux->child=getCopyNode(typeSpecNode);
+        decAux->child->next=aux;
+
+        decAux=decAux->next; //iterate no next declaration node
     }
-    return d;
+
+    return n;
 }
 
 void addNext(node *n, node *next)

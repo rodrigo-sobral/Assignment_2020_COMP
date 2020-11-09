@@ -111,7 +111,7 @@ declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declara
     |   error SEMI {$$=NULL;}
     ;
 declaratorsAux: /*epsilon*/     {$$=NULL;}
-    |   declaratorsAux COMMA declarator  {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
+    |   declaratorsAux COMMA declarator  {struct node *n;  if($1!=NULL){$$=$1; n=createNode("Declaration"); addChild(n,$3); addNext($$,n);} else{n=createNode("Declaration"); addChild(n,$3); $$=n;}}
     ;
 typeSpec:   CHAR    {$$=createNode("Char");}
     |   INT {$$=createNode("Int");}
@@ -136,7 +136,6 @@ statement:  SEMI    {$$=createNode("Null");}
 statementsAux:  statement   {$$=$1;}
     |   statementsAux statement {if($1!=NULL){addNext($1,$2); $$=$1;} else{$$=$2;}}
     ;
-
 expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild($$,$3); }
     |   expr PLUS expr   {$$= createNode("Add"); addChild($$,$1); addChild($$,$3); }
     |   expr MINUS expr   {$$= createNode("Sub"); addChild($$,$1); addChild($$,$3); }
@@ -170,7 +169,7 @@ functionCall: ID LPAR RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1)
     |   ID LPAR error RPAR  {$$=NULL;}
     ;
 exprList:   expr {$$=$1;}
-    |   exprList COMMA expr  {$$= $1; addNext($$,$3); /*$$= createNode("Comma"); addChild($$,$1); addChild($$,$3);*/}
+    |   exprList COMMA expr  {$$= $1; addNext($$,$3);}
     ;
 exprComplete: expr  {$$=$1;}
     |   exprComplete COMMA expr {$$= createNode("Comma"); addChild($$,$1); addChild($$,$3);}
@@ -178,6 +177,7 @@ exprComplete: expr  {$$=$1;}
 %%
 
 void yyerror (char *s) { //sintax errors
-    printf("Line %d, col %d: %s: %s\n", lineNum,colNum-yyleng,s,yytext);
+    if(colNum-yyleng<=0) printf("Line %d, col %d: %s: %s\n", lineNum,colNum,s,yytext);
+    else printf("Line %d, col %d: %s: %s\n", lineNum,colNum-yyleng,s,yytext);
     errorFlag=1; //syntax error happened!
 }
