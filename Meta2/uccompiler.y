@@ -180,7 +180,7 @@ exprComplete: expr  {$$=$1;}
 %%
 
 void yyerror (char *s) { //sintax errors
-    if(colNum-yyleng<=0) printf("Line %d, col %d: %s: %s\n", lineNum,colNum,s,yytext);
+    if(programIsEmpty()) printf("Line %d, col %d: %s: %s\n", 1,1,s,yytext);
     else printf("Line %d, col %d: %s: %s\n", lineNum,colNum-yyleng,s,yytext);
     errorFlag=1; //syntax error happened!
 }

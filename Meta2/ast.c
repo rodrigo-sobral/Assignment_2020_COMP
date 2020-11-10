@@ -15,6 +15,13 @@ void initTree(node *n)
     root = n; //set tree root
 }
 
+int programIsEmpty(void){
+    if(root==NULL)
+        return 1;
+    else
+        return 0;    
+}
+
 node *createNode(char *str)
 {
     node *n;

@@ -14,6 +14,7 @@ typedef struct node{
 
 /*Function Declaration*/
 void initTree(node* n);
+int programIsEmpty(void);
 node *createNode(char *str);
 node *getCopyNode(node *n);
 node *getDeclarationNodes(node* n,node *typeSpecNode);
