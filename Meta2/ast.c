@@ -105,23 +105,3 @@ static void freeAll_(node *n)
         free(n);
     }
 }
-
-node* listStatements(node *n){
-    //recebe o nó inicial da lista ligada com nós statements
-    //função agrupa statements em StatList e devolve ponteiro para nó StatList (se o nr de nós statements for >=2)
-    int count=0;
-    node *aux=n;
-    node *statList=createNode("StatList");
-    while(aux!=NULL){
-        count++;
-        aux=aux->next;
-    }
-
-    if(count>=2){
-        addChild(statList,n);
-        return statList;
-    }
-    else{
-        return n;
-    }
-}

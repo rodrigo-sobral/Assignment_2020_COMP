@@ -23,6 +23,5 @@ static void preOrder_(node *n, int h);
 void printTree(void);
 static void freeAll_(node *n); 
 void freeAll(void);
-node* listStatements(node* n);
 
 #endif
