@@ -4,6 +4,7 @@
     //Rodrigo Fernando Henriques Sobral     2018298209
     #include <stdlib.h>
     #include <stdio.h>
+    #include <string.h>
     #include "y.tab.h"
     #include "ast.h"
 
@@ -180,7 +181,7 @@ exprComplete: expr  {$$=$1;}
 %%
 
 void yyerror (char *s) { //sintax errors
-    if(programIsEmpty()) printf("Line %d, col %d: %s: %s\n", 1,1,s,yytext);
+    if(strlen(yytext)==0) printf("Line %d, col %d: %s: %s\n", 1,1,s,yytext);
     else printf("Line %d, col %d: %s: %s\n", lineNum,colNum-yyleng,s,yytext);
     errorFlag=1; //syntax error happened!
 }

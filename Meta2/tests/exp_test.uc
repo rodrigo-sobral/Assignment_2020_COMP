@@ -1,13 +1,10 @@
-void soma(int a, char b) {
-    prinft('v');
-    print(15.434);
-}
-
 void soma(int a, char b);
+void subt(int, char, double);
 
-int main(void) {
+int main(void, void) {
     char a= -4+3-(-3);
     int b=a+4-(-a);
+    char
 
     while ( ( a == 3 && b < a ) || a < 3 ) {
         a=b;
