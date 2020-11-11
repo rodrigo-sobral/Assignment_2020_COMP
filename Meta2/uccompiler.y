@@ -134,7 +134,7 @@ statement:  SEMI    {$$=createNode("Null");}
     |   RETURN SEMI {$$=createNode("Return"); addChild($$,createNode("Null"));}
     |   RETURN exprComplete SEMI    {$$=createNode("Return"); addChild($$,$2);}
     ;
-statementsAux:  statError   {$$=$1;}
+statementsAux:  statError   {if(isNullNode($1){$$=NULL;} else{$$=$1;}}
     |   statementsAux statError {if($1!=NULL){$$=$1; if(!isNullNode($2)){addNext($$,$2);}} else{if(!isNullNode($2)){$$=$2;} else{$$=NULL;}}}
     ;
 statError: statement    {$$=$1;}
