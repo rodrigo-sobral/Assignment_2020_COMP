@@ -125,7 +125,7 @@ declarator: ID  {sprintf(buffer, "Id(%s)", $1); $$=createNode(buffer);}
     ;
 statement:  SEMI    {$$=createNode("Null");}   
     |   exprComplete SEMI {$$=$1;}
-    |   LBRACE statementsAux RBRACE   {if($2!=NULL){if(($2)->next!=NULL){$$=createNode("StatList"); addChild($$,$2);} else{$$=$2;}} else{$$=NULL;}}
+    |   LBRACE statementsAux RBRACE   {if($2!=NULL){if(($2)->next!=NULL){$$=createNode("StatList"); addChild($$,$2);} else{$$=$2;}} else{$$=createNode("Null");}}
     |   LBRACE error RBRACE {$$=NULL;}
     |   LBRACE RBRACE   {$$=createNode("Null");}
     |   IF LPAR exprComplete RPAR statError %prec THEN  {$$=createNode("If"); addChild($$,$3); addChild($$,$5); addChild($$,createNode("Null"));}
@@ -134,7 +134,7 @@ statement:  SEMI    {$$=createNode("Null");}
     |   RETURN SEMI {$$=createNode("Return"); addChild($$,createNode("Null"));}
     |   RETURN exprComplete SEMI    {$$=createNode("Return"); addChild($$,$2);}
     ;
-statementsAux:  statError   {if(isNullNode($1){$$=NULL;} else{$$=$1;}}
+statementsAux:  statError   {if(isNullNode($1)){$$=NULL;} else{$$=$1;}}
     |   statementsAux statError {if($1!=NULL){$$=$1; if(!isNullNode($2)){addNext($$,$2);}} else{if(!isNullNode($2)){$$=$2;} else{$$=NULL;}}}
     ;
 statError: statement    {$$=$1;}
