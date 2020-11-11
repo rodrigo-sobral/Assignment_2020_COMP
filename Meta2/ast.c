@@ -56,6 +56,13 @@ node *getDeclarationNodes(node* n,node *typeSpecNode){
     return n;
 }
 
+int isNullNode(node *n){
+    if(n!=NULL&&(strcmp(n->str,"Null")==0))
+        return 1;
+    else
+        return 0;
+}
+
 void addNext(node *n, node *next)
 {
     if (n == NULL || next == NULL)

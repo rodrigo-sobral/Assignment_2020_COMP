@@ -18,6 +18,7 @@ int programIsEmpty(void);
 node *createNode(char *str);
 node *getCopyNode(node *n);
 node *getDeclarationNodes(node* n,node *typeSpecNode);
+int isNullNode(node *n);
 void addNext(node *n, node *next);
 void addChild(node *n, node *child);
 static void preOrder_(node *n, int h);

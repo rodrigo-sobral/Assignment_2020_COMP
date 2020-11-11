@@ -91,10 +91,10 @@ functionDefinition: typeSpec functionDeclarator functionBody    {$$=createNode("
 functionBody:   LBRACE RBRACE   {$$=createNode("FuncBody");}
     |   LBRACE declarationsAndStatements RBRACE {$$=createNode("FuncBody"); addChild($$,$2);}
     ;
-declarationsAndStatements:  statement declarationsAndStatements {$$=$1; addNext($$,$2);}
-    |   declaration declarationsAndStatements   {$$=$1; addNext($$,$2);}
-    |   statement   {$$=$1;}
-    |   declaration {$$=$1;}
+declarationsAndStatements:  statement declarationsAndStatements {if(isNullNode($1)){$$=$2;} else{$$=$1; addNext($$,$2);}}
+    |   declaration declarationsAndStatements   {if(isNullNode($1)){$$=$2;} else{$$=$1; addNext($$,$2);}}
+    |   statement   {if(isNullNode($1)){$$=NULL;} else{$$=$1;}}
+    |   declaration {if(isNullNode($1)){$$=NULL;} else{$$=$1;}}
     ;
 functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration"); addChild($$,$1); addChild($$,$2);}
     ;
@@ -181,7 +181,7 @@ exprComplete: expr  {$$=$1;}
 %%
 
 void yyerror (char *s) { //sintax errors
-    if(strlen(yytext)==0) printf("Line %d, col %d: %s: %s\n", 1,1,s,yytext);
+    if(strlen(yytext)==0) printf("Line %d, col %d: %s: %s\n", lineNum,colNum,s,yytext);
     else printf("Line %d, col %d: %s: %s\n", lineNum,colNum-yyleng,s,yytext);
     errorFlag=1; //syntax error happened!
 }
