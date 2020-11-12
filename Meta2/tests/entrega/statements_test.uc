@@ -1,7 +1,10 @@
 void soma(int a, char b);
 void subt(int, char, double);
 
-int pila(void) {
+int a=3, b=5;
+int d=3, c=5; double t=3;
+
+int chama(void) {
     if (o==e) {
         ;;;
         while (1) {
