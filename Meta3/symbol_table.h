@@ -11,7 +11,7 @@ typedef enum {intlit, charlit, reallit, voidlit} _type;
 typedef struct sym {
     char *name; // symbol name e.g. putchar, return, ...
     _type type;
-    param* param_list; //list head
+    struct param* param_list; //list head
     int isFunc; //to distinguish between function and variable
     int isDec; //to flag func or variable declaration
     struct sym *next; 
@@ -19,7 +19,7 @@ typedef struct sym {
 
 typedef struct param{
     _type type;
-    param *next;
+    struct param *next;
 }param;
 
 typedef struct sym_table{
