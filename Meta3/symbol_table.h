@@ -5,7 +5,7 @@
 #ifndef SYMBOL_TABLE_H 
 #define SYMBOL_TABLE_H
 
-typedef enum {intlit, charlit, reallit} sym_type;
+typedef enum {intlit, charlit, reallit, voidlit} sym_type;
 
 /*Structures*/
 typedef struct sym{

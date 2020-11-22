@@ -10,7 +10,7 @@
     int lineNum=1,colNum=1; //line counter, collumn counter
     int auxL,auxC;    //to save aux values 
 
-    extern int errorFlag;
+    extern int sintaxErrorFlag;
 %}
 
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
             //do lexical and sintax analysis
             yyparse();   
             
-            if(!errorFlag){ //if no syntax error occurred 
+            if(!sintaxErrorFlag){ //if no syntax error occurred 
                 printTree();
             }
             freeAll();//dont forget to free up memory!            

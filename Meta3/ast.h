@@ -5,12 +5,19 @@
 #ifndef AST_H 
 #define AST_H
 
-/*Structures [linked lists tree]*/
+/*linked lists tree structure*/
 typedef struct node{
     char *str; //name
     struct node *next;
     struct node *child; 
 } node;
+
+/*token structure*/
+typedef struct token{
+    char* str;
+    int lineNum;
+    int colNum;
+}token;
 
 /*Function Declaration*/
 void initTree(node* n);
