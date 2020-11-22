@@ -7,7 +7,7 @@
 #include "ast.h"
 
 //Abstract Syntax Tree Root
-static node *root;
+node *root;
 
 /*Functions*/
 void initTree(node *n)
@@ -88,8 +88,7 @@ void printTree(void)
     preOrder_(root, 0);
 }
 
-static void preOrder_(node *n, int h)
-{
+static void preOrder_(node *n, int h){
     int i;
     if (n != NULL)
     {
@@ -101,12 +100,11 @@ static void preOrder_(node *n, int h)
     }
 }
 
-void freeAll(void)
-{
-    freeAll_(root);
+void freeTree(void){
+    freeTree_(root);
 }
 
-static void freeAll_(node *n)
+static void freeTree_(node *n)
 {
     if (n != NULL)
     {
@@ -118,4 +116,20 @@ static void freeAll_(node *n)
         free(n->str); //str
         free(n);
     }
+}
+
+
+
+/*create token struct*/
+token* createToken(char* str, int lineNum, int colNum){
+    token *tk;
+    if ((tk = (token *)malloc(sizeof(token))) == NULL)
+    {
+        fprintf(stderr, "Error allocating memory");
+        exit(-1);
+    }
+    tk->value = strdup(str);
+    tk->lineNum=lineNum;
+    tk->colNum=colNum;
+    return tk;
 }

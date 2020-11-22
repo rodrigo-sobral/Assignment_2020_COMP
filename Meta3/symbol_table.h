@@ -5,25 +5,37 @@
 #ifndef SYMBOL_TABLE_H 
 #define SYMBOL_TABLE_H
 
-typedef enum {intlit, charlit, reallit, voidlit} sym_type;
+typedef enum {intlit, charlit, reallit, voidlit} _type;
 
 /*Structures*/
-typedef struct sym{
+typedef struct sym {
     char *name; // symbol name e.g. putchar, return, ...
-    sym_type type;
-    struct sym *next; 
+    _type type;
+    param* param_list; //list head
     int isFunc; //to distinguish between function and variable
-    int isDef; //to flag func or variable definition
-}sym;
+    int isDec; //to flag func or variable declaration
+    struct sym *next; 
+} sym;
+
+typedef struct param{
+    _type type;
+    param *next;
+}param;
 
 typedef struct sym_table{
     char* name; //e.g. Function main, Global, ...
-    struct sym *head;
+    struct sym *sym_list; //list head
     struct sym_table *next;
-}sym_table;
+} sym_table;
 
+sym_table* create_global_table(void);
+sym_table* create_sym_table(char* name);
+sym *create_sym(char *name,_type type, int isfunc, int isdec);
+param* create_param(_type type);
 
+void add_sym(sym* s, sym* snext);
+void add_param(sym *s, _type type);
 
-
+struct sym* astToTable(struct node*);
 
 #endif

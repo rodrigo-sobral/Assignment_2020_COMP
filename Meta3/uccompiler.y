@@ -98,7 +98,7 @@ declarationsAndStatements:  statement declarationsAndStatements {if(isNullNode($
     ;
 functionDeclaration:    typeSpec functionDeclarator SEMI    {$$=createNode("FuncDeclaration"); addChild($$,$1); addChild($$,$2);}
     ;
-functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1->str); $$=createNode(buffer); addNext($$,$3);} 
+functionDeclarator: ID LPAR parameterList RPAR  {sprintf(buffer, "Id(%s)", $1->value); $$=createNode(buffer); addNext($$,$3);} 
     ;
 parameterList:  parameterDeclaration parametersAux   {$$=createNode("ParamList"); addChild($$,$1); if($2!=NULL){addChild($$,$2);}}
     ;
@@ -106,7 +106,7 @@ parametersAux:      {$$=NULL;}
     |   parametersAux COMMA parameterDeclaration {if($1!=NULL){$$=$1; addNext($$,$3);} else{$$=$3;}}
     ; 
 parameterDeclaration:  typeSpec {$$=createNode("ParamDeclaration"); addChild($$,$1);}
-    |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2->str); addChild($$,createNode(buffer));}
+    |   typeSpec ID {$$=createNode("ParamDeclaration"); addChild($$,$1); sprintf(buffer, "Id(%s)", $2->value); addChild($$,createNode(buffer));}
     ;
 declaration:  typeSpec declarator declaratorsAux SEMI    {$$=createNode("Declaration"); addChild($$,$1); addChild($$,$2); if($3!=NULL){addNext($$,getDeclarationNodes($3,$1));}}
     |   error SEMI {$$=NULL;}
@@ -120,8 +120,8 @@ typeSpec:   CHAR    {$$=createNode("Char");}
     |   SHORT   {$$=createNode("Short");}
     |   DOUBLE  {$$=createNode("Double");}
     ;
-declarator: ID  {sprintf(buffer, "Id(%s)", $1->str); $$=createNode(buffer);}
-    |   ID ASSIGN exprComplete  {sprintf(buffer, "Id(%s)", $1->str); $$=createNode(buffer); addNext($$,$3);}
+declarator: ID  {sprintf(buffer, "Id(%s)", $1->value); $$=createNode(buffer);}
+    |   ID ASSIGN exprComplete  {sprintf(buffer, "Id(%s)", $1->value); $$=createNode(buffer); addNext($$,$3);}
     ;
 statement:  SEMI    {$$=createNode("Null");}   
     |   exprComplete SEMI {$$=$1;}
@@ -161,15 +161,15 @@ expr:   expr ASSIGN expr    {$$= createNode("Store"); addChild($$,$1); addChild(
     |   MINUS expr %prec NOT    {$$= createNode("Minus"); addChild($$,$2); }   
     |   NOT expr   {$$= createNode("Not"); addChild($$,$2); }
     |   functionCall    {$$=$1;}
-    |   ID   {sprintf(buffer, "Id(%s)", $1->str); $$=createNode(buffer);}
-    |   INTLIT  {sprintf(buffer, "IntLit(%s)", $1->str); $$=createNode(buffer);}
-    |   CHRLIT  {sprintf(buffer, "ChrLit(%s)", $1->str); $$=createNode(buffer);}
-    |   REALLIT {sprintf(buffer, "RealLit(%s)", $1->str); $$=createNode(buffer);}
+    |   ID   {sprintf(buffer, "Id(%s)", $1->value); $$=createNode(buffer);}
+    |   INTLIT  {sprintf(buffer, "IntLit(%s)", $1->value); $$=createNode(buffer);}
+    |   CHRLIT  {sprintf(buffer, "ChrLit(%s)", $1->value); $$=createNode(buffer);}
+    |   REALLIT {sprintf(buffer, "RealLit(%s)", $1->value); $$=createNode(buffer);}
     |   LPAR exprComplete RPAR  {$$=$2;}
     |   LPAR error RPAR {$$=NULL;}
     ;
-functionCall: ID LPAR RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1->str); addChild($$,createNode(buffer));}
-    |   ID LPAR exprList RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1->str); addChild($$,createNode(buffer)); addChild($$,$3);}
+functionCall: ID LPAR RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer));}
+    |   ID LPAR exprList RPAR {$$=createNode("Call"); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer)); addChild($$,$3);}
     |   ID LPAR error RPAR  {$$=NULL;}
     ;
 exprList:   expr {$$=$1;}
