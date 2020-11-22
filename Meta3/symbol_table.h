@@ -32,10 +32,7 @@ sym_table* create_global_table(void);
 sym_table* create_sym_table(char* name);
 sym *create_sym(char *name,_type type, int isfunc, int isdec);
 param* create_param(_type type);
-
 void add_sym(sym* s, sym* snext);
 void add_param(sym *s, _type type);
-
-struct sym* astToTable(struct node*);
 
 #endif

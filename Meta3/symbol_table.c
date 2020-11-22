@@ -6,11 +6,11 @@
 #include <string.h>
 #include "symbol_table.h"
 #include "ast.h"
+
 /*
 st=symtable
 s=sym
 */
-struct sym_table* st_root;
 
 sym_table* create_sym_table(char* name) {
     sym_table *st;
@@ -39,7 +39,7 @@ sym_table* create_global_table(void) {
     add_param(aux, intlit);
     add_sym(st->sym_list, aux);
     
-    st_root=st; 
+    return st;
 }
 /********************************************************/
 sym *create_sym(char *name,_type type, int isfunc, int isdec){
