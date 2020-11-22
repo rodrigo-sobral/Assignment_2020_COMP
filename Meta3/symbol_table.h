@@ -23,7 +23,4 @@ typedef struct sym_table{
 }sym_table;
 
 
-
-
-
 #endif
