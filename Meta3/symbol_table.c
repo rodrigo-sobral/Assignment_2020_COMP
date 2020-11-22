@@ -29,15 +29,15 @@ sym_table* create_global_table(void) {
     sym_table* st=create_sym_table("Global");
     aux=  create_sym("putchar", intlit, 1, 1);
     add_param(aux, intlit);
-    add_sym(st->sym_list, aux);
+    add_sym(st, aux);
     
     aux= create_sym("getchar", intlit, 1, 1);
     add_param(aux, intlit);
-    add_sym(st->sym_list, aux);
+    add_sym(st, aux);
     
     aux= create_sym("main", intlit, 1, 1);
     add_param(aux, intlit);
-    add_sym(st->sym_list, aux);
+    add_sym(st, aux);
     
     return st;
 }
@@ -57,13 +57,17 @@ sym *create_sym(char *name,_type type, int isfunc, int isdec){
     return s;
 }
 
-void add_sym(sym* s, sym* snext){
-    sym *aux;
-    if(s!=NULL){
-        aux=s;
+void add_sym(sym_table* st, sym* s){
+    sym *aux=NULL;
+    if(st->sym_list!=NULL){
+        aux=st->sym_list;
         while(aux->next!=NULL) aux=aux->next;
-        aux->next=snext;
-    } else { s= snext; }
+        aux->next=s;
+    }
+    else{
+        st->sym_list=s;
+    }
+
 }
 /*************************************************/
 void add_param(sym *s, _type type){

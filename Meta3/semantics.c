@@ -15,11 +15,12 @@ void semanticAnalysis(node* ast_root){
 }
 
 void buildSymbolTables(node* ast_root){
-    node* ast_node=ast_root;
+    node* ast_node=ast_root->child; //lista ligada de func e variaveis globais
     st_root=create_global_table();
     /*funcDefinition funcDeclaration declaration */
     while(ast_node!=NULL){
-        
+        st_root
+        ast_node=ast_node->next;
     }
 
 }
