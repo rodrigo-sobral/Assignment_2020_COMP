@@ -10,8 +10,7 @@
 node *root;
 
 /*Functions*/
-void initTree(node *n)
-{
+void initTree(node *n){
     root = n; //set tree root
 }
 
