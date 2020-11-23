@@ -35,7 +35,7 @@ sym_table* create_global_table(void) {
     aux= create_sym("getchar", intlit, 1, 1);
     add_param(aux, intlit);
     add_sym(st, aux);
-    
+
     /*
     aux= create_sym("main", intlit, 1, 0);
     add_param(aux, voidlit);
@@ -72,7 +72,6 @@ sym *create_sym(char *name,_type type, int isfunc, int isdef){
         exit(-1);
     }
     s->param_list=NULL;
-    //s->declar_list=NULL;
     s->next = NULL;
     s->isDef=isdef;
     s->isFunc=isfunc;
@@ -93,13 +92,14 @@ void add_sym(sym_table* st, sym* s){
 sym* get_sym(sym* s,sym_table* st){
     sym *aux=st->sym_list;
     while(aux!=NULL){
-        if(strcmp(aux->name,s->name)==0&&s->isFunc==aux->isFunc) return aux; 
+        if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
         aux=aux->next;
     } return NULL;
 }
 
+
 void free_sym(sym *s){
-    if(s!=NULL){
+    if (s) {
         free(s->name);
         free_param_list(s->param_list);
         free(s);
@@ -108,14 +108,12 @@ void free_sym(sym *s){
 /*************************************************/
 void add_param(sym *s, _type type){
     param *aux;
-    if(s->param_list!=NULL){
+    if(s->param_list){
         aux=s->param_list;
-        while(aux->next!=NULL)  aux=aux->next;
+        while(aux->next)  aux=aux->next;
         aux->next=create_param(type);
     }
-    else{
-        s->param_list=create_param(type);
-    }
+    else s->param_list=create_param(type);
 }
 
 param* create_param(_type type){

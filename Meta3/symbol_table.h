@@ -22,13 +22,7 @@ typedef struct param{
     _type type;
     struct param *next;
 }param;
-/*
-typedef struct declar{
-    char* name;
-    _type type;
-    struct param *next;
-} declar;
-*/
+
 typedef struct sym_table{
     char* name; //e.g. Function main, Global, ...
     struct sym *sym_list; //list head
@@ -39,7 +33,7 @@ sym_table* create_global_table(void);
 sym_table* create_sym_table(char* name);
 void add_sym_table(sym_table *st);
 sym_table *get_sym_table(char* name);
-sym *create_sym(char *name,_type type, int isfunc, int isdec);
+sym *create_sym(char *name,_type type, int isfunc, int isdef);
 param* create_param(_type type);
 void add_sym(sym_table* st, sym* s);
 sym* get_sym(sym* s,sym_table* st);

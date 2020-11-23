@@ -13,5 +13,6 @@ void handle_funcDecs(node* n);
 void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode);
 int isDeclared(sym *s, sym_table *st);
 int check_params_list_types(sym *s0, sym *s1);
+int paramsCounter(struct param* param_list);
 
 #endif

@@ -1,0 +1,140 @@
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+c1	char
+c2	char
+s	short
+t	short
+i	int
+j	int
+d	double
+e	double
+f1	char(void)
+df	double(double,double)
+ii	int(int,char,double,short)
+dd	double
+sf	short(short)
+
+===== Function f1 Symbol Table =====
+return	char
+s	short
+i	int
+d	double
+
+===== Function df Symbol Table =====
+return	double
+d	double	param
+dd	double	param
+
+===== Function ii Symbol Table =====
+return	int
+i	int	param
+c	char	param
+d	double	param
+s	short	param
+
+===== Function sf Symbol Table =====
+return	short
+s	short	param
+
+Program
+..Declaration
+....Char
+....Id(c1)
+..Declaration
+....Char
+....Id(c2)
+..Declaration
+....Short
+....Id(s)
+..Declaration
+....Short
+....Id(t)
+..Declaration
+....Int
+....Id(i)
+..Declaration
+....Int
+....Id(j)
+..Declaration
+....Double
+....Id(d)
+..Declaration
+....Double
+....Id(e)
+..FuncDefinition
+....Char
+....Id(f1)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Declaration
+........Short
+........Id(s)
+......Declaration
+........Int
+........Id(i)
+......Declaration
+........Double
+........Id(d)
+......Return
+........Id(c1) - char
+..FuncDeclaration
+....Double
+....Id(df)
+....ParamList
+......ParamDeclaration
+........Double
+......ParamDeclaration
+........Double
+..FuncDefinition
+....Double
+....Id(df)
+....ParamList
+......ParamDeclaration
+........Double
+........Id(d)
+......ParamDeclaration
+........Double
+........Id(dd)
+....FuncBody
+......Return
+........Call - double
+..........Id(df) - double(double,double)
+..........Id(d) - double
+..........Id(e) - double
+..FuncDefinition
+....Int
+....Id(ii)
+....ParamList
+......ParamDeclaration
+........Int
+........Id(i)
+......ParamDeclaration
+........Char
+........Id(c)
+......ParamDeclaration
+........Double
+........Id(d)
+......ParamDeclaration
+........Short
+........Id(s)
+....FuncBody
+......Return
+........Add - int
+..........Id(i) - int
+..........Id(j) - int
+..Declaration
+....Double
+....Id(dd)
+..FuncDefinition
+....Short
+....Id(sf)
+....ParamList
+......ParamDeclaration
+........Short
+........Id(s)
+....FuncBody
+......Return
+........Id(t) - short
