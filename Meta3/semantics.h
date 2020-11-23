@@ -5,5 +5,13 @@
 #ifndef SEMANTICS_H 
 #define SEMANTICS_H
 
+void startSemanticAnalysis(node* ast_root);
+void buildSymbolTables(node* ast_root);
+void handle_varDecs(node *n);
+void handle_funcDefs(node* n);
+void handle_funcDefs(node* n);
+void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode);
+int isDeclared(sym *s, sym_table *st);
+int check_params_list(sym *s0, sym *s1);
 
 #endif

@@ -8,7 +8,7 @@
 /*linked lists tree structure*/
 typedef struct node{
     char *str; //name
-    //token *tk; //token value, lineNum,colNum
+    token *tk; //tk has-> value, lineNum,colNum
     struct node *next;
     struct node *child; 
 } node;
