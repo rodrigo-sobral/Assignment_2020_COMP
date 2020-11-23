@@ -22,7 +22,7 @@ int programIsEmpty(void){
         return 0;    
 }
 
-node *createNode(char *str)
+node *createNode(char *str, token *tk)
 {
     node *n;
     if ((n = (node *)malloc(sizeof(node))) == NULL)
@@ -33,6 +33,7 @@ node *createNode(char *str)
     n->next = NULL;
     n->child = NULL;
     n->str = strdup(str);
+    n->tk=tk; //VERIFICAR SE ESTE ASSIGNMENT FUNCIONA!
     return n;
 }
 

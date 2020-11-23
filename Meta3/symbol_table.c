@@ -7,6 +7,7 @@
 #include "symbol_table.h"
 #include "ast.h"
 
+extern struct sym_table* st_root; 
 /*
 st=symtable
 s=sym
@@ -34,15 +35,36 @@ sym_table* create_global_table(void) {
     aux= create_sym("getchar", intlit, 1, 1);
     add_param(aux, intlit);
     add_sym(st, aux);
-    
-    aux= create_sym("main", intlit, 1, 1);
-    add_param(aux, intlit);
-    add_sym(st, aux);
-    
+        
     return st;
 }
+
+void add_sym_table(sym_table *st){
+    sym_table *aux=st_root;
+    if(aux!=NULL){
+
+        while(aux->next!=NULL) aux=aux->next;
+        aux->next=st;
+    }
+    else{
+        st_root=st;
+    }
+}
+
+sym_table *get_sym_table(char* name){ 
+    //searches and returns sym_table if found (doesnt include global table!)
+    sym_table *aux;
+    if(st_root!=NULL){
+        aux=st_root->next;
+        while(aux!=NULL){
+            if(strcmp(aux->name,name)==0) return aux;
+            aux=aux->next;
+        }
+    }
+    return NULL;
+}
 /********************************************************/
-sym *create_sym(char *name,_type type, int isfunc, int isdec){
+sym *create_sym(char *name,_type type, int isfunc, int isdef){
     sym *s;
     if ((s = (sym *)malloc(sizeof(sym))) == NULL) {
         fprintf(stderr, "Error allocating memory");
@@ -50,7 +72,7 @@ sym *create_sym(char *name,_type type, int isfunc, int isdec){
     }
     s->param_list=NULL;
     s->next = NULL;
-    s->isDec=isdec;
+    s->isDef=isdef;
     s->isFunc=isfunc;
     s->type = type;
     s->name = strdup(name);
@@ -67,7 +89,25 @@ void add_sym(sym_table* st, sym* s){
     else{
         st->sym_list=s;
     }
+}
 
+sym* get_sym(sym* s,sym_table* st){
+    sym *aux=st->sym_list;
+    while(aux!=NULL){
+        if(strcmp(aux->name,s->name)==0&&s->isFunc==aux->isFunc){ 
+            return aux;
+        } 
+        aux=aux->next;
+    }
+    return NULL;
+}
+
+void free_sym(sym *s){
+    if(s!=NULL){
+        free(s->name);
+        free_param_list(s->param_list);
+        free(s);
+    }
 }
 /*************************************************/
 void add_param(sym *s, _type type){
@@ -89,62 +129,23 @@ param* create_param(_type type){
     p->next=NULL;
     return p;
 }
-/**********************************************/
-/*
-sym_table* astToTable(node *ast) {
-	sym_table* aux_t;
 
-	if (ast != NULL) {
-        if(strcmp(ast->str,"Program") == 0) {
-            syms_table= create_sym_table();
-
-		} else if (strcmp(ast->str,"Declaration") == 0) {
-
-		} else if (strcmp(ast->str,"ParamList") == 0) {
-
-		} else if (strcmp(ast->str,"FuncDeclaration") == 0) {
-
-		} else if (strcmp(ast->str,"FuncDefinition") == 0) {
-
-		} else if (strcmp(ast->str,"FuncBody") == 0) {
-			
-		} else if(strcmp(ast->str,"IntLit") == 0) {
-
-		} else if(strcmp(ast->str,"ChrLit") == 0) {
-
-		} else if(strcmp(ast->str,"Id") == 0) {
-
-		} else if(strcmp(ast->str,"Call") == 0) {
-
-		} else if(strcmp(ast->str,"Store") == 0) {
-
-		} else if(strcmp(ast->str, "Comma") == 0) {
-
-		} else if(strcmp(ast->str, "Not") == 0) {
-
-		} else if(strcmp(ast->str, "Lt") == 0 || strcmp(ast->str, "Gt") == 0 || strcmp(ast->str, "Le") == 0 || strcmp(ast->str, "Ge") == 0) {
-
-		} else if(strcmp(ast->str, "Eq") == 0 || strcmp(ast->str, "Ne") == 0) {
-
-		} else if(strcmp(ast->str, "Or") == 0 || strcmp(ast->str, "And") == 0) {
-
-		} else if(strcmp(ast->str, "Mul") == 0 || strcmp(ast->str, "Div") == 0 || strcmp(ast->str, "Mod") == 0) {
-
-		} else if(strcmp(ast->str, "Plus") == 0 || strcmp(ast->str, "Minus") == 0) {
-
-		} else if(strcmp(ast->str, "Add") == 0) {
-
-		} else if(strcmp(ast->str, "Sub") == 0) {
-			
-		} else if(strcmp(ast->str, "If") == 0) {
-						
-		} else if(strcmp(ast->str, "Return") == 0) {
-			
-		} else {
-
-		}
+void free_param_list(param* p){
+    param *aux;
+    if(p!=NULL){
+        aux=p;
+        while(p!=NULL){
+            aux=p->next;
+            free(p);
+            p=aux;
+        }
     }
-
-	return NULL;
 }
-*/
+/**********************************************/
+_type getType(char* str){
+    if(strcmp(str,"Char")==0) return charlit;
+    else if(strcmp(str,"Void")==0) return voidlit;
+    else if(strcmp(str,"Int")==0) return intlit;
+    else if(strcmp(str,"Short")==0) return shortlit;
+    else if(strcmp(str,"Double")==0) return reallit;
+}

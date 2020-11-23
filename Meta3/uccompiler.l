@@ -32,40 +32,40 @@ char [^\n\'\\]|{esc}
 
 
 %%
-char        {if(printTokenFlag){printf("CHAR\n");} colNum+=yyleng; if(parseFlag){return CHAR;}}
-int         {if(printTokenFlag){printf("INT\n");} colNum+=yyleng; if(parseFlag){return INT;}}
-short       {if(printTokenFlag){printf("SHORT\n");} colNum+=yyleng; if(parseFlag){return SHORT;}}
-double      {if(printTokenFlag){printf("DOUBLE\n");} colNum+=yyleng; if(parseFlag){return DOUBLE;}}
-void        {if(printTokenFlag){printf("VOID\n");} colNum+=yyleng; if(parseFlag){return VOID;}}
-if          {if(printTokenFlag){printf("IF\n");} colNum+=yyleng; if(parseFlag){return IF;}}
-else        {if(printTokenFlag){printf("ELSE\n");} colNum+=yyleng; if(parseFlag){return ELSE;}}
-while       {if(printTokenFlag){printf("WHILE\n");} colNum+=yyleng; if(parseFlag){return WHILE;}}
-return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFlag){return RETURN;}}
+char        {if(printTokenFlag){printf("CHAR\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return CHAR;}}
+int         {if(printTokenFlag){printf("INT\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return INT;}}
+short       {if(printTokenFlag){printf("SHORT\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return SHORT;}}
+double      {if(printTokenFlag){printf("DOUBLE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return DOUBLE;}}
+void        {if(printTokenFlag){printf("VOID\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return VOID;}}
+if          {if(printTokenFlag){printf("IF\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return IF;}}
+else        {if(printTokenFlag){printf("ELSE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return ELSE;}}
+while       {if(printTokenFlag){printf("WHILE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return WHILE;}}
+return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return RETURN;}}
 {reserved}  {if(printTokenFlag){printf("RESERVED(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum); return RESERVED;}}
-"("         {if(printTokenFlag){printf("LPAR\n");} colNum++; if(parseFlag){return LPAR;}}
-")"         {if(printTokenFlag){printf("RPAR\n");} colNum++; if(parseFlag){return RPAR;}}
-"{"         {if(printTokenFlag){printf("LBRACE\n");} colNum++; if(parseFlag){return LBRACE;}}
-"}"         {if(printTokenFlag){printf("RBRACE\n");} colNum++; if(parseFlag){return RBRACE;}}
-";"         {if(printTokenFlag){printf("SEMI\n");} colNum++; if(parseFlag){return SEMI;}} 
-","         {if(printTokenFlag){printf("COMMA\n");} colNum++; if(parseFlag){return COMMA;}} 
-"&&"        {if(printTokenFlag){printf("AND\n");} colNum+=yyleng; if(parseFlag){return AND;}}
-"||"        {if(printTokenFlag){printf("OR\n");} colNum+=yyleng; if(parseFlag){return OR;}}
-"&"         {if(printTokenFlag){printf("BITWISEAND\n");} colNum++; if(parseFlag){return BITWISEAND;}}
-"|"         {if(printTokenFlag){printf("BITWISEOR\n");} colNum++; if(parseFlag){return BITWISEOR;}}
-"^"         {if(printTokenFlag){printf("BITWISEXOR\n");} colNum++; if(parseFlag){return BITWISEXOR;}}
-"!="        {if(printTokenFlag){printf("NE\n");} colNum+=yyleng; if(parseFlag){return NE;}}
-"=="        {if(printTokenFlag){printf("EQ\n");} colNum+=yyleng; if(parseFlag){return EQ;}}
-">="        {if(printTokenFlag){printf("GE\n");} colNum+=yyleng; if(parseFlag){return GE;}}
-">"         {if(printTokenFlag){printf("GT\n");} colNum++; if(parseFlag){return GT;}}
-"<="        {if(printTokenFlag){printf("LE\n");} colNum+=yyleng; if(parseFlag){return LE;}}
-"<"         {if(printTokenFlag){printf("LT\n");} colNum++; if(parseFlag){return LT;}}
-"!"         {if(printTokenFlag){printf("NOT\n");} colNum++; if(parseFlag){return NOT;}}
-"="         {if(printTokenFlag){printf("ASSIGN\n");} colNum++; if(parseFlag){return ASSIGN;}}
-"*"         {if(printTokenFlag){printf("MUL\n");} colNum++; if(parseFlag){return MUL;}}
-"+"         {if(printTokenFlag){printf("PLUS\n");} colNum++; if(parseFlag){return PLUS;}}
-"-"         {if(printTokenFlag){printf("MINUS\n");} colNum++; if(parseFlag){return MINUS;}}
-"/"         {if(printTokenFlag){printf("DIV\n");} colNum++; if(parseFlag){return DIV;}}
-"%"         {if(printTokenFlag){printf("MOD\n");} colNum++; if(parseFlag){return MOD;}}
+"("         {if(printTokenFlag){printf("LPAR\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return LPAR;}}
+")"         {if(printTokenFlag){printf("RPAR\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return RPAR;}}
+"{"         {if(printTokenFlag){printf("LBRACE\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return LBRACE;}}
+"}"         {if(printTokenFlag){printf("RBRACE\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return RBRACE;}}
+";"         {if(printTokenFlag){printf("SEMI\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return SEMI;}} 
+","         {if(printTokenFlag){printf("COMMA\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return COMMA;}} 
+"&&"        {if(printTokenFlag){printf("AND\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return AND;}}
+"||"        {if(printTokenFlag){printf("OR\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return OR;}}
+"&"         {if(printTokenFlag){printf("BITWISEAND\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return BITWISEAND;}}
+"|"         {if(printTokenFlag){printf("BITWISEOR\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return BITWISEOR;}}
+"^"         {if(printTokenFlag){printf("BITWISEXOR\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return BITWISEXOR;}}
+"!="        {if(printTokenFlag){printf("NE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return NE;}}
+"=="        {if(printTokenFlag){printf("EQ\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return EQ;}}
+">="        {if(printTokenFlag){printf("GE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return GE;}}
+">"         {if(printTokenFlag){printf("GT\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return GT;}}
+"<="        {if(printTokenFlag){printf("LE\n");} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return LE;}}
+"<"         {if(printTokenFlag){printf("LT\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return LT;}}
+"!"         {if(printTokenFlag){printf("NOT\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return NOT;}}
+"="         {if(printTokenFlag){printf("ASSIGN\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return ASSIGN;}}
+"*"         {if(printTokenFlag){printf("MUL\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return MUL;}}
+"+"         {if(printTokenFlag){printf("PLUS\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return PLUS;}}
+"-"         {if(printTokenFlag){printf("MINUS\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return MINUS;}}
+"/"         {if(printTokenFlag){printf("DIV\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return DIV;}}
+"%"         {if(printTokenFlag){printf("MOD\n");} colNum++; if(parseFlag){yylval.tk = createToken(NULL,lineNum,colNum);return MOD;}}
  
 '{char}'		        {if(printTokenFlag) printf("CHRLIT(%s)\n", yytext); colNum+=yyleng; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum); return CHRLIT;}}
 '([^\n\'\\]|\\.)*'		{printf("Line %d, col %d: invalid char constant (%s)\n", lineNum, colNum, yytext); colNum+=yyleng;}
