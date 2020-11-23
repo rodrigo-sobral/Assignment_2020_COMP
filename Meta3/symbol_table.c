@@ -90,6 +90,42 @@ param* create_param(_type type){
     return p;
 }
 /**********************************************/
+
+void printGlobal(sym_table* st) {
+    sym* global_func= st->sym_list;		
+    printf("===== Global Symbol Table =====\n");
+	while(global_func != NULL) {
+		if (global_func->isFunc==1) {
+            printf("%s\t%s(%s", global_func->name, global_func->type, global_func->param_list->type);
+            param* global_func_param= global_func->param_list->next;
+            while (global_func_param!=NULL) {
+                printf(", %s", global_func_param->type);
+                global_func_param= global_func_param->next;
+            }
+            printf(")\n");
+        }
+	    global_func = global_func->next;
+    } printf("\n");
+}
+
+//  pode vir a ser preciso criar uma ll com todas as variaveis declaradas dentro duma certa funçao (global_func->declar_list)
+// alem disso poderá ser preciso definir também uma flag de definição de funçao
+void printFunctions(sym_table* st) {
+    sym* global_func= st->sym_list;	
+    while(global_func != NULL) {
+		if (global_func->isFunc==1 && global_func->isDec==1) {
+            printf("===== Function %s Symbol Table =====\n", global_func->name);
+            printf("return\t%s\n", global_func->type);
+            /*param* func_declar = global_func->declar_list;
+            while (func_declar!=NULL) {
+                printf("%s\t%s\n", func_declar->name, func_declar->type);
+                func_declar= func_declar->next;
+            } */           
+        }
+	    global_func = global_func->next;
+    } printf("\n");
+}
+
 /*
 sym_table* astToTable(node *ast) {
 	sym_table* aux_t;
