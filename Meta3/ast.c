@@ -7,7 +7,7 @@
 #include "ast.h"
 
 //Abstract Syntax Tree Root
-static node *root;
+node *root;
 
 /*Functions*/
 void initTree(node *n)
@@ -22,7 +22,7 @@ int programIsEmpty(void){
         return 0;    
 }
 
-node *createNode(char *str)
+node *createNode(char *str, token *tk)
 {
     node *n;
     if ((n = (node *)malloc(sizeof(node))) == NULL)
@@ -33,11 +33,12 @@ node *createNode(char *str)
     n->next = NULL;
     n->child = NULL;
     n->str = strdup(str);
+    n->tk=tk; //VERIFICAR SE ESTE ASSIGNMENT FUNCIONA!
     return n;
 }
 
 node *getCopyNode(node *n){
-    return createNode(n->str);
+    return createNode(n->str,n->tk);
 }
 
 node *getDeclarationNodes(node* n,node *typeSpecNode){
@@ -88,8 +89,7 @@ void printTree(void)
     preOrder_(root, 0);
 }
 
-static void preOrder_(node *n, int h)
-{
+void preOrder_(node *n, int h){ //used to be static :'(
     int i;
     if (n != NULL)
     {
@@ -101,21 +101,41 @@ static void preOrder_(node *n, int h)
     }
 }
 
-void freeAll(void)
-{
-    freeAll_(root);
+void freeTree(void){
+    freeTree_(root);
 }
 
-static void freeAll_(node *n)
+void freeTree_(node *n) //used to be static :'(
 {
     if (n != NULL)
     {
         if (n->child != NULL)
-            freeAll_(n->child);
+            freeTree_(n->child);
         if (n->next != NULL)
-            freeAll_(n->next);
+            freeTree_(n->next);
         //free (heap) allocated memory
         free(n->str); //str
         free(n);
     }
+}
+
+
+
+/*create token struct*/
+token* createToken(char* str, int lineNum, int colNum){
+    token *tk;
+    if ((tk = (token *)malloc(sizeof(token))) == NULL)
+    {
+        fprintf(stderr, "Error allocating memory");
+        exit(-1);
+    }
+    if(str!=NULL){
+        tk->value = strdup(str);
+    }
+    else{
+        tk->value=NULL;
+    }
+    tk->lineNum=lineNum;
+    tk->colNum=colNum;
+    return tk;
 }
