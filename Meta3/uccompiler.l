@@ -5,7 +5,7 @@
     #include <string.h>
     #include "y.tab.h"
     #include "ast.h"
-    #include "symbol_table.h"
+    #include "semantics.h"
 
     int printTokenFlag=0; //if 0(default) print error_messages from lexical_analysis only; else print all tokens and error_messages from lexical_analysis
     int parseFlag=1; //if 1(default) execute parser
@@ -98,8 +98,8 @@ int main(int argc, char *argv[]){
                 /*FAZER ANÁLISE SEMÂNTICA*/
                 /*IMPRIMIR TABELAS DE SIMBOLOS*/
                 /*IMPRIMIR AST ANOTADA */
-                astToTable(root);
-                continue; //apagar qnd estiver feito
+                startSemanticAnalysis(root);
+                printSymTables();
             }
             /*LIBERTAR MEMORIA DA AST E DAS TABELAS DE SÍMBOLOS (desalocar tokens tb pela tabela)*/
         }
@@ -117,8 +117,7 @@ int main(int argc, char *argv[]){
         yyparse(); //stdout lexical and sintax errors 
         if(!sintaxErrorFlag){ //if no syntax error occurred 
             /*FAZER ANÁLISE SEMÂNTICA*/
-            astToTable(root);
-            continue; //substituir pela analise semantica
+            startSemanticAnalysis(root);
         }
         /*LIBERTAR MEMORIA DA AST E DAS TABELAS DE SÍMBOLOS (desalocar tokens tb pela tabela)*/
     }

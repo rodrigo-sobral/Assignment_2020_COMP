@@ -4,15 +4,15 @@
 
 #ifndef SYMBOL_TABLE_H 
 #define SYMBOL_TABLE_H
-
-typedef enum {intlit, charlit, reallit, voidlit, shortlit} _type;
+#include "symbol_table.h"
+typedef enum {intlit, charlit, reallit, voidlit, shortlit,undef} _type;
 
 /*Structures*/
 typedef struct sym {
     char *name; // symbol name e.g. putchar, return, ...
     _type type;
     struct param* param_list; //list head
-    struct declar* declar_list; //list head
+    //struct declar* declar_list; //list head
     int isFunc; //to distinguish between function and variable
     int isDef; //to flag func or variable definition
     struct sym *next; 
@@ -22,13 +22,13 @@ typedef struct param{
     _type type;
     struct param *next;
 }param;
-
+/*
 typedef struct declar{
     char* name;
     _type type;
     struct param *next;
 } declar;
-
+*/
 typedef struct sym_table{
     char* name; //e.g. Function main, Global, ...
     struct sym *sym_list; //list head
@@ -41,11 +41,14 @@ void add_sym_table(sym_table *st);
 sym_table *get_sym_table(char* name);
 sym *create_sym(char *name,_type type, int isfunc, int isdec);
 param* create_param(_type type);
-void add_sym(sym* s, sym* snext);
+void add_sym(sym_table* st, sym* s);
 sym* get_sym(sym* s,sym_table* st);
 void free_sym(sym *s);
 void add_param(sym *s, _type type);
-_type getType(char* str);
+_type str_to_type(char* str);
+char* type_to_str(_type t);
 void free_param_list(param* p);
-
+void printFunctions(sym_table* st);
+void printGlobal(sym_table* st);
+void printSymTables(void);
 #endif
