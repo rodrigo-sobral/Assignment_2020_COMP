@@ -35,6 +35,12 @@ sym_table* create_global_table(void) {
     aux= create_sym("getchar", intlit, 1, 1);
     add_param(aux, intlit);
     add_sym(st, aux);
+    
+    /*
+    aux= create_sym("main", intlit, 1, 0);
+    add_param(aux, voidlit);
+    add_sym(st, aux);
+    */
         
     return st;
 }
@@ -66,7 +72,7 @@ sym *create_sym(char *name,_type type, int isfunc, int isdef){
         exit(-1);
     }
     s->param_list=NULL;
-    s->declar_list=NULL;
+    //s->declar_list=NULL;
     s->next = NULL;
     s->isDef=isdef;
     s->isFunc=isfunc;
@@ -120,49 +126,46 @@ param* create_param(_type type){
     return p;
 }
 /**********************************************/
+void printSymTables(void){
+    printGlobal(st_root); //print global table
+    printFunctions(st_root->next); //print functions tables
+}
 
-void printGlobal(sym_table* st) {
-    sym* global_func= st->sym_list;		
+void printGlobal(sym_table* st) { //table
+    sym* s= st->sym_list;	
+    param* param_list;	
     printf("===== Global Symbol Table =====\n");
-	while(global_func != NULL) {
-		if (global_func->isFunc==1) {
-            printf("%s\t%s(%s", global_func->name, global_func->type, global_func->param_list->type);
-            param* global_func_param= global_func->param_list->next;
-            while (global_func_param!=NULL) {
-                printf(", %s", global_func_param->type);
-                global_func_param= global_func_param->next;
+	while(s != NULL) {
+        printf("%s\t%s", s->name, type_to_str(s->type));
+        param_list= s->param_list;
+        if(param_list!=NULL){
+            printf("(%s",type_to_str(param_list->type));
+            param_list=param_list->next;
+            while(param_list!=NULL){
+                printf(",%s",type_to_str(param_list->type));
+                param_list=param_list->next;
             }
-            printf(")\n");
+            printf(")");
         }
-	    global_func = global_func->next;
+        printf("\n");
+        s=s->next;
     } printf("\n");
 }
 
 //  pode vir a ser preciso criar uma ll com todas as variaveis declaradas dentro duma certa funçao (global_func->declar_list)
 // alem disso poderá ser preciso definir também uma flag de definição de funçao
-void printFunctions(sym_table* st) {
-    sym* global_func= st->sym_list;	
-    while(global_func != NULL) {
-		if (global_func->isFunc==1 && global_func->isDef==1) {
-            printf("===== Function %s Symbol Table =====\n", global_func->name);
-            printf("return\t%s\n", global_func->type);
-            declar* func_declar = global_func->declar_list;
-            while (func_declar!=NULL) {
-                printf("%s\t%s\n", func_declar->name, func_declar->type);
-                func_declar= func_declar->next;
-            }
-        }
-	    global_func = global_func->next;
-    } printf("\n");
+void printFunctions(sym_table* st) { //tables
+    sym* s;
+    if(st!=NULL){
+        printf("===== Function %s Symbol Table =====\n", st->name);
+        s=st->sym_list;	
+        while(s != NULL) {
+            printf("%s\t%s\n",s->name,type_to_str(s->type));
+            s = s->next;
+        } printf("\n");
+        printFunctions(st->next);
+    }
 }
-
-/*
-sym_table* astToTable(node *ast) {
-	sym_table* aux_t;
-
-	if (ast != NULL) {
-        if(strcmp(ast->str,"Program") == 0) {
-            syms_table= create_sym_table();
 
 void free_param_list(param* p){
     param *aux;
@@ -176,10 +179,29 @@ void free_param_list(param* p){
     }
 }
 /**********************************************/
-_type getType(char* str){
+_type str_to_type(char* str){
     if(strcmp(str,"Char")==0) return charlit;
     else if(strcmp(str,"Void")==0) return voidlit;
     else if(strcmp(str,"Int")==0) return intlit;
     else if(strcmp(str,"Short")==0) return shortlit;
     else if(strcmp(str,"Double")==0) return reallit;
+}
+
+char* type_to_str(_type t){
+    switch(t){
+        case charlit:
+            return "char";
+        case intlit:
+            return "int";
+        case reallit:
+            return "double";
+        case voidlit:
+            return "void";
+        case shortlit:
+            return "short";
+        case undef:
+            return "undef";
+        default:
+            return "undef";
+    }
 }

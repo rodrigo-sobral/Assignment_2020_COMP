@@ -8,7 +8,7 @@
 /*linked lists tree structure*/
 typedef struct node{
     char *str; //name
-    token *tk; //tk has-> value, lineNum,colNum
+    struct token *tk; //tk has-> value, lineNum,colNum
     struct node *next;
     struct node *child; 
 } node;
@@ -23,15 +23,15 @@ typedef struct token{
 /*Function Declaration*/
 void initTree(node* n);
 int programIsEmpty(void);
-node *createNode(char *str);
+node *createNode(char *str, token *tk);
 node *getCopyNode(node *n);
 node *getDeclarationNodes(node* n,node *typeSpecNode);
 int isNullNode(node *n);
 void addNext(node *n, node *next);
 void addChild(node *n, node *child);
-static void preOrder_(node *n, int h);
+void preOrder_(node *n, int h);
 void printTree(void);
-static void freeTree_(node *n); 
+void freeTree_(node *n); 
 void freeTree(void);
 token* createToken(char* str, int lineNum, int colNum);
 
