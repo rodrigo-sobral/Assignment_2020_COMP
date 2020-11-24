@@ -118,15 +118,14 @@ void handle_funcDefs(node* n) {
         }
 
         //if params types are not equal
-        if(!check_params_list_types(funcDef,get_sym(funcDef,st_root))){
+        if(!check_params_list_types(funcDef,get_sym(funcDef,st_root),n->next->next->tk->lineNum,n->next->next->tk->colNum)){
             free_sym(funcDef);
             return;
         }
         
         /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
         if(get_sym_table(funcName)){
-            /*DONE:THROW FUNCTION ALREADY DEFINED ERROR*/
-            printf("Line %d, col %d: Symbol %s already defined\n", 0, 0, funcName);
+            printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
             free_sym(funcDef);
             return;
         } else {
@@ -143,8 +142,8 @@ void handle_funcDefs(node* n) {
                         add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
                     else {
-                        //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
-                        printf("Line %d, col %d: Lvalue required\n", 0, 0); 
+                        //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
+                        //printf("Line %d, col %d: Lvalue required\n", 0, 0); //<-acho q n é isto
                     } 
                 }               
                 paramAux=paramAux->next; //next paramdeclaration node
@@ -213,7 +212,7 @@ void handle_funcDefs(node* n) {
         /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
         if(get_sym_table(funcName)){
             /*DONE:THROW FUNCTION ALREADY DEFINED ERROR*/
-            printf("Line %d, col %d: Symbol %s already defined\n", 0, 0, funcName);
+            printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum,  n->next->tk->colNum, funcName);
             free_sym(funcDef);
             return;
         } else {
@@ -230,8 +229,8 @@ void handle_funcDefs(node* n) {
                         add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
                     else {
-                        //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
-                        printf("Line %d, col %d: Lvalue required\n", 0, 0); 
+                        //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
+                        //printf("Line %d, col %d: Lvalue required\n", 0, 0); //<-acho q n é isto
                     } 
                 }               
                 paramAux=paramAux->next; //next paramdeclaration node
@@ -246,7 +245,7 @@ void handle_funcDefs(node* n) {
     }
     else{
         //DONE:throw FUNCTION UNDECLARED error
-        printf("Line %d, col %d: Symbol %s is not a function\n", 0, 0, funcDefTable->name);
+        printf("Line %d, col %d: Symbol %s is not a function\n",n->next->tk->lineNum , n->next->tk->lineNum,funcName);
         free_sym(funcDef);
         return;
     }    
@@ -266,7 +265,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             aux=aux->next; //id
             if(isDeclared(s,st)){
                 //DONE: THROW ERROR váriável q se está a declarar já foi declarada
-                printf("Line %d, col %d: Symbol %s already defined\n", 0, 0, funcDecAndStats->str);
+                printf("Line %d, col %d: Symbol %s already defined\n", aux->next->tk->lineNum, aux->next->tk->colNum, funcDecAndStats->str);
             }
             else{
                 if(aux->next!=NULL){
@@ -300,7 +299,7 @@ int isDeclared(sym *s, sym_table *st) {
     return 0; 
 }
 
-int check_params_list_types(sym *sym_defined, sym *sym_declared) {
+int check_params_list_types(sym *sym_defined, sym *sym_declared, int lineNum, int colNum) {
     param *list0=sym_defined->param_list;
     param *list1=sym_declared->param_list;
 
@@ -311,7 +310,7 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared) {
     }
     if(list1 || list0) {
         //throw error ? one sym has more parameters than the other
-        printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", 0, 0, sym_declared->name, paramsCounter(sym_defined->param_list), paramsCounter(sym_declared->param_list));
+        printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", lineNum, colNum, sym_declared->name, paramsCounter(sym_defined->param_list), paramsCounter(sym_declared->param_list));
         return 0; 
     }
     return 1;    

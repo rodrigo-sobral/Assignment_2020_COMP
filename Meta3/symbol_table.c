@@ -33,7 +33,7 @@ sym_table* create_global_table(void) {
     add_sym(st, aux);
     
     aux= create_sym("getchar", intlit, 1,0);
-    add_param(aux, intlit);
+    add_param(aux, voidlit);
     add_sym(st, aux);
 
     /*
