@@ -187,19 +187,12 @@ _type str_to_type(char* str) {
 
 char* type_to_str(_type t) {
     switch(t){
-        case charlit:
-            return "char";
-        case intlit:
-            return "int";
-        case reallit:
-            return "double";
-        case voidlit:
-            return "void";
-        case shortlit:
-            return "short";
-        case undef:
-            return "undef";
-        default:
-            return "undef";
+        case charlit: return "char";
+        case intlit: return "int";
+        case reallit: return "double";
+        case voidlit: return "void";
+        case shortlit: return "short";
+        case undef: return "undef";
+        default: return "undef";
     }
 }
