@@ -124,6 +124,8 @@ void freeTree_(node *n) //used to be static :'(
             freeTree_(n->next);
         //free (heap) allocated memory
         free(n->str); //str
+        if(n->tk->value!=NULL){free(n->tk->value);}
+        free(n->tk);
         free(n);
     }
 }

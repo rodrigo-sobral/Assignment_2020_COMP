@@ -52,6 +52,8 @@ char* type_to_str(_type t);
 //  FREERES
 void free_sym(sym *s);
 void free_param_list(param* p);
+void free_sym_table(sym_table* st);
+void freeTables(void);
 
 //  PRINTERS
 void printFunctions(sym_table* st);

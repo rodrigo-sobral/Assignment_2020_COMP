@@ -102,7 +102,8 @@ int main(int argc, char *argv[]){
                 printSymTables();
                 printTree(1); //with anotations
             }
-            /*LIBERTAR MEMORIA DA AST E DAS TABELAS DE SÍMBOLOS (desalocar tokens tb pela tabela)*/
+            freeTree();
+            freeSymTables();
         }
         else if(strcmp(argv[1],"-t")==0){
             //do lexical and sintax analysis
@@ -119,7 +120,8 @@ int main(int argc, char *argv[]){
         if(!sintaxErrorFlag){ //if no syntax error occurred 
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
         }
-        /*LIBERTAR MEMORIA DA AST E DAS TABELAS DE SÍMBOLOS (desalocar tokens tb pela tabela)*/
+        freeTree();
+        freeSymTables();
     }
     return 0;
 }

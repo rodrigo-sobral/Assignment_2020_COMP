@@ -176,6 +176,17 @@ void free_param_list(param* p) {
         }
     }
 }
+
+void free_sym_table(sym_table* st){
+    sym *s=st->sym_list,*s_aux;
+    while(s!=NULL){
+        s_aux=s->next;
+        free(st->name);
+        free_sym(s);
+        s=s_aux;
+    }
+    free(st);
+}
 /**********************************************/
 _type str_to_type(char* str) {
     if(strcmp(str,"Char")==0||strcmp(str,"char")==0) return charlit;
@@ -194,5 +205,14 @@ char* type_to_str(_type t) {
         case shortlit: return "short";
         case undef: return "undefined";
         default: return "undefined";
+    }
+}
+/*****************************************************/
+void freeTables(void){
+    sym_table *st=st_root,*st_aux;
+    while(st!=NULL){
+        st_aux=st->next;
+        free_sym_table(st);
+        st=st_aux;
     }
 }
