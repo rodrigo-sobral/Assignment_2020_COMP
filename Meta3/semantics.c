@@ -275,6 +275,8 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                     expr_type=get_statement_type(aux,st_root);
                     if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
                         free_sym(s);
+                        funcDecAndStats=funcDecAndStats->next;
+                        continue;
                     }
                 }
                 add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
@@ -475,7 +477,7 @@ int getTerminalType(node *n,sym_table *st) {
         }
         free_sym(aux1);
     }
-    else if(strncmp(n->str,"ChrLit",7)==0){
+    else if(strncmp(n->str,"ChrLit",6)==0){
         //return charlit;
         return intlit;
     } else if(strncmp(n->str,"IntLit",6)==0){
@@ -504,14 +506,15 @@ int checkConflitingTypes(_type expectedType,_type gotType,int line, int col){
     if(expectedType==charlit||expectedType==shortlit){aux0=intlit;}
     else{aux0=expectedType;}
     if(gotType==charlit||gotType==shortlit){aux1=intlit;}
-    else{aux1=expectedType;}
-
-    if(!(aux0==aux1)){
-        if(aux0==reallit&&aux1==intlit){
-            return 0;
-        }
+    else{aux1=gotType;}
+    if(aux0==aux1){
+        return 0; //no conflict
+    }
+    else if(aux0==reallit&&aux1==intlit){
+        return 0; //no conflict
+    }
+    else{
         printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", line, col, type_to_str(gotType), type_to_str(expectedType));
         return 1;
     }
-    return 0;
 }
