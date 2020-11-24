@@ -176,11 +176,11 @@ void free_param_list(param* p) {
 }
 /**********************************************/
 _type str_to_type(char* str) {
-    if(strcmp(str,"Char")==0) return charlit;
-    else if(strcmp(str,"Void")==0) return voidlit;
-    else if(strcmp(str,"Int")==0) return intlit;
-    else if(strcmp(str,"Short")==0) return shortlit;
-    else if(strcmp(str,"Double")==0) return reallit;
+    if(strcmp(str,"Char")==0||strcmp(str,"char")==0) return charlit;
+    else if(strcmp(str,"Void")==0||strcmp(str,"void")==0) return voidlit;
+    else if(strcmp(str,"Int")==0||strcmp(str,"int")==0) return intlit;
+    else if(strcmp(str,"Short")==0||strcmp(str,"short")==0) return shortlit;
+    else if(strcmp(str,"Double")==0||strcmp(str,"double")==0) return reallit;
 }
 
 char* type_to_str(_type t) {
