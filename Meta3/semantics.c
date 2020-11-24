@@ -420,7 +420,7 @@ _type get_store_type(node *store, sym_table*st) {
         if(storedSym==NULL){ 
             //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA (nome da variável n declara: n_aux->tk->value)
             //linenum colnum: n_aux->tk->lineNum e  n_aux->tk->colNum
-            printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
+            printf("Line %d, col %d: Lvalue required\n", n_aux->tk->lineNum, n_aux->tk->colNum);
             return undef;
         }
     }
@@ -456,7 +456,7 @@ _type get_funcCall_type(node *call,sym_table*st) {
         p_aux1=s_aux->param_list; //lista com tipos de parametros da func call 
         if(paramsCounter(p_aux0) != paramsCounter(p_aux1)){
             //DONE:  THROW ERROR nr de parametros da function call diferente do nr de parametros declarados para esssa funcção
-            printf("Line %d, col %d: Wrong  number  of  arguments  to  function %s (got %d, required %d)", n_aux->tk->lineNum, n_aux->tk->colNum, n_aux->str, s_aux->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
+            printf("Line %d, col %d: Wrong  number  of  arguments  to  function %s (got %d, required %d)", n_aux->tk->lineNum, n_aux->tk->colNum, s_aux->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
         }
         while(p_aux0&&p_aux1){
             count++;
@@ -465,7 +465,7 @@ _type get_funcCall_type(node *call,sym_table*st) {
                 for(i=1;i<=count;i++) n_aux=n_aux->next;
                 //DONE: THROW ERROR : tipo do parametro no funcCall diferente daquele q foi declarado!
                 //numlinha e numcoluna do erro vai ser: n_aux->tk->lineNum e n_aux->tk->colNum !!! 
-                printf("Line %d, col %d: Conflicting  types (got %s, expected %s)", n_aux->tk->lineNum, n_aux->tk->colNum, p_aux1->type, p_aux0->type); 
+                printf("Line %d, col %d: Conflicting  types (got %s, expected %s)", n_aux->tk->lineNum, n_aux->tk->colNum, type_to_str(p_aux1->type), type_to_str(p_aux0->type)); 
             }
             p_aux1=p_aux1->next;
             p_aux0=p_aux0->next;
