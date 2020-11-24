@@ -386,12 +386,12 @@ _type get_statement_type(node* statement, sym_table *st) {
     }
     else if(strcmp(statement->str,"While")==0){
         //check confliting types in expr of while(expr)
-        checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        //checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
         add_funcBody_syms_to_table(st, statement); 
         return voidlit; //doesnt matter here..
     }
     else if(strcmp(statement->str,"If")==0){
-        checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        //checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
         add_funcBody_syms_to_table(st, statement); 
         return voidlit; //doesnt matter here..
     }
@@ -482,6 +482,7 @@ _type get_store_type(node *store, sym_table*st) {
             printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
             store->child->type=undef; //var node
             store->child->next->type=get_statement_type(store->child->next, st);//expr node
+            free(s_aux);
             return undef; 
         }
     }
