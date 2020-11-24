@@ -161,7 +161,7 @@ void handle_funcDefs(node* n) {
         //move to paramList node
         aux=aux->next;//paramList
         //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
-        paramAux=aux->child; //paramCec
+        paramAux=aux->child; //paramDec
         while(paramAux){ //iterate through paramList childs
            //paramDec content (typespec-->[option: id])
             add_param(funcDef,str_to_type(paramAux->child->str)); //add param to sym paramlist
@@ -178,8 +178,7 @@ void handle_funcDefs(node* n) {
         while(paramAux){ //iterate through paramList childs
             //paramDec content (typespec-->[option: id])
             if(str_to_type(paramAux->child->str)!=voidlit){
-                if(paramAux->child->next){ //var name
-                    /*TODO:FAZER VERIFICAÇAO SEMANTICA SE NOME DA VAR (paramAux->child->next->tk->value) é igual ao utilizado na funcDec desta funcao.. */
+                if(paramAux->child->next){ //var name                   
                     if (isDeclared(funcDef , funcDefTable))
                         printf("Line %d, col %d: Symbol %s already defined\n", paramAux->child->next->tk->lineNum, paramAux->child->next->tk->colNum, paramAux->child->next->tk->value);
                     //add this variable to symtable of this function
@@ -193,8 +192,8 @@ void handle_funcDefs(node* n) {
             paramAux=paramAux->next; //next paramdeclaration node
         }
 
-        /*TODO: ENTRAR NO FUNCBODY*/
         aux=aux->next; //funcBody node
+        
         /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
         add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
         add_sym_table(funcDefTable);
@@ -254,7 +253,6 @@ void handle_funcDefs(node* n) {
 }
 
 void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
-    //eu trato desta função hj
     node *funcDecAndStats=funcBodyNode->child; 
     node *aux;
     _type expr_type;
@@ -266,16 +264,23 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             aux=funcDecAndStats->child; //typedef            
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
-            if(aux->next){
-                //var definition
-                aux=aux->next; //expr
-                s->isDef=1;
-                expr_type=get_statement_type(aux,st_root);
-                if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
-                    free_sym(s);
-                }
+            if(isDeclared(s,st)){
+                //TODO: THROW ERROR váriável q se está a declarar já foi declarada
+                printf("error declaracao\n");
             }
-            add_sym(st,s);
+            else{
+                if(aux->next!=NULL){
+                    //var definition
+                    aux=aux->next; //expr
+                    s->isDef=1;
+                    expr_type=get_statement_type(aux,st_root);
+                    if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
+                        free_sym(s);
+                    }
+                }
+                add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
+            }
+            
         }
         else{
             expr_type=get_statement_type(funcDecAndStats, st);
@@ -287,7 +292,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
 int isDeclared(sym *s, sym_table *st) {
     //check if s is declared in st, if sym is a function and sym is before main func, return declared=1
     sym *symAux=st->sym_list;
-    while(symAux){
+    while(symAux!=NULL){
         if(strcmp(s->name,symAux->name)==0 && s->isFunc==symAux->isFunc) return 1;
         symAux=symAux->next;
     }
@@ -472,7 +477,7 @@ int getTerminalType(node *n,sym_table *st) {
         }
         free_sym(aux1);
     }
-    else if(strncmp(n->str,"CharLit",7)==0){
+    else if(strncmp(n->str,"ChrLit",7)==0){
         //return charlit;
         return intlit;
     }
