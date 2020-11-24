@@ -14,7 +14,7 @@ typedef struct sym {
     struct param* param_list; //list head
     //struct declar* declar_list; //list head
     int isFunc; //to distinguish between function and variable
-    int isDef; //to flag func or variable definition
+    int isParam; //to flag var as parameter
     struct sym *next; 
 } sym;
 
@@ -33,7 +33,7 @@ typedef struct sym_table{
 //  CREATERS
 sym_table* create_global_table(void);
 sym_table* create_sym_table(char* name);
-sym *create_sym(char *name,_type type, int isfunc, int isdef);
+sym *create_sym(char *name,_type type, int isfunc, int isparam);
 param* create_param(_type type);
 
 //  GETTERS

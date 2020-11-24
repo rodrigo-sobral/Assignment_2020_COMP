@@ -28,11 +28,11 @@ sym_table* create_sym_table(char* name) {
 sym_table* create_global_table(void) {
     sym *aux;
     sym_table* st=create_sym_table("Global");
-    aux=  create_sym("putchar", intlit, 1, 1);
+    aux=  create_sym("putchar", intlit, 1,0);
     add_param(aux, intlit);
     add_sym(st, aux);
     
-    aux= create_sym("getchar", intlit, 1, 1);
+    aux= create_sym("getchar", intlit, 1,0);
     add_param(aux, intlit);
     add_sym(st, aux);
 
@@ -65,7 +65,7 @@ sym_table *get_sym_table(char* name) {
     } return NULL;
 }
 /********************************************************/
-sym *create_sym(char *name,_type type, int isfunc, int isdef) {
+sym *create_sym(char *name,_type type, int isfunc, int isparam) {
     sym *s;
     if ((s = (sym *)malloc(sizeof(sym))) == NULL) {
         fprintf(stderr, "Error allocating memory");
@@ -73,7 +73,7 @@ sym *create_sym(char *name,_type type, int isfunc, int isdef) {
     }
     s->param_list=NULL;
     s->next = NULL;
-    s->isDef=isdef;
+    s->isParam=isparam;
     s->isFunc=isfunc;
     s->type = type;
     s->name = strdup(name);
@@ -156,7 +156,9 @@ void printFunctions(sym_table* st) { //tables
         printf("===== Function %s Symbol Table =====\n", st->name);
         s=st->sym_list;	
         while(s != NULL) {
-            printf("%s\t%s\n",s->name,type_to_str(s->type));
+            printf("%s\t%s",s->name,type_to_str(s->type));
+            if(!s->isFunc&&s->isParam){ printf("\tparam");}
+            printf("\n");
             s = s->next;
         } printf("\n");
         printFunctions(st->next);

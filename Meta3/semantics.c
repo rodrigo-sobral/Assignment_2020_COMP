@@ -39,7 +39,6 @@ void handle_varDecs(node *n) {
     aux=aux->next; //id
     if(aux->next!=NULL){
         aux=aux->next; //expr
-        s->isDef=1;
         expr_type=get_statement_type(aux,st_root);
         if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
             free_sym(s);
@@ -102,7 +101,7 @@ void handle_funcDefs(node* n) {
     //move to id
     aux=aux->next;
     funcName=strdup(aux->tk->value); //id(value)
-    funcDef=create_sym(funcName,retType,1,1);
+    funcDef=create_sym(funcName,retType,1,0);
     /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA PARA VERIFICACAO DE ERROS*/
 
     if(isDeclared(funcDef,st_root)) {
@@ -139,7 +138,7 @@ void handle_funcDefs(node* n) {
                 //paramDec content (typespec-->[option: id])
                 if(str_to_type(paramAux->child->str)!=voidlit){
                     if(paramAux->child->next!=NULL){ //var name
-                        add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,0)); //parameter variable sym
+                        add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
                     else {
                         //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
@@ -181,7 +180,7 @@ void handle_funcDefs(node* n) {
                     if (isDeclared(funcDef , funcDefTable))
                         printf("Line %d, col %d: Symbol %s already defined\n", paramAux->child->next->tk->lineNum, paramAux->child->next->tk->colNum, paramAux->child->next->tk->value);
                     //add this variable to symtable of this function
-                    add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,0)); //parameter variable sym
+                    add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                 }
                 else{
                     //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
@@ -226,7 +225,7 @@ void handle_funcDefs(node* n) {
                 //paramDec content (typespec-->[option: id])
                 if(str_to_type(paramAux->child->str)!=voidlit){
                     if(paramAux->child->next){ //var name
-                        add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,0)); //parameter variable sym
+                        add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
                     else {
                         //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
@@ -271,7 +270,6 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                 if(aux->next!=NULL){
                     //var definition
                     aux=aux->next; //expr
-                    s->isDef=1;
                     expr_type=get_statement_type(aux,st_root);
                     if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
                         free_sym(s);
@@ -439,7 +437,7 @@ _type get_funcCall_type(node *call,sym_table*st) {
     param* funcCall_params,*p_aux0,*p_aux1; //da func call
     int count=0,i;
     n_aux=call->child; //function name node->str = Id(name)
-    s_aux=create_sym(n_aux->tk->value,undef,1,1);
+    s_aux=create_sym(n_aux->tk->value,undef,1,0);
     funcSym=get_sym(s_aux,st_root);
     n_aux=n_aux->next; //1º argumento da call
     if(funcSym){
