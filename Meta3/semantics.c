@@ -330,15 +330,10 @@ int paramsCounter(struct param* param_list) {
 _type get_statement_type(node* statement, sym_table *st) {
     node *aux=statement;
     _type t_aux;
-    //store 2
-    //add 2,sub 2,mul 2 ,div 2,or 2,mod 2 ,and 2,bitwiseand 2,bitwiseor 2,bitwisexor 2
-    //eq 2, ne 2, le 2, ge 2, lt 2, gt 2, plus 1, minus 1, not 1
-    //call 0 ou mais
-    //coma...2 ou mais acho q n faz nada
     if(strcmp(statement->str,"Plus")==0 || strcmp(statement->str,"Minus")==0 || strcmp(statement->str,"Not")==0){
         //1 nó filho
         if(!isTerminal(aux->child)){
-            get_statement_type(aux->child,st);
+            return get_statement_type(aux->child,st);
         }
         else{
             t_aux=getTerminalType(aux->child,st);
@@ -355,16 +350,43 @@ _type get_statement_type(node* statement, sym_table *st) {
     else if(strcmp(statement->str,"Store")==0){
         return get_store_type(statement,st);
     }
+    else if(strcmp(statement->str,"Comma")==0){
+        //evaluates first expr and discard result, evaluates second expr and returns result
+        get_statement_type(statement->child,st); //evaluates and discards
+        return get_statement_type(statement->child->next,st); //evaluates and returns
+    }
     else if(strcmp(statement->str,"Add")==0||strcmp(statement->str,"Sub")==0||strcmp(statement->str,"Mul")==0||strcmp(statement->str,"Div")==0||strcmp(statement->str,"Mod")==0){
         return get_operation_type(statement,st);
     }
     else if(strcmp(statement->str,"Or")==0||strcmp(statement->str,"And")==0||strcmp(statement->str,"BitWiseAnd")==0||strcmp(statement->str,"BitWiseOr")==0||strcmp(statement->str,"BitWiseXor")==0||strcmp(statement->str,"Eq")==0||strcmp(statement->str,"Ne")==0||strcmp(statement->str,"Le")==0||strcmp(statement->str,"Ge")==0||strcmp(statement->str,"Lt")==0||strcmp(statement->str,"Gt")==0){
         return intlit;
     }
-
+    else if(strcmp(statement->str,"StatList")==0){
+        add_funcBody_syms_to_table(st, statement); 
+        return voidlit; //doesnt matter here..
+    }
+    else if(strcmp(statement->str,"While")==0){
+        //check confliting types in expr of while(expr)
+        checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        add_funcBody_syms_to_table(st, statement); 
+        return voidlit; //doesnt matter here..
+    }
+    else if(strcmp(statement->str,"If")==0){
+        checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        add_funcBody_syms_to_table(st, statement); 
+        return voidlit; //doesnt matter here..
+    }
+    else if(strcmp(statement->str,"Return")==0){
+        //verificar se tipo coincide q se espera returnar, coincide
+        checkConflitingTypes(st->sym_list->type,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        return st->sym_list->type; //doesnt matter here..
+    }
     else if(isTerminal(statement)){
         //intlit ou realit ou undef..
-        getTerminalType(statement,st);
+        return getTerminalType(statement,st);
+    }
+    else if(strcmp(statement->str,"Null")==0){
+        return voidlit;
     }
 }
 
