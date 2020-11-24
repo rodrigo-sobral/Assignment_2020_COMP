@@ -265,7 +265,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             aux=aux->next; //id
             if(isDeclared(s,st)){
                 //TODO: THROW ERROR váriável q se está a declarar já foi declarada
-                printf("error declaracao\n");
+                printf("Line %d, col %d: Symbol %s already defined\n", 0, 0, funcDecAndStats->str);
             }
             else{
                 if(aux->next!=NULL){
