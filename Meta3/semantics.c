@@ -405,27 +405,29 @@ _type get_operation_type(node * operation,sym_table *st) {
 }
 
 _type get_store_type(node *store, sym_table*st) {
-    node *n_aux=store->child; //store variable node (Id) 
+    node *n_aux= store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
     _type t_aux;
-    s_aux=create_sym(n_aux->tk->value,undef,0,0);
-    storedSym=get_sym(s_aux,st);
+    s_aux= create_sym(n_aux->tk->value, undef, 0, 0);
+    storedSym= get_sym(s_aux, st);
     if(storedSym==NULL){
         storedSym==get_sym(s_aux,st_root);
         if(storedSym==NULL){ 
             //TODO: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA (nome da variável n declara: n_aux->tk->value)
             //linenum colnum: n_aux->tk->lineNum e  n_aux->tk->colNum
+            printf("Line %d, col %d: Symbol %s already defined\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
             return undef;
         }
     }
-    if(storedSym->type==charlit){t_aux=intlit;} //chars são considerados ints
-    else{t_aux=storedSym->type;}
-    if(t_aux!=get_statement_type(n_aux->next,st)){
+    if(storedSym->type==charlit) { t_aux=intlit; } //chars são considerados ints
+    else { t_aux=storedSym->type; }
+    if ( t_aux != get_statement_type(n_aux->next, st) ) {
         //TODO: THROW ERROR tentar associar a uma variável um tipo q n é aquele q foi declarado para essa variável
         //tipo: int i; i=2.3; <--
         //linenum e colnum: n_aux->next->tk->lineNum e n_aux->next->tk->colNum 
+        printf("Line %d, col %d: Conflicting  types (got %s, expected %s)\n", n_aux->next->tk->lineNum, n_aux->next->tk->colNum, type_to_str(get_statement_type(n_aux->next, st)), type_to_str(t_aux));
         return undef;
-    } else{
+    } else {
         return t_aux;
     }
 
