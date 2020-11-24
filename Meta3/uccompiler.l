@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
                 printTree(1); //with anotations
             }
             freeTree();
-            freeSymTables();
+            freeTables();
         }
         else if(strcmp(argv[1],"-t")==0){
             //do lexical and sintax analysis
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]){
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
         }
         freeTree();
-        freeSymTables();
+        freeTables();
     }
     return 0;
 }
