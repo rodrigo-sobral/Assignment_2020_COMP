@@ -22,6 +22,8 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode);
 int isDeclared(sym *s, sym_table *st);
 int check_params_list_types(sym *s0, sym *s1);
 int isTerminal(node *n);
+int isBeforeMainFunc(sym *s);
+int checkConflitingTypes(_type expectedType,_type gotType,int line, int col);
 
 //  COUNTERS
 int paramsCounter(struct param* param_list);
