@@ -341,7 +341,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         }
         else{
             t_aux=getTerminalType(aux->child,st);
-            if(t_aux==undef){ printf("Line %d, col %d: Unknown symbol %s\n", aux->child->tk->lineNum, aux->child->tk->colNum,aux->child->tk->value); return t_aux;}
+            if(t_aux==undef){return t_aux;}
             if(!(t_aux==reallit||t_aux==intlit)){
                 printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->child->tk->lineNum, aux->child->tk->colNum, aux->child->tk->value, type_to_str(t_aux));
                 statement->type=undef;
@@ -478,11 +478,10 @@ _type get_store_type(node *store, sym_table*st) {
     if(storedSym==NULL){
         storedSym==get_sym(s_aux,st_root);
         if(storedSym==NULL){ 
-            //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA (nome da variável n declara: n_aux->tk->value)
-            //linenum colnum: n_aux->tk->lineNum e  n_aux->tk->colNum
+            //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA 
             printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
             store->child->type=undef; //var node
-            store->child->next->type=get_statement_type(n_aux->next, st);//expr node
+            store->child->next->type=get_statement_type(store->child->next, st);//expr node
             return undef; 
         }
     }
