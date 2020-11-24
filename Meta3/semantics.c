@@ -116,9 +116,8 @@ void handle_funcDefs(node* n) {
             paramAux=paramAux->next;
         }
 
+        //if params types are not equal
         if(!check_params_list_types(funcDef,get_sym(funcDef,st_root))){
-            //if params types are not equal
-            //DONE: THROW ERROR parametros da definicao diferentes da declaracao
             free_sym(funcDef);
             return;
         }
@@ -266,7 +265,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             aux=aux->next; //id
             if(isDeclared(s,st)){
                 //TODO: THROW ERROR váriável q se está a declarar já foi declarada
-                printf("error declaracao\n");
+                printf("Line %d, col %d: Symbol %s already defined\n", 0, 0, funcDecAndStats->str);
             }
             else{
                 if(aux->next!=NULL){
@@ -489,14 +488,13 @@ int getTerminalType(node *n,sym_table *st) {
                 //not in global table...
                 //TODO: THROW ERROR VARIABLE NOT DECLARED
                 return undef;
-            }
-            else{
-                if(aux0->type==charlit){return intlit;}
-                else{return aux0->type;}
+            } else{
+                if(aux0->type==charlit) {return intlit;}
+                else {return aux0->type;}
             }
         }
         else{
-            if(aux0->type==charlit){return intlit;}
+            if(aux0->type==charlit) {return intlit;}
             else{return aux0->type;}
         }
         free_sym(aux1);
@@ -504,11 +502,9 @@ int getTerminalType(node *n,sym_table *st) {
     else if(strncmp(n->str,"ChrLit",6)==0){
         //return charlit;
         return intlit;
-    }
-    else if(strncmp(n->str,"IntLit",6)==0){
+    } else if(strncmp(n->str,"IntLit",6)==0){
         return intlit;
-    }
-    else if(strncmp(n->str,"RealLit",7)==0){
+    } else if(strncmp(n->str,"RealLit",7)==0){
         return reallit;
     }
 }
