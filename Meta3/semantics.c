@@ -126,16 +126,14 @@ void handle_funcDefs(node* n) {
             paramAux=paramAux->next;
         }
 
+        //if params types are not equal
         if(!check_params_list_types(funcDef,get_sym(funcDef,st_root))){
-            //if params types are not equal
-            //DONE: THROW ERROR parametros da definicao diferentes da declaracao
             free_sym(funcDef);
             return;
         }
         
         /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
         if(get_sym_table(funcName)){
-            /*DONE:THROW FUNCTION ALREADY DEFINED ERROR*/
             printf("Line %d, col %d: Symbol %s already defined", 0, 0, funcName);
             free_sym(funcDef);
             return;
@@ -155,8 +153,7 @@ void handle_funcDefs(node* n) {
                             printf("Line %d, col %d: Symbol %s is not a function", 0, 0, paramAux->child->next->tk->value);
                         //add this variable to symtable of this function
                         else add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,0)); //parameter variable sym
-                    }
-                    else {
+                    } else {
                         //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
                         printf("Line %d, col %d: Lvalue required\n", 0, 0); 
                     } 
@@ -212,9 +209,8 @@ void handle_funcDefs(node* n) {
         /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
         add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
         add_sym_table(funcDefTable);
-    }
-    else{
-        //TODO:throw FUNCTION UNDECLARED error
+    } else{
+        //  DONE:throw FUNCTION UNDECLARED error
         printf("Line %d, col %d: Symbol %s is not a function\n", 0, 0, funcDefTable->name);
         free_sym(funcDef);
         return;
@@ -231,25 +227,29 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
     while(funcDecAndStats){
         if(strcmp(funcDecAndStats->str,"Declaration")==0){
             /*TODO:verificar se o symbolo já foi declarado */
-            aux=funcDecAndStats->child; //typedef
-            type=str_to_type(aux->str);
-            aux=aux->next; //id
-            s=create_sym(aux->tk->value,type,0,0); 
-            if(aux->next){
-                //var definition
-                aux=aux->next; //expr
-                s->isDef=1;
-                if(type==charlit){type==intlit;}
-                expr_type=get_statement_type(aux,st_root);
-                if(expr_type!=type){ 
-                    printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum, aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
-                    free_sym(s);
+            aux= funcDecAndStats->child; //typedef
+            type= str_to_type(aux->str);
+            aux= aux->next; //id
+            s= create_sym(aux->tk->value, type, 0, 0); 
+            //  Eu, Rodrigo Sobral, adicionei este código.
+            if (isDeclared(s, st)) {
+                printf("Line %d, col %d: Symbol %s already defined\n",funcDecAndStats->child->tk->lineNum, funcDecAndStats->child->tk->colNum , s->name);
+            } else {
+                if(aux->next){
+                    //var definition
+                    aux=aux->next; //expr
+                    s->isDef=1;
+                    if(type==charlit){type==intlit;}
+                    expr_type=get_statement_type(aux,st_root);
+                    if(expr_type!=type){ 
+                        printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum, aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
+                        free_sym(s);
+                    }
+                    /*TODO: THROW ERROR SE O TYPE FOR INVALIDO e dar free no symbolo s*/
                 }
-                /*TODO: THROW ERROR SE O TYPE FOR INVALIDO e dar free no symbolo s*/
-            }
-            add_sym(st,s);
-        }
-        else{
+                add_sym(st,s);
+            } 
+        } else {
             expr_type=get_statement_type(funcDecAndStats, st);
         }
         funcDecAndStats=funcDecAndStats->next;
@@ -435,14 +435,13 @@ int getTerminalType(node *n,sym_table *st) {
                 //not in global table...
                 //TODO: THROW ERROR VARIABLE NOT DECLARED
                 return undef;
-            }
-            else{
-                if(aux0->type==charlit){return intlit;}
-                else{return aux0->type;}
+            } else{
+                if(aux0->type==charlit) {return intlit;}
+                else {return aux0->type;}
             }
         }
         else{
-            if(aux0->type==charlit){return intlit;}
+            if(aux0->type==charlit) {return intlit;}
             else{return aux0->type;}
         }
         free_sym(aux1);
@@ -450,11 +449,9 @@ int getTerminalType(node *n,sym_table *st) {
     else if(strncmp(n->str,"CharLit",7)==0){
         //return charlit;
         return intlit;
-    }
-    else if(strncmp(n->str,"IntLit",6)==0){
+    } else if(strncmp(n->str,"IntLit",6)==0){
         return intlit;
-    }
-    else if(strncmp(n->str,"RealLit",7)==0){
+    } else if(strncmp(n->str,"RealLit",7)==0){
         return reallit;
     }
 }
