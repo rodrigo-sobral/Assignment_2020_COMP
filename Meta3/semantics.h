@@ -20,7 +20,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode);
 
 //  CHECKERS
 int isDeclared(sym *s, sym_table *st);
-int check_params_list_types(sym *s0, sym *s1);
+int check_params_list_types(sym *s0, sym *s1, int lineNum, int colNum);
 int isTerminal(node *n);
 int isBeforeMainFunc(sym *s);
 int checkConflitingTypes(_type expectedType,_type gotType,int line, int col);
@@ -31,6 +31,7 @@ int paramsCounter(struct param* param_list);
 //  GETTERS
 _type get_statement_type(node* statement, sym_table *st);
 _type get_operation_type(node * operation,sym_table *st);
+_type get_comparisons_type(node * operation,sym_table *st);
 _type get_store_type(node *store, sym_table*st);
 _type get_funcCall_type(node *call,sym_table*st);
 _type getTerminalType(node *n,sym_table *st);

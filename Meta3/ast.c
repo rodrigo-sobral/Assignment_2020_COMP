@@ -33,7 +33,8 @@ node *createNode(char *str, token *tk)
     n->next = NULL;
     n->child = NULL;
     n->str = strdup(str);
-    n->tk=tk; //VERIFICAR SE ESTE ASSIGNMENT FUNCIONA!
+    n->tk=tk; 
+    n->type=-1;//for tree notation
     return n;
 }
 
@@ -84,20 +85,28 @@ void addChild(node *n, node *child)
         addNext(n->child, child);
 }
 
-void printTree(void)
+void printTree(int anotate)
 {
-    preOrder_(root, 0);
+    preOrder_(root, 0,anotate);
 }
 
-void preOrder_(node *n, int h){ //used to be static :'(
+void preOrder_(node *n, int h,int anotate){ //used to be static :'(
     int i;
     if (n != NULL)
     {
         for (i = 0; i < h; i++)
             printf("..");
-        printf("%s\n", n->str);
-        preOrder_(n->child, h + 1);
-        preOrder_(n->next, h);
+        printf("%s", n->str);
+        /*ANOTATE TREE*/
+        if(anotate){
+            if(n->type!=-1){
+                printf(" - %s",type_to_str(n->type));
+            }
+        }
+        /**************/
+        printf("\n");
+        preOrder_(n->child, h + 1,anotate);
+        preOrder_(n->next, h,anotate);
     }
 }
 

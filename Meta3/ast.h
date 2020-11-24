@@ -4,11 +4,14 @@
 
 #ifndef AST_H 
 #define AST_H
-
+#include "symbol_table.h"
 /*linked lists tree structure*/
 typedef struct node{
     char *str; //name
     struct token *tk; //tk has-> value, lineNum,colNum
+    /*for tree notation*/
+    _type type;
+    /**/
     struct node *next;
     struct node *child; 
 } node;
@@ -29,8 +32,8 @@ node *getDeclarationNodes(node* n,node *typeSpecNode);
 int isNullNode(node *n);
 void addNext(node *n, node *next);
 void addChild(node *n, node *child);
-void preOrder_(node *n, int h);
-void printTree(void);
+void preOrder_(node *n, int h,int anotate);
+void printTree(int anotate);
 void freeTree_(node *n); 
 void freeTree(void);
 token* createToken(char* str, int lineNum, int colNum);
