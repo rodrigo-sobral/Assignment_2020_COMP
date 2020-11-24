@@ -32,7 +32,7 @@ void buildSymbolTables(node* ast_root) {
 }
 
 void handle_varDecs(node *n) {
-    node *aux=n;//typedef
+node *aux=n;//typedef
     _type expr_type;
     sym *s;
     s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
@@ -42,6 +42,7 @@ void handle_varDecs(node *n) {
         expr_type=get_statement_type(aux,st_root);
         if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
             free_sym(s);
+            return;
         }
     }
 
@@ -335,10 +336,14 @@ _type get_statement_type(node* statement, sym_table *st) {
         }
         else{
             t_aux=getTerminalType(aux->child,st);
+            if(t_aux==undef){/*TODO: THROW NOT DECLARED ERROR*/ return t_aux;}
             if(!(t_aux==reallit||t_aux==intlit)){
                 //TODO: THROW ERROR invalid statement type (por exemplo fazer: -'a' )
                 printf("error\n");
                 return undef;
+            }
+            else{
+                return t_aux;
             }
         }
     }
@@ -380,7 +385,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         return st->sym_list->type; //doesnt matter here..
     }
     else if(isTerminal(statement)){
-        //intlit ou realit ou undef..
+        //intlit ou realit ou undef ou id..
         return getTerminalType(statement,st);
     }
     else if(strcmp(statement->str,"Null")==0){
@@ -407,7 +412,7 @@ _type get_operation_type(node * operation,sym_table *st) {
 _type get_store_type(node *store, sym_table*st) {
     node *n_aux= store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
-    _type t_aux;
+    _type t_aux,expr_type;
     s_aux= create_sym(n_aux->tk->value, undef, 0, 0);
     storedSym= get_sym(s_aux, st);
     if(storedSym==NULL){
@@ -419,16 +424,14 @@ _type get_store_type(node *store, sym_table*st) {
             return undef;
         }
     }
+    free(s_aux);
     if(storedSym->type==charlit) { t_aux=intlit; } //chars são considerados ints
     else { t_aux=storedSym->type; }
-    if ( t_aux != get_statement_type(n_aux->next, st) ) {
-        //TODO: THROW ERROR tentar associar a uma variável um tipo q n é aquele q foi declarado para essa variável
-        //tipo: int i; i=2.3; <--
-        //linenum e colnum: n_aux->next->tk->lineNum e n_aux->next->tk->colNum 
-        printf("Line %d, col %d: Conflicting  types (got %s, expected %s)\n", n_aux->next->tk->lineNum, n_aux->next->tk->colNum, type_to_str(get_statement_type(n_aux->next, st)), type_to_str(t_aux));
+    expr_type=get_statement_type(n_aux->next, st);
+    if ( checkConflitingTypes(t_aux,expr_type,n_aux->next->tk->lineNum, n_aux->next->tk->colNum) ){
         return undef;
     } else {
-        return t_aux;
+        return storedSym->type;
     }
 
 }
@@ -479,14 +482,13 @@ _type get_funcCall_type(node *call,sym_table*st) {
 
 
 
-int getTerminalType(node *n,sym_table *st) {
+_type getTerminalType(node *n,sym_table *st) {
     sym *aux0,*aux1;
     if(strncmp(n->str,"Id",2)==0){
         aux1=create_sym(n->tk->value,undef,0,0);
         if((aux0=get_sym(aux1,st))==NULL){ //if not in local table, search in global table
             if((aux0=get_sym(aux1,st_root))==NULL){
                 //not in global table...
-                //TODO: THROW ERROR VARIABLE NOT DECLARED
                 return undef;
             } else{
                 if(aux0->type==charlit) {return intlit;}

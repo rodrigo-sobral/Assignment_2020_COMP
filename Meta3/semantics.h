@@ -33,6 +33,6 @@ _type get_statement_type(node* statement, sym_table *st);
 _type get_operation_type(node * operation,sym_table *st);
 _type get_store_type(node *store, sym_table*st);
 _type get_funcCall_type(node *call,sym_table*st);
-int getTerminalType(node *n,sym_table *st);
+_type getTerminalType(node *n,sym_table *st);
 
 #endif
