@@ -45,7 +45,7 @@ sym_table* create_global_table(void) {
     return st;
 }
 
-void add_sym_table(sym_table *st){
+void add_sym_table(sym_table *st) {
     sym_table *aux=st_root;
     if(aux!=NULL){
         while(aux->next!=NULL) aux=aux->next;
@@ -53,7 +53,7 @@ void add_sym_table(sym_table *st){
     } else st_root=st;
 }
 
-sym_table *get_sym_table(char* name){ 
+sym_table *get_sym_table(char* name) { 
     //searches and returns sym_table if found (doesnt include global table!)
     sym_table *aux;
     if(st_root!=NULL){
@@ -65,7 +65,7 @@ sym_table *get_sym_table(char* name){
     } return NULL;
 }
 /********************************************************/
-sym *create_sym(char *name,_type type, int isfunc, int isdef){
+sym *create_sym(char *name,_type type, int isfunc, int isdef) {
     sym *s;
     if ((s = (sym *)malloc(sizeof(sym))) == NULL) {
         fprintf(stderr, "Error allocating memory");
@@ -80,7 +80,7 @@ sym *create_sym(char *name,_type type, int isfunc, int isdef){
     return s;
 }
 
-void add_sym(sym_table* st, sym* s){
+void add_sym(sym_table* st, sym* s) {
     sym *aux=NULL;
     if(st->sym_list!=NULL){
         aux=st->sym_list;
@@ -89,7 +89,7 @@ void add_sym(sym_table* st, sym* s){
     } else st->sym_list=s;
 }
 
-sym* get_sym(sym* s,sym_table* st){
+sym* get_sym(sym* s,sym_table* st) {
     sym *aux=st->sym_list;
     while(aux!=NULL){
         if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
@@ -98,7 +98,7 @@ sym* get_sym(sym* s,sym_table* st){
 }
 
 
-void free_sym(sym *s){
+void free_sym(sym *s) {
     if (s) {
         free(s->name);
         free_param_list(s->param_list);
@@ -106,7 +106,7 @@ void free_sym(sym *s){
     }
 }
 /*************************************************/
-void add_param(sym *s, _type type){
+void add_param(sym *s, _type type) {
     param *aux;
     if(s->param_list){
         aux=s->param_list;
@@ -116,7 +116,7 @@ void add_param(sym *s, _type type){
     else s->param_list=create_param(type);
 }
 
-param* create_param(_type type){
+param* create_param(_type type) {
     param* p;
     p=(param *)malloc(sizeof(param));
     p->type=type;
@@ -124,7 +124,7 @@ param* create_param(_type type){
     return p;
 }
 /**********************************************/
-void printSymTables(void){
+void printSymTables(void) {
     printGlobal(st_root); //print global table
     printFunctions(st_root->next); //print functions tables
 }
@@ -150,8 +150,6 @@ void printGlobal(sym_table* st) { //table
     } printf("\n");
 }
 
-//  pode vir a ser preciso criar uma ll com todas as variaveis declaradas dentro duma certa funçao (global_func->declar_list)
-// alem disso poderá ser preciso definir também uma flag de definição de funçao
 void printFunctions(sym_table* st) { //tables
     sym* s;
     if(st!=NULL){
@@ -165,7 +163,7 @@ void printFunctions(sym_table* st) { //tables
     }
 }
 
-void free_param_list(param* p){
+void free_param_list(param* p) {
     param *aux;
     if(p!=NULL){
         aux=p;
@@ -177,7 +175,7 @@ void free_param_list(param* p){
     }
 }
 /**********************************************/
-_type str_to_type(char* str){
+_type str_to_type(char* str) {
     if(strcmp(str,"Char")==0) return charlit;
     else if(strcmp(str,"Void")==0) return voidlit;
     else if(strcmp(str,"Int")==0) return intlit;
@@ -185,7 +183,7 @@ _type str_to_type(char* str){
     else if(strcmp(str,"Double")==0) return reallit;
 }
 
-char* type_to_str(_type t){
+char* type_to_str(_type t) {
     switch(t){
         case charlit:
             return "char";

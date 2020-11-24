@@ -10,11 +10,11 @@
 
 struct sym_table* st_root; 
 
-void startSemanticAnalysis(node* ast_root){
+void startSemanticAnalysis(node* ast_root) {
     buildSymbolTables(ast_root);    
 }
 
-void buildSymbolTables(node* ast_root){
+void buildSymbolTables(node* ast_root) {
     node* ast_node=ast_root->child; //lista ligada de func e variaveis globais
 
     st_root=create_global_table();
@@ -31,26 +31,37 @@ void buildSymbolTables(node* ast_root){
     }
 }
 
-void handle_varDecs(node *n){
+void handle_varDecs(node *n) {
     node *aux=n;//typedef
-    _type type;
+    _type type, expr_type;
     sym *s;
 
     type=str_to_type(aux->str);
-    aux=aux->next; //id
-    s=create_sym(aux->tk->value,type,0,0); 
-    if(aux->next){
-        aux=aux->next; //expr
+    aux=aux->next; //expr
         s->isDef=1;
-        /* TODO: tratar de inicializações ..FAZER VERIFICAÇÕES SOBRE AS EXPRESSIONS..POR CAUSA DOS TIPOS E DAS DECLARAÇÕES*/
-        /*TODO: THROW ERROR SE O TYPE FOR INVALIDO e dar free no symbolo s*/
-    }
-    /*TODO:verificar se o symbolo já foi declarado antes!*/
+        if(type==charlit){type==intlit;}
+        expr_type=get_statement_type(aux,st_root);
+        if(expr_type!=type){ 
+            printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum, aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
+            free_sym(s);
+        }
+        /*         
+        Conflicting types ( got <type >, expected <type >)
+        Invalid use of void type in declaration
+        Lvalue required
+        Operator <token > cannot be applied to type <type >
+        Operator <token > cannot be applied to types <type >, <type >
+        Symbol <token > already defined
+        Symbol <token > is not a function
+        Unknown symbol <token >
+        Wrong number of arguments to function <token > ( got <number >, required <number >)
+        */
+
     if (isDeclared(s, st_root)) printf("Line %d, col %d: Symbol %s already defined\n",n->tk->lineNum, n->tk->colNum ,s->name);
     else add_sym(st_root,s);
 }
 
-void handle_funcDecs(node* n){
+void handle_funcDecs(node* n) {
     //recebe head da lista ligada com nós:
     //typespec-->funcDeclarator
     sym *funcDec;
@@ -88,7 +99,7 @@ void handle_funcDecs(node* n){
 
 }
 
-void handle_funcDefs(node* n){
+void handle_funcDefs(node* n) {
     //recebe head da lista ligada com nós:
     //typespec-->funcDeclarator-->funcBody
     sym *funcDef;
@@ -108,7 +119,7 @@ void handle_funcDefs(node* n){
         //move to paramList node
         aux=aux->next; //paramList
         //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
-        paramAux=aux->child; //paramCec
+        paramAux=aux->child; //paramDec
         while(paramAux){ //iterate through paramList childs
            //paramDec content (typespec-->[option: id])
             add_param(funcDef,str_to_type(paramAux->child->str)); //add param to sym paramlist
@@ -147,7 +158,7 @@ void handle_funcDefs(node* n){
                     }
                     else {
                         //DONE: throw error declaração de função sem nome de variaveis nos parâmetros
-                        printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", 0, 0, paramAux->child->next->tk->value, paramsCounter(paramAux->child->next->child), paramsCounter(funcDefTable)); //temporary
+                        printf("Line %d, col %d: Lvalue required\n", 0, 0); 
                     } 
                 }               
                 paramAux=paramAux->next; //next paramdeclaration node
@@ -210,11 +221,11 @@ void handle_funcDefs(node* n){
     }    
 }
 
-void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode){
+void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
     //eu trato desta função hj
     node *funcDecAndStats=funcBodyNode->child;
     node *aux;
-    _type type;
+    _type type,expr_type;
     sym *s;
     // ^^lista ligada de declarations and statements do func body
     while(funcDecAndStats){
@@ -228,20 +239,24 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode){
                 //var definition
                 aux=aux->next; //expr
                 s->isDef=1;
-                /*nota:Estou a tratar disto neste momento_FAZER VERIFICAÇÕES SOBRE AS EXPRESSIONS..POR CAUSA DOS TIPOS E DAS DECLARAÇÕES*/
+                if(type==charlit){type==intlit;}
+                expr_type=get_statement_type(aux,st_root);
+                if(expr_type!=type){ 
+                    printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum, aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
+                    free_sym(s);
+                }
                 /*TODO: THROW ERROR SE O TYPE FOR INVALIDO e dar free no symbolo s*/
             }
             add_sym(st,s);
         }
         else{
-            /*TODO: ESTOU A TRATAR DISTO NESTE MOMENTO_eduardo*/
-            //
+            expr_type=get_statement_type(funcDecAndStats, st);
         }
         funcDecAndStats=funcDecAndStats->next;
     }
 }
 
-int isDeclared(sym *s, sym_table *st){
+int isDeclared(sym *s, sym_table *st) {
     //check if s is declared in st, if sym is a function and sym is before main func, return declared=1
     sym *symAux=st->sym_list;
     while(symAux){
@@ -251,7 +266,7 @@ int isDeclared(sym *s, sym_table *st){
     return 0; 
 }
 
-int check_params_list_types(sym *sym_defined, sym *sym_declared){
+int check_params_list_types(sym *sym_defined, sym *sym_declared) {
     param *list0=sym_defined->param_list;
     param *list1=sym_declared->param_list;
 
@@ -281,7 +296,7 @@ int paramsCounter(struct param* param_list) {
     return counter;    
 }
 
-_type get_statement_type(node* statement, sym_table *st){
+_type get_statement_type(node* statement, sym_table *st) {
     node *aux=statement;
     _type t_aux;
     //store 2
@@ -322,7 +337,7 @@ _type get_statement_type(node* statement, sym_table *st){
     }
 }
 
-_type get_operation_type(node * operation,sym_table *st){
+_type get_operation_type(node * operation,sym_table *st) {
     node *n_aux=operation->child;
     _type type0, type1; //operation only has 2 nodes
     type0=get_statement_type(n_aux,st);
@@ -338,7 +353,7 @@ _type get_operation_type(node * operation,sym_table *st){
     }
 }
 
-_type get_store_type(node *store, sym_table*st){
+_type get_store_type(node *store, sym_table*st) {
     node *n_aux=store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
     _type t_aux;
@@ -365,7 +380,7 @@ _type get_store_type(node *store, sym_table*st){
 
 }
 
-_type get_funcCall_type(node *call,sym_table*st){
+_type get_funcCall_type(node *call,sym_table*st) {
     node *n_aux;
     sym * s_aux, *funcSym;
     param* funcCall_params,*p_aux0,*p_aux1; //da func call
@@ -411,7 +426,7 @@ _type get_funcCall_type(node *call,sym_table*st){
 
 
 
-int getTerminalType(node *n,sym_table *st){
+int getTerminalType(node *n,sym_table *st) {
     sym *aux0,*aux1;
     if(strncmp(n->str,"Id",2)==0){
         aux1=create_sym(n->tk->value,undef,0,0);
@@ -443,7 +458,7 @@ int getTerminalType(node *n,sym_table *st){
         return reallit;
     }
 }
-int isTerminal(node *n){
+int isTerminal(node *n) {
     if(n->tk->value) return 1;    
     else return 0;
 }

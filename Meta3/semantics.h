@@ -5,14 +5,32 @@
 #ifndef SEMANTICS_H 
 #define SEMANTICS_H
 #include "symbol_table.h"
+
+//  STARTES
 void startSemanticAnalysis(node* ast_root);
 void buildSymbolTables(node* ast_root);
+
+//  HANDLERS
 void handle_varDecs(node *n);
-void handle_funcDefs(node* n);
 void handle_funcDecs(node* n);
+void handle_funcDefs(node* n);
+
+//  ADDERS
 void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode);
+
+//  CHECKERS
 int isDeclared(sym *s, sym_table *st);
 int check_params_list_types(sym *s0, sym *s1);
+int isTerminal(node *n);
+
+//  COUNTERS
 int paramsCounter(struct param* param_list);
+
+//  GETTERS
+_type get_statement_type(node* statement, sym_table *st);
+_type get_operation_type(node * operation,sym_table *st);
+_type get_store_type(node *store, sym_table*st);
+_type get_funcCall_type(node *call,sym_table*st);
+int getTerminalType(node *n,sym_table *st);
 
 #endif

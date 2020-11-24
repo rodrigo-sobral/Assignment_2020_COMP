@@ -29,20 +29,33 @@ typedef struct sym_table{
     struct sym_table *next;
 } sym_table;
 
+
+//  CREATERS
 sym_table* create_global_table(void);
 sym_table* create_sym_table(char* name);
-void add_sym_table(sym_table *st);
-sym_table *get_sym_table(char* name);
 sym *create_sym(char *name,_type type, int isfunc, int isdef);
 param* create_param(_type type);
-void add_sym(sym_table* st, sym* s);
+
+//  GETTERS
+sym_table *get_sym_table(char* name);
 sym* get_sym(sym* s,sym_table* st);
-void free_sym(sym *s);
+
+//  ADDERS
+void add_sym_table(sym_table *st);
+void add_sym(sym_table* st, sym* s);
 void add_param(sym *s, _type type);
+
+//  CONVERTES
 _type str_to_type(char* str);
 char* type_to_str(_type t);
+
+//  FREERES
+void free_sym(sym *s);
 void free_param_list(param* p);
+
+//  PRINTERS
 void printFunctions(sym_table* st);
 void printGlobal(sym_table* st);
 void printSymTables(void);
+
 #endif
