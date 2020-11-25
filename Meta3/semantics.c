@@ -230,6 +230,7 @@ void handle_funcDefs(node* n) {
                     }
                     else {
                         //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
+
                         printf("**semantic error: funcDef sem nomes de variaveis**\n"); //temporary
                     } 
                 }               
@@ -482,11 +483,10 @@ _type get_store_type(node *store, sym_table*st) {
     s_aux= create_sym(n_aux->tk->value, undef, 0, 0);
     storedSym= get_sym(s_aux, st);
     if(storedSym==NULL){
-        storedSym= get_sym(s_aux,st_root);
+        storedSym=get_sym(s_aux,st_root);
         if(storedSym==NULL){ 
             //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA 
-            if (s_aux->type==undef) printf("Line %d, col %d: Lvalue required\n", n_aux->tk->lineNum, n_aux->tk->colNum);
-            else printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
+            printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
             store->child->type=undef; //var node
             store->child->next->type=get_statement_type(store->child->next, st);//expr node
             free(s_aux);
