@@ -407,6 +407,9 @@ _type get_statement_type(node* statement, sym_table *st) {
         statement->type=voidlit;
         return voidlit;
     }
+    else{
+        return undef;
+    }
 }
 
 _type get_operation_type(node * operation,sym_table *st){
@@ -515,7 +518,7 @@ _type get_store_type(node *store, sym_table*st) {
 _type get_funcCall_type(node *call,sym_table*st) {
     node *n_aux;
     sym * s_aux, *funcSym;
-    param* funcCall_params,*p_aux0,*p_aux1; //da func call
+    param *p_aux0,*p_aux1; //da func call
     _type t_aux;
     int count=0,i;
     n_aux=call->child; //function name node->str = Id(name)

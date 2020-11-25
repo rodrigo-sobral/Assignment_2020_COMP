@@ -5,7 +5,7 @@
 #ifndef SYMBOL_TABLE_H 
 #define SYMBOL_TABLE_H
 #include "symbol_table.h"
-typedef enum {intlit, charlit, reallit, voidlit, shortlit,undef} _type;
+typedef enum {none,intlit, charlit, reallit, voidlit, shortlit,undef} _type;
 
 /*Structures*/
 typedef struct sym {

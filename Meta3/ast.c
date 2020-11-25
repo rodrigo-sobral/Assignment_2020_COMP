@@ -34,7 +34,7 @@ node *createNode(char *str, token *tk)
     n->child = NULL;
     n->str = strdup(str);
     n->tk=tk; 
-    n->type=-1;//for tree notation
+    n->type=none;//for tree notation
     n-> param_list=NULL; //for tree notation
     return n;
 }
@@ -102,7 +102,7 @@ void preOrder_(node *n, int h,int anotate){ //used to be static :'(
         /*ANOTATE TREE*/
         if(anotate){
             p=n->param_list;
-            if(n->type!=-1){
+            if(n->type!=none){
                 printf(" - %s",type_to_str(n->type));
             }
             if(p!=NULL){
