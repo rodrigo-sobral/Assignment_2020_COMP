@@ -58,7 +58,6 @@ void handle_funcDecs(node* n) {
     node* aux=n, *paramAux;
     _type retType; //func return type
     char *funcName;
-    int voidFlag=0;
 
     retType=str_to_type(aux->str); //get func return type from typespec node
 
