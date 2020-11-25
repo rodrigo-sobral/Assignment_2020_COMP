@@ -526,10 +526,10 @@ _type get_funcCall_type(node *call,sym_table*st) {
         //calcular tipos dos parametros dos argumentos da funccall e add à lista de param do sym_auxiliar
         if(n_aux==NULL){add_param(s_aux,voidlit);} //se a func n tiver argumentos..add param type void
         while(n_aux){
-            t_aux=get_statement_type(n_aux,st);
+            t_aux=get_statement_type(n_aux,st); //int
             add_param(s_aux,t_aux);
-            n_aux->type= t_aux;//add anotation to ast tree arg node
-            add_param_to_node(call->child, t_aux);          
+            //n_aux->type= t_aux;//add anotation to ast tree arg node
+            add_param_to_node(call->child, t_aux); //int         
             n_aux=n_aux->next; //next funccall arg
         }
         //verificar tipos dos parametros
@@ -561,8 +561,8 @@ _type get_funcCall_type(node *call,sym_table*st) {
         /*anotate func args types*/
         n_aux=call->child->next; //first arg
         while(n_aux){
-            n_aux->type=get_statement_type(n_aux,st);  
-            add_param_to_node(call->child, n_aux->type);          
+            t_aux=get_statement_type(n_aux,st);  
+            add_param_to_node(call->child, t_aux);          
             n_aux=n_aux->next; //next funccall arg
         }
         /*************************/
