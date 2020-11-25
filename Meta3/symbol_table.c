@@ -204,8 +204,8 @@ char* type_to_str(_type t) {
         case reallit: return "double";
         case voidlit: return "void";
         case shortlit: return "short";
-        case undef: return "undefined";
-        default: return "undefined";
+        case undef: return "undef";
+        default: return "undef";
     }
 }
 /*****************************************************/

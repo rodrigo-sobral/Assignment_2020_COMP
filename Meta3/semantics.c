@@ -282,7 +282,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
         if(strcmp(funcDecAndStats->str,"Declaration")==0){
             /*DONE:verificar se o symbolo já foi declarado */
             aux=funcDecAndStats->child; //typedef 
-            if(str_to_type(aux->str)==voidlit){/*TODO: ERROR invalid use of void in declaration*/printf("%d%d",aux->tk->lineNum,aux->tk->colNum);}           
+            if(str_to_type(aux->str)==voidlit){/*TODO: ERROR invalid use of void in declaration*/printf("%d%d\n",aux->tk->lineNum,aux->tk->colNum);}           
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
             if(isDeclared(s,st)){
@@ -560,16 +560,16 @@ _type get_funcCall_type(node *call,sym_table*st) {
         p_aux1=s_aux->param_list; //lista com tipos de parametros da func call 
         if(paramsCounter(p_aux0) != paramsCounter(p_aux1)){
             //DONE:  THROW ERROR nr de parametros da function call diferente do nr de parametros declarados para esssa funcção
-            printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)", n_aux->tk->lineNum, n_aux->tk->colNum, funcSym->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
+            printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, funcSym->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
         }
         if(p_aux1->type==voidlit){count--;}
         while(p_aux0&&p_aux1){
+            /*get node line and col*/
             count++;
-            if(p_aux0->type != p_aux1->type) {                
-                n_aux=call; n_aux=n_aux->child; //1º nome da funcao
-                for(i=1;i<=count;i++) n_aux=n_aux->next;
-                printf("Line %d, col %d: Conflicting types (got %s, expected %s)", n_aux->tk->lineNum, n_aux->tk->colNum, type_to_str(p_aux1->type),type_to_str(p_aux0->type)); 
-            }
+            n_aux=call; n_aux=n_aux->child; //1º nome da funcao
+            for(i=1;i<=count;i++) n_aux=n_aux->next; 
+            /************************/
+            checkConflitingTypes(p_aux0->type,p_aux1->type,n_aux->tk->lineNum,n_aux->tk->colNum);       
             p_aux1=p_aux1->next;
             p_aux0=p_aux0->next;
         }
@@ -623,6 +623,9 @@ _type getTerminalType(node *n,sym_table *st) {
     } else if(strncmp(n->str,"RealLit",7)==0){
         n->type=reallit;
         return reallit;
+    }
+    else{
+        return undef;
     }
 }
 
