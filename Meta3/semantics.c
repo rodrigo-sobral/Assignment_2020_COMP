@@ -514,6 +514,7 @@ _type get_funcCall_type(node *call,sym_table*st) {
     n_aux=n_aux->next; //1º argumento da func
     if(funcSym){//se a funcao estiver declarada
         //calcular tipos dos parametros dos argumentos da funccall e add à lista de param do sym_auxiliar
+        if(n_aux==NULL){add_param(s_aux,voidlit);} //se a func n tiver argumentos..add param type void
         while(n_aux){
             t_aux=get_statement_type(n_aux,st);
             add_param(s_aux,t_aux);
@@ -527,13 +528,12 @@ _type get_funcCall_type(node *call,sym_table*st) {
             //DONE:  THROW ERROR nr de parametros da function call diferente do nr de parametros declarados para esssa funcção
             printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)", n_aux->tk->lineNum, n_aux->tk->colNum, funcSym->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
         }
+        if(p_aux1->type==voidlit){count--;}
         while(p_aux0&&p_aux1){
             count++;
             if(p_aux0->type != p_aux1->type) {                
-                n_aux=call; n_aux=n_aux->child; //1º nó dos parametros da funcCall
+                n_aux=call; n_aux=n_aux->child; //1º nome da funcao
                 for(i=1;i<=count;i++) n_aux=n_aux->next;
-                //DONE: THROW ERROR : tipo do parametro no funcCall diferente daquele q foi declarado!
-                //numlinha e numcoluna do erro vai ser: n_aux->tk->lineNum e n_aux->tk->colNum !!! 
                 printf("Line %d, col %d: Conflicting types (got %s, expected %s)", n_aux->tk->lineNum, n_aux->tk->colNum, type_to_str(p_aux1->type),type_to_str(p_aux0->type)); 
             }
             p_aux1=p_aux1->next;
