@@ -472,6 +472,14 @@ _type get_store_type(node *store, sym_table*st) {
     node *n_aux= store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
     _type t_aux,expr_type;
+
+    if(strncmp(store->child->str,"Id",2)!=0){
+        printf("Line %d, col %d: Lvalue required",store->child->tk->lineNum,store->child->tk->colNum);
+        store->child->type=get_statement_type(store->child, st);
+        store->child->next->type=get_statement_type(store->child->next, st);//expr node
+        return undef;
+    }
+ 
     /*verificar se variável está declarada*/
     s_aux= create_sym(n_aux->tk->value, undef, 0, 0);
     storedSym= get_sym(s_aux, st);
@@ -487,6 +495,7 @@ _type get_store_type(node *store, sym_table*st) {
         }
     }
     free(s_aux);
+
     if(storedSym->type==charlit) { t_aux=intlit; } //chars são considerados ints
     else { t_aux=storedSym->type; }
     expr_type=get_statement_type(n_aux->next, st);
