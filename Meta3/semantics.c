@@ -389,7 +389,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         return voidlit; //doesnt matter here..
     }
     else if(strcmp(statement->str,"If")==0){
-        //heckConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
+        //checkConflitingTypes(intlit,get_statement_type(statement->child,st),statement->child->tk->lineNum,statement->child->tk->colNum);
         add_funcBody_syms_to_table(st, statement); 
         return voidlit; //doesnt matter here..
     }
@@ -476,11 +476,12 @@ _type get_store_type(node *store, sym_table*st) {
     if(storedSym==NULL){
         storedSym= get_sym(s_aux,st_root);
         if(storedSym==NULL){ 
-            //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA (nome da variável n declara: n_aux->tk->value)
-            //linenum colnum: n_aux->tk->lineNum e  n_aux->tk->colNum
-            printf("Line %d, col %d: Lvalue required\n", n_aux->tk->lineNum, n_aux->tk->colNum);
+            //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA 
+            if (s_aux->type==undef) printf("Line %d, col %d: Lvalue required\n", n_aux->tk->lineNum, n_aux->tk->colNum);
+            else printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
             store->child->type=undef; //var node
-            store->child->next->type= get_statement_type(n_aux->next, st);//expr node
+            store->child->next->type=get_statement_type(store->child->next, st);//expr node
+            free(s_aux);
             return undef; 
         }
     }
