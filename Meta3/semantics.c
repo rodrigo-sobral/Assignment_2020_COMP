@@ -526,7 +526,8 @@ _type get_funcCall_type(node *call,sym_table*st) {
         while(n_aux){
             t_aux=get_statement_type(n_aux,st);
             add_param(s_aux,t_aux);
-            n_aux->type= t_aux;//add anotation to ast tree arg node           
+            n_aux->type= t_aux;//add anotation to ast tree arg node
+            add_param_to_node(call->child, t_aux);          
             n_aux=n_aux->next; //next funccall arg
         }
         //verificar tipos dos parametros
@@ -558,7 +559,8 @@ _type get_funcCall_type(node *call,sym_table*st) {
         /*anotate func args types*/
         n_aux=call->child->next; //first arg
         while(n_aux){
-            n_aux->type=get_statement_type(n_aux,st);            
+            n_aux->type=get_statement_type(n_aux,st);  
+            add_param_to_node(call->child, n_aux->type);          
             n_aux=n_aux->next; //next funccall arg
         }
         /*************************/
@@ -578,11 +580,11 @@ _type getTerminalType(node *n,sym_table *st) {
                 n->type=undef;
                 return undef;
             } else{
-                if(aux0->type==charlit) {n->type=intlit; return intlit;}
+                if(aux0->type==charlit) {n->type=aux0->type; return intlit;}
                 else {n->type=aux0->type; return aux0->type;}
             }
         } else {
-            if(aux0->type==charlit) { n->type=intlit; return intlit;}
+            if(aux0->type==charlit) { n->type=aux0->type; return intlit;}
             else{n->type=aux0->type; return aux0->type;}
         }
         free_sym(aux1);

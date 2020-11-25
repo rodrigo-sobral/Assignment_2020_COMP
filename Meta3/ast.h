@@ -11,6 +11,7 @@ typedef struct node{
     struct token *tk; //tk has-> value, lineNum,colNum
     /*for tree notation*/
     _type type;
+    struct param* param_list; //list head
     /**/
     struct node *next;
     struct node *child; 
@@ -37,5 +38,5 @@ void printTree(int anotate);
 void freeTree_(node *n); 
 void freeTree(void);
 token* createToken(char* str, int lineNum, int colNum);
-
+void add_param_to_node(node *n, _type type);
 #endif

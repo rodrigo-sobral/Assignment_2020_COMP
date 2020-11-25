@@ -35,6 +35,7 @@ node *createNode(char *str, token *tk)
     n->str = strdup(str);
     n->tk=tk; 
     n->type=-1;//for tree notation
+    n-> param_list=NULL; //for tree notation
     return n;
 }
 
@@ -92,6 +93,7 @@ void printTree(int anotate)
 
 void preOrder_(node *n, int h,int anotate){ //used to be static :'(
     int i;
+    param *p;
     if (n != NULL)
     {
         for (i = 0; i < h; i++)
@@ -99,8 +101,18 @@ void preOrder_(node *n, int h,int anotate){ //used to be static :'(
         printf("%s", n->str);
         /*ANOTATE TREE*/
         if(anotate){
+            p=n->param_list;
             if(n->type!=-1){
                 printf(" - %s",type_to_str(n->type));
+            }
+            if(p!=NULL){
+                printf("(%s",type_to_str(p->type));
+                p=p->next;
+                while(p!=NULL){
+                    printf(",%s",type_to_str(p->type));
+                    p=p->next;
+                }
+                printf(")");
             }
         }
         /**************/
@@ -125,8 +137,19 @@ void freeTree_(node *n) //used to be static :'(
         //free (heap) allocated memory
         free(n->str); //str
         if(n->tk->value!=NULL){free(n->tk->value);}
+        free_param_list(n->param_list);
         free(n);
     }
+}
+
+void add_param_to_node(node* n, _type type){
+    param *aux;
+    if(n->param_list){
+        aux=n->param_list;
+        while(aux->next)  aux=aux->next;
+        aux->next=create_param(type);
+    }
+    else n->param_list=create_param(type);
 }
 
 

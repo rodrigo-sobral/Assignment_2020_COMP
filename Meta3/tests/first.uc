@@ -1,8 +1,7 @@
 int main(void) {
   char i = 'A';
-  int a;
-  3= a;
-  while (f=3) {
+  while (i <= 'Z')
+  {
     putchar(i);
     i = i + 1;
   }
