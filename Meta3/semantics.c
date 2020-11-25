@@ -53,11 +53,12 @@ void handle_varDecs(node *n) {
 
 void handle_funcDecs(node* n) {
     //recebe head da lista ligada com nós:
-    //typespec-->funcDeclarator
+    //typespec
     sym *funcDec;
     node* aux=n, *paramAux;
     _type retType; //func return type
     char *funcName;
+    int voidFlag=0;
 
     retType=str_to_type(aux->str); //get func return type from typespec node
 
@@ -79,10 +80,16 @@ void handle_funcDecs(node* n) {
         //move to paramList node
         aux=aux->next; //paramlist
         //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
-        aux=aux->child;
-        while(aux){ //iterate through paramList childs
+        aux=aux->child; //paramDec
+        if(aux!=NULL){
             paramAux=aux->child; //paramDec content (typespec-->[option: id])
             add_param(funcDec,str_to_type(paramAux->str)); //add param to sym paramlist
+            aux=aux->next;
+        }
+        while(aux){ //iterate through paramList childs
+            paramAux=aux->child; //paramDec content (typespec-->[option: id])
+            if(str_to_type(paramAux->str)==voidlit){/*TODO: THROW ERROR UNVALID USE OF VOID TYPE IN DECLARATION*/}
+            else{add_param(funcDec,str_to_type(paramAux->str)); /*add param to func sym param list*/}
             aux=aux->next;
         }
         add_sym(st_root,funcDec);
