@@ -32,10 +32,10 @@ void buildSymbolTables(node* ast_root) {
 }
 
 void handle_varDecs(node *n) {
-node *aux=n;//typedef
+    node *aux=n;//typedef
     _type expr_type;
     sym *s;
-    if(str_to_type(aux->str)==voidlit){/*TODO: ERROR invalid use of void in declaration*/printf("%d%d",aux->tk->lineNum,aux->tk->colNum);}
+    if(str_to_type(aux->str)==voidlit) { printf("Line %d, col %d: Invalid use of void type in declaration\n",aux->tk->lineNum, aux->tk->colNum); }
     s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
     aux=aux->next; //id
     if(aux->next!=NULL){
@@ -421,12 +421,14 @@ _type get_operation_type(node * operation,sym_table *st){
     else if(type0==voidlit){
         /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
         /*linha e col: n_aux->tk->lineNum ..e.. n_aux->tk->colNum*/
+        printf("Line %d, col %d: Invalid use of void type in declaration\n",operation->tk->lineNum,operation->tk->colNum);
         operation->type=voidlit;
         return voidlit;
     }
     else if(type1==voidlit){
         /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
         /*linha e col: n_aux->next->tk->lineNum ..e.. n_aux->next->tk->colNum*/
+        printf("Line %d, col %d: Invalid use of void type in declaration\n",operation->tk->lineNum,operation->tk->colNum);
         operation->type=voidlit;
         return voidlit;
     }    
@@ -473,7 +475,7 @@ _type get_store_type(node *store, sym_table*st) {
     _type t_aux,expr_type;
 
     if(strncmp(store->child->str,"Id",2)!=0){
-        printf("Line %d, col %d: Lvalue required",store->child->tk->lineNum,store->child->tk->colNum);
+        printf("Line %d, col %d: Lvalue required\n",store->child->tk->lineNum,store->child->tk->colNum);
         store->child->type=get_statement_type(store->child, st);
         store->child->next->type=get_statement_type(store->child->next, st);//expr node
         return undef;
