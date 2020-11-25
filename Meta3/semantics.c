@@ -88,7 +88,10 @@ void handle_funcDecs(node* n) {
         }
         while(aux){ //iterate through paramList childs
             paramAux=aux->child; //paramDec content (typespec-->[option: id])
-            if(str_to_type(paramAux->str)==voidlit){/*TODO: THROW ERROR UNVALID USE OF VOID TYPE IN DECLARATION*/}
+            if(str_to_type(paramAux->str)==voidlit) {
+                /*TODO: THROW ERROR UNVALID USE OF VOID TYPE IN DECLARATION*/
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->tk->lineNum, paramAux->tk->colNum);
+            }
             else{add_param(funcDec,str_to_type(paramAux->str)); /*add param to func sym param list*/}
             aux=aux->next;
         }
