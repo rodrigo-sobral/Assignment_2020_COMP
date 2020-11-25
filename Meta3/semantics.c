@@ -58,6 +58,7 @@ void handle_funcDecs(node* n) {
     node* aux=n, *paramAux;
     _type retType; //func return type
     char *funcName;
+    int voidFlag=0;
 
     retType=str_to_type(aux->str); //get func return type from typespec node
 
@@ -83,14 +84,19 @@ void handle_funcDecs(node* n) {
         if(aux!=NULL){
             paramAux=aux->child; //paramDec content (typespec-->[option: id])
             add_param(funcDec,str_to_type(paramAux->str)); //add param to sym paramlist
+            if(str_to_type(paramAux->str)==voidlit) {voidFlag=1;}
             aux=aux->next;
         }
         while(aux){ //iterate through paramList childs
             paramAux=aux->child; //paramDec content (typespec-->[option: id])
-            if(str_to_type(paramAux->str)==voidlit) {
-                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->tk->lineNum, paramAux->tk->colNum);
+            if(voidFlag){add_param(funcDec,undef);/*TODO: THROW ERROR void must be the only parameter: ex do erro: main(void,int)*/}
+            else{
+                if(str_to_type(paramAux->str)==voidlit) {
+                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->tk->lineNum, paramAux->tk->colNum);
+                    add_param(funcDec,undef);
+                }
+                else{add_param(funcDec,str_to_type(paramAux->str)); /*add param to func sym param list*/}
             }
-            else{add_param(funcDec,str_to_type(paramAux->str)); /*add param to func sym param list*/}
             aux=aux->next;
         }
         add_sym(st_root,funcDec);
@@ -150,11 +156,7 @@ void handle_funcDefs(node* n) {
                     if(paramAux->child->next!=NULL){ //var name
                         add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
-                    else {
-                        //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
-                        printf("erro\n");
-                    } 
-                }               
+                }         
                 paramAux=paramAux->next; //next paramdeclaration node
             }
                 
@@ -198,10 +200,6 @@ void handle_funcDefs(node* n) {
                     //add this variable to symtable of this function
                     add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                 }
-                else{
-                    //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
-                    printf("**semantic error: funcDef sem nomes de variaveis**\n"); //temporary
-                }   
             }             
             paramAux=paramAux->next; //next paramdeclaration node
         }
@@ -248,11 +246,6 @@ void handle_funcDefs(node* n) {
                     if(paramAux->child->next){ //var name
                         add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
                     }
-                    else {
-                        //TODO: throw error declaração de função sem nome de variaveis nos parâmetros
-
-                        printf("**semantic error: funcDef sem nomes de variaveis**\n"); //temporary
-                    } 
                 }               
                 paramAux=paramAux->next; //next paramdeclaration node
             }
@@ -267,8 +260,50 @@ void handle_funcDefs(node* n) {
     else{
         //DONE:throw FUNCTION UNDECLARED error
         printf("Line %d, col %d: Symbol %s is not a function\n",n->next->tk->lineNum , n->next->tk->lineNum,funcName);
-        free_sym(funcDef);
-        return;
+        //move to paramList node
+        aux=aux->next; //paramList
+        //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
+        paramAux=aux->child; //paramDec
+        if(paramAux!=NULL){
+            //paramDec content (typespec-->[option: id])
+            add_param(funcDef,str_to_type(paramAux->child->str)); //add param to sym paramlist
+            paramAux=paramAux->next;
+        }
+        while(paramAux){ //iterate through paramList childs
+           //paramDec content (typespec-->[option: id])
+            if(str_to_type(paramAux->child->str)==voidlit){printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->child->tk->lineNum, paramAux->child->tk->colNum);}
+            else{add_param(funcDef,str_to_type(paramAux->child->str));} //add param to sym paramlist
+            paramAux=paramAux->next;
+        }      
+        /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
+        if(get_sym_table(funcName)){
+            /*DONE:THROW FUNCTION ALREADY DEFINED ERROR*/
+            printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum,  n->next->tk->colNum, funcName);
+            free_sym(funcDef);
+            return;
+        } else {
+            //create new sym_table
+            funcDefTable=create_sym_table(funcName);
+            add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
+            
+            /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
+            paramAux=aux->child; //paramDec
+            while(paramAux){ //iterate through paramList childs
+                //paramDec content (typespec-->[option: id])
+                if(str_to_type(paramAux->child->str)!=voidlit){
+                    if(paramAux->child->next){ //var name
+                        add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); //parameter variable sym
+                    }
+                }               
+                paramAux=paramAux->next; //next paramdeclaration node
+            }
+                
+            /*ENTRAR NO FUNCBODY*/
+            aux=aux->next; //funcBody node
+            /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
+            add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
+            add_sym_table(funcDefTable);
+        }
     }    
 }
 
@@ -286,7 +321,6 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
             if(isDeclared(s,st)){
-                //DONE: THROW ERROR váriável q se está a declarar já foi declarada
                 printf("Line %d, col %d: Symbol %s already defined\n", aux->tk->lineNum, aux->tk->colNum, aux->tk->value);
             }
             else{
@@ -326,7 +360,7 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared, int lineNum, in
     param *list1=sym_declared->param_list;
 
     while(list0 && list1){
-        checkConflitingTypes(list0->type,list1->type,0, 0);         
+        checkConflitingTypes(list0->type,list1->type,lineNum, colNum);         
         list0=list0->next;
         list1=list1->next;
     }
@@ -442,16 +476,12 @@ _type get_operation_type(node * operation,sym_table *st){
         return undef;
     }
     else if(type0==voidlit){
-        /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
-        /*linha e col: n_aux->tk->lineNum ..e.. n_aux->tk->colNum*/
-        printf("Line %d, col %d: Invalid use of void type in declaration\n",operation->tk->lineNum,operation->tk->colNum);
+        printf("Line %d, col %d: Invalid use of void type in declaration\n",n_aux->next->tk->lineNum,n_aux->next->tk->colNum);
         operation->type=voidlit;
         return voidlit;
     }
     else if(type1==voidlit){
-        /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
-        /*linha e col: n_aux->next->tk->lineNum ..e.. n_aux->next->tk->colNum*/
-        printf("Line %d, col %d: Invalid use of void type in declaration\n",operation->tk->lineNum,operation->tk->colNum);
+        printf("Line %d, col %d: Invalid use of void type in declaration\n",n_aux->next->tk->lineNum,n_aux->next->tk->colNum);
         operation->type=voidlit;
         return voidlit;
     }    
@@ -475,14 +505,12 @@ _type get_comparisons_type(node *operation, sym_table *st){
         return undef;
     }
     else if(type0==voidlit){
-        /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
-        /*linha e col: n_aux->tk->lineNum ..e.. n_aux->tk->colNum*/
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
         operation->type=voidlit;
         return voidlit;
     }
     else if(type1==voidlit){
-        /*TODO: THROW ERROR exemplo:  void > 2 .. ou seja, erro de void!*/
-        /*linha e col: n_aux->next->tk->lineNum ..e.. n_aux->next->tk->colNum*/
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->next->tk->lineNum,n_aux->next->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
         operation->type=voidlit;
         return voidlit;
     }
