@@ -506,10 +506,10 @@ _type get_funcCall_type(node *call,sym_table*st) {
     _type t_aux;
     int count=0,i;
     n_aux=call->child; //function name node->str = Id(name)
-    s_aux=create_sym(n_aux->tk->value,undef,1,0);
+    s_aux=create_sym(n_aux->tk->value,st->sym_list->type,1,0); //estava undef!
     funcSym=get_sym(s_aux,st_root);
     n_aux=n_aux->next; //1º argumento da func
-    if(funcSym){//se a funcao estiver declarada
+    if(funcSym!=NULL){//se a funcao estiver declarada
         //calcular tipos dos parametros dos argumentos da funccall e add à lista de param do sym_auxiliar
         if(n_aux==NULL){add_param(s_aux,voidlit);} //se a func n tiver argumentos..add param type void
         while(n_aux){
