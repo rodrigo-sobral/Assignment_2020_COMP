@@ -53,13 +53,32 @@ void add_sym_table(sym_table *st) {
     } else st_root=st;
 }
 
-sym_table *get_sym_table(char* name) { 
+sym_table *get_sym_table(sym* s) { 
     //searches and returns sym_table if found (doesnt include global table!)
     sym_table *aux;
+    sym *param_sym;
+    param *s_param=s->param_list;
+    int flag=0;
+
     if(st_root!=NULL){
         aux=st_root->next;
         while(aux!=NULL){
-            if(strcmp(aux->name,name)==0) return aux;
+            if(strcmp(aux->name,s->name)==0&&aux->sym_list->type==s->type){
+                param_sym=aux->sym_list->next; //first parameter if theres any
+                if(param_sym!=NULL&&param_sym->isParam){
+                    while(param_sym!=NULL&&s_param!=NULL){
+                        if(s_param->type!=param_sym->type){      
+                            flag=1;                      
+                            break;
+                        }
+                        s_param=s_param->next;
+                        param_sym=param_sym->next;
+                    }
+                    if(flag==0&&param_sym==NULL&&s_param==NULL){
+                        return aux;
+                    }
+                }
+            }
             aux=aux->next;
         }
     } return NULL;
@@ -92,7 +111,15 @@ void add_sym(sym_table* st, sym* s) {
 sym* get_sym(sym* s,sym_table* st) {
     sym *aux=st->sym_list;
     while(aux!=NULL){
-        if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
+        if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc){
+            if(s->param_list!=NULL&&aux->param_list!=NULL&& s->type==aux->type){ //is function
+                if(check_params_list_types(aux, s)){
+                    return aux;
+                }
+            }else{
+                return aux;
+            }
+        } 
         aux=aux->next;
     } return NULL;
 }
@@ -207,6 +234,26 @@ char* type_to_str(_type t) {
         case undef: return "undef";
         default: return "undef";
     }
+}
+/*******************************************************/
+int check_params_list_types(sym *sym_defined, sym *sym_declared) {
+    param *list0=sym_defined->param_list;
+    param *list1=sym_declared->param_list;
+
+    while(list0 && list1){
+        if(list1->type!=list0->type){
+            //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", lineNum, colNum, type_to_str(list0->type), type_to_str(list1->type));
+            return 0; //different param types
+        }  
+        list0=list0->next;
+        list1=list1->next;
+    }
+    if(list1 || list0) {
+        //throw error ? one sym has more parameters than the other
+        //printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", lineNum, colNum, sym_declared->name, paramsCounter(sym_defined->param_list), paramsCounter(sym_declared->param_list));
+        return 0;  //different para types
+    }
+    return 1;    
 }
 /*****************************************************/
 void freeTables(void){
