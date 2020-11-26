@@ -55,19 +55,35 @@ void handle_funcDecs(node* n) {
     //recebe head da lista ligada com nós:
     //typespec
     sym *funcDec;
-    node* aux=n, *paramAux;
+    node* aux=n, *paramDec;
     _type retType; //func return type
     char *funcName;
-    int voidFlag=0;
 
     retType=str_to_type(aux->str); //get func return type from typespec node
 
-    //move to id
     aux=aux->next; //id
     funcName=strdup(aux->tk->value); //id(value)
-
     funcDec=create_sym(funcName,retType,1,0);
-  
+    /*OBTER PARÂMETROS DOS NÓS DA DEFINIÇÃO*/
+    aux=aux->next; //paramList
+    //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
+
+    paramDec=aux->child; //paramDec
+    if(paramDec!=NULL){
+        add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
+        paramDec=paramDec->next; //next paramdeclaration node
+    }
+    while(paramDec!=NULL){ //iterate through paramList childs
+       //paramDec content (typespec-->[option: id])
+       if(str_to_type(paramDec->child->str)==voidlit) { //param type
+            printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);                
+        }
+        add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
+        paramDec=paramDec->next;
+    }  
+
+
+
     if(get_sym(funcDec,st_root)!=NULL){
         //DONE:THROW ERROR!! função já declarada
         printf("Line %d, col %d: Symbol %s already defined\n", n->tk->lineNum, n->tk->colNum ,funcName);
@@ -75,30 +91,6 @@ void handle_funcDecs(node* n) {
         return;
     }
     else{
-        //add param and 
-        //add to global symlist
-        //move to paramList node
-        aux=aux->next; //paramlist
-        //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
-        aux=aux->child; //paramDec
-        if(aux!=NULL){
-            paramAux=aux->child; //paramDec content (typespec-->[option: id])
-            add_param(funcDec,str_to_type(paramAux->str)); //add param to sym paramlist
-            if(str_to_type(paramAux->str)==voidlit) {voidFlag=1;}
-            aux=aux->next;
-        }
-        while(aux){ //iterate through paramList childs
-            paramAux=aux->child; //paramDec content (typespec-->[option: id])
-            if(voidFlag){add_param(funcDec,undef);/*TODO: THROW ERROR void must be the only parameter: ex do erro: main(void,int)*/}
-            else{
-                if(str_to_type(paramAux->str)==voidlit) {
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->tk->lineNum, paramAux->tk->colNum);
-                    add_param(funcDec,undef);
-                }
-                else{add_param(funcDec,str_to_type(paramAux->str)); /*add param to func sym param list*/}
-            }
-            aux=aux->next;
-        }
         add_sym(st_root,funcDec);
     }
 
@@ -109,27 +101,24 @@ void handle_funcDefs(node* n) {
     //typespec-->funcDeclarator-->funcBody
     sym *funcDef, *s_aux;
     sym_table *funcDefTable;
-    node* aux=n, *paramAux;
+    node* aux=n, *paramDec;
     _type retType; //func return type
     char *funcName;
-    int voidFlag=0;
     retType=str_to_type(aux->str); //get func0 return type from typespec node
 
-    //move to id
-    aux=aux->next;
+    aux=aux->next; //id node
     funcName=strdup(aux->tk->value); //id(value)
     funcDef=create_sym(funcName,retType,1,0);
     /*OBTER PARÂMETROS DOS NÓS DA DEFINIÇÃO*/
-    //move to paramList node
     aux=aux->next; //paramList
     //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
-    paramAux=aux->child; //paramDec
-    while(paramAux){ //iterate through paramList childs
+    paramDec=aux->child; //paramDec
+    while(paramDec){ //iterate through paramList childs
        //paramDec content (typespec-->[option: id])
-        add_param(funcDef,str_to_type(paramAux->child->str)); //add param to sym paramlist
-        paramAux=paramAux->next;
+        add_param(funcDef,str_to_type(paramDec->child->str)); //add param type to paramlist of funcDec
+        paramDec=paramDec->next;
     }
-    /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA PARA VERIFICACAO DE ERROS*/
+    /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA*/
     if((s_aux=get_sym(funcDef,st_root))!=NULL) { //se a funcao estiver declarada
     
         /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
@@ -143,22 +132,21 @@ void handle_funcDefs(node* n) {
             add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
 
             /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-            paramAux=aux->child; //paramDec
-            if(paramAux!=NULL){
-                if(str_to_type(paramAux->child->str)==voidlit) {voidFlag=1;}
-                paramAux=paramAux->next;
+            paramDec=aux->child; //paramDec
+            if(paramDec!=NULL){
+                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}             
+                paramDec=paramDec->next; //next paramdeclaration node
             }
-            while(paramAux!=NULL){ //iterate through paramList childs
-                if(voidFlag){/*no caso de int func(void,int a,int b){...} adiciona: a undef(param) à tabela*/ add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,undef,0,1)); /*TODO: THROW ERROR void must be the only parameter: ex do erro: main(void,int)*/}
-                else{
-                    if(str_to_type(paramAux->child->str)==voidlit) {
-                        printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->child->next->tk->lineNum, paramAux->child->next->tk->colNum);
-                        voidFlag=1;
-                        /*no caso de int func(int a, void, int b){...} a partir do void passa a adicionar: b undef(param)*/
-                    }
-                    else{add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); }
+            while(paramDec!=NULL){ //iterate through paramList childs
+                if(str_to_type(paramDec->child->str)==voidlit) { //param type
+                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+                    add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
                 }
-                 paramAux=paramAux->next; //next paramdeclaration node
+                else{
+                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}  
+                }                              
+                paramDec=paramDec->next; //next paramdeclaration node
             }            
              /*************************/   
             /*ENTRAR NO FUNCBODY*/
@@ -170,28 +158,26 @@ void handle_funcDefs(node* n) {
     }
     else{
         add_sym(st_root,funcDef); //add to global table 
-
         //create new sym_table
         funcDefTable=create_sym_table(funcName);
         add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
 
         /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-        paramAux=aux->child; //paramDec
-        if(paramAux!=NULL){
-            if(str_to_type(paramAux->child->str)==voidlit) {voidFlag=1;}
-            paramAux=paramAux->next;
+        paramDec=aux->child; //paramDec
+        if(paramDec!=NULL){
+            if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}             
+            paramDec=paramDec->next; //next paramdeclaration node
         }
-        while(paramAux!=NULL){ //iterate through paramList childs
-            if(voidFlag){/*no caso de int func(void,int a,int b){...} adiciona: a undef(param) à tabela*/ add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,undef,0,1)); /*TODO: THROW ERROR void must be the only parameter: ex do erro: main(void,int)*/}
-            else{
-                if(str_to_type(paramAux->child->str)==voidlit) {
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramAux->child->next->tk->lineNum, paramAux->child->next->tk->colNum);
-                    voidFlag=1;
-                        /*no caso de int func(int a, void, int b){...} a partir do void passa a adicionar: b undef(param)*/
-                }
-                else{add_sym(funcDefTable,create_sym(paramAux->child->next->tk->value,str_to_type(paramAux->child->str),0,1)); }
+        while(paramDec!=NULL){ //iterate through paramList childs
+            if(str_to_type(paramDec->child->str)==voidlit) { //param type
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum); 
+                add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));               
             }
-                paramAux=paramAux->next; //next paramdeclaration node
+            else{
+                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}   
+            }                         
+            paramDec=paramDec->next; //next paramdeclaration node
         }            
          /*************************/   
         /*ENTRAR NO FUNCBODY*/
