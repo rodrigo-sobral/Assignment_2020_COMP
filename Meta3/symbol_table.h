@@ -37,7 +37,7 @@ sym *create_sym(char *name,_type type, int isfunc, int isparam);
 param* create_param(_type type);
 
 //  GETTERS
-sym_table *get_sym_table(sym* s);
+sym_table *get_sym_table(char* name);
 sym* get_sym(sym* s,sym_table* st);
 
 //  ADDERS
@@ -61,7 +61,6 @@ void printGlobal(sym_table* st);
 void printSymTables(void);
 
 //CHECKERs
-int check_params_list_types(sym *s0, sym *s1);
 int isVarNameInSymList(char* name ,sym_table* st);
 
 #endif

@@ -53,31 +53,16 @@ void add_sym_table(sym_table *st) {
     } else st_root=st;
 }
 
-sym_table *get_sym_table(sym* s) { 
+sym_table *get_sym_table(char* name) { 
     //searches and returns sym_table if found (doesnt include global table!)
     sym_table *aux;
-    sym *param_sym;
-    param *s_param=s->param_list;
-    int flag=0;
-
     if(st_root!=NULL){
         aux=st_root->next;
         while(aux!=NULL){
-            if(strcmp(aux->name,s->name)==0&&aux->sym_list->type==s->type){ //mesmo nome e mesmo tipo
-                param_sym=aux->sym_list->next; //first parameter of func table if theres any
-                while(param_sym!=NULL&&param_sym->isParam&&s_param!=NULL){
-                    if(param_sym->type!=s_param->type){flag=1;break;/*iterate to next table*/}
-                    param_sym=param_sym->next;
-                    s_param=s_param->next;
-                }
-                if(!flag&&param_sym==NULL&&s_param==NULL){return aux;}
-                else{flag=0;}                 
-                
-            }
+            if(strcmp(aux->name,name)==0) return aux;
             aux=aux->next;
         }
-    } 
-    return NULL;
+    } return NULL;
 }
 /********************************************************/
 sym *create_sym(char *name,_type type, int isfunc, int isparam) {
@@ -106,24 +91,10 @@ void add_sym(sym_table* st, sym* s) {
 
 sym* get_sym(sym* s,sym_table* st) {
     sym *aux=st->sym_list;
-    if(s->isFunc){ //para funções
-        while(aux!=NULL){
-            if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc&&s->type==aux->type){
-                if(s->param_list!=NULL&&aux->param_list!=NULL){ //is function
-                    if(check_params_list_types(aux, s)){
-                        return aux;
-                    }
-                }
-            } 
-            aux=aux->next;
-        } return NULL;
-    }
-    else{ //para variaveis
-        while(aux!=NULL){
-            if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
-            aux=aux->next;
-        } return NULL;
-    }
+    while(aux!=NULL){
+        if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
+        aux=aux->next;
+    } return NULL;
 }
 
 
@@ -151,15 +122,6 @@ param* create_param(_type type) {
     p->type=type;
     p->next=NULL;
     return p;
-}
-
-int isVarNameInSymList(char* name ,sym_table* st){
-    sym* aux=st->sym_list;
-    while(aux!=NULL){
-        if(!(aux->isFunc)&&(strcmp(aux->name,name)==0)){ return 1;}
-        aux=aux->next;
-    }
-    return 0;
 }
 /**********************************************/
 void printSymTables(void) {
@@ -246,26 +208,6 @@ char* type_to_str(_type t) {
         default: return "undef";
     }
 }
-/*******************************************************/
-int check_params_list_types(sym *sym_defined, sym *sym_declared) {
-    param *list0=sym_defined->param_list;
-    param *list1=sym_declared->param_list;
-
-    while(list0!=NULL && list1!=NULL){
-        if(list1->type!=list0->type){
-            //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", lineNum, colNum, type_to_str(list0->type), type_to_str(list1->type));
-            return 0; //different param types
-        }  
-        list0=list0->next;
-        list1=list1->next;
-    }
-    if(list1==NULL&&list0==NULL) {
-        return 1;
-    }
-    else{
-        return 0;
-    }  
-}
 /*****************************************************/
 void freeTables(void){
     sym_table *st=st_root,*st_aux;
@@ -274,4 +216,13 @@ void freeTables(void){
         free_sym_table(st);
         st=st_aux;
     }
+}
+/********************************************************/
+int isVarNameInSymList(char* name ,sym_table* st){
+    sym* aux=st->sym_list;
+    while(aux!=NULL){
+        if(!(aux->isFunc)&&(strcmp(aux->name,name)==0)){ return 1;}
+        aux=aux->next;
+    }
+    return 0;
 }
