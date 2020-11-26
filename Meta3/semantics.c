@@ -133,6 +133,7 @@ void handle_funcDefs(node* n) {
 
         //if params types are not equal
         if(!check_params_list_types(funcDef,get_sym(funcDef,st_root),n->next->next->tk->lineNum,n->next->next->tk->colNum)){
+            /*ACHO Q FALTA ANOTAR A ARVORE AQUI, N TENHO A CERTEZA..VERIFICAR AMANHA HJ TOU CANSADO*/
             free_sym(funcDef);
             return;
         }
@@ -272,7 +273,9 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared, int lineNum, in
     param *list1=sym_declared->param_list;
 
     while(list0 && list1){
-        checkConflitingTypes(list1->type,list0->type,lineNum, colNum);         
+        if(list1->type!=list0->type){
+            printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", lineNum, colNum, type_to_str(list0->type), type_to_str(list1->type));
+        }  
         list0=list0->next;
         list1=list1->next;
     }
@@ -370,7 +373,6 @@ _type get_statement_type(node* statement, sym_table *st) {
         return getTerminalType(statement,st);
     }
     else if(strcmp(statement->str,"Null")==0){
-        statement->type=voidlit;
         return voidlit;
     }
     else{
