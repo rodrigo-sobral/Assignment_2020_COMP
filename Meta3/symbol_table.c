@@ -63,25 +63,21 @@ sym_table *get_sym_table(sym* s) {
     if(st_root!=NULL){
         aux=st_root->next;
         while(aux!=NULL){
-            if(strcmp(aux->name,s->name)==0&&aux->sym_list->type==s->type){
-                param_sym=aux->sym_list->next; //first parameter if theres any
-                if(param_sym!=NULL&&param_sym->isParam){
-                    while(param_sym!=NULL&&s_param!=NULL){
-                        if(s_param->type!=param_sym->type){      
-                            flag=1;                      
-                            break;
-                        }
-                        s_param=s_param->next;
-                        param_sym=param_sym->next;
-                    }
-                    if(flag==0&&param_sym==NULL&&s_param==NULL){
-                        return aux;
-                    }
+            if(strcmp(aux->name,s->name)==0&&aux->sym_list->type==s->type){ //mesmo nome e mesmo tipo
+                param_sym=aux->sym_list->next; //first parameter of func table if theres any
+                while(param_sym!=NULL&&param_sym->isParam&&s_param!=NULL){
+                    if(param_sym->type!=s_param->type){flag=1;break;/*iterate to next table*/}
+                    param_sym=param_sym->next;
+                    s_param=s_param->next;
                 }
+                if(!flag&&param_sym==NULL&&s_param==NULL){return aux;}
+                else{flag=0;}                 
+                
             }
             aux=aux->next;
         }
-    } return NULL;
+    } 
+    return NULL;
 }
 /********************************************************/
 sym *create_sym(char *name,_type type, int isfunc, int isparam) {
@@ -155,6 +151,15 @@ param* create_param(_type type) {
     p->type=type;
     p->next=NULL;
     return p;
+}
+
+int isVarNameInSymList(char* name ,sym_table* st){
+    sym* aux=st->sym_list;
+    while(aux!=NULL){
+        if(!(aux->isFunc)&&(strcmp(aux->name,name)==0)){ return 1;}
+        aux=aux->next;
+    }
+    return 0;
 }
 /**********************************************/
 void printSymTables(void) {

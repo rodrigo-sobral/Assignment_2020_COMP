@@ -82,8 +82,6 @@ void handle_funcDecs(node* n) {
         paramDec=paramDec->next;
     }  
 
-
-
     if(get_sym(funcDec,st_root)!=NULL){
         //DONE:THROW ERROR!! função já declarada
         printf("Line %d, col %d: Symbol %s already defined\n", n->tk->lineNum, n->tk->colNum ,funcName);
@@ -134,7 +132,8 @@ void handle_funcDefs(node* n) {
             /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
             paramDec=aux->child; //paramDec
             if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}             
+                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}             
                 paramDec=paramDec->next; //next paramdeclaration node
             }
             while(paramDec!=NULL){ //iterate through paramList childs
@@ -143,7 +142,15 @@ void handle_funcDefs(node* n) {
                     add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
                 }
                 else{
-                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                    if(paramDec->child->next!=NULL){
+                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                            add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));
+                        }
+                        else{
+                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                        }                        
+                    }
                     else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}  
                 }                              
                 paramDec=paramDec->next; //next paramdeclaration node
@@ -165,7 +172,8 @@ void handle_funcDefs(node* n) {
         /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
         paramDec=aux->child; //paramDec
         if(paramDec!=NULL){
-            if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}             
+            if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}  
+            else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}            
             paramDec=paramDec->next; //next paramdeclaration node
         }
         while(paramDec!=NULL){ //iterate through paramList childs

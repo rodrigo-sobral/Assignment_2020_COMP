@@ -62,5 +62,6 @@ void printSymTables(void);
 
 //CHECKERs
 int check_params_list_types(sym *s0, sym *s1);
+int isVarNameInSymList(char* name ,sym_table* st);
 
 #endif
