@@ -258,7 +258,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                 if(aux->next!=NULL){
                     //var definition
                     aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st_root);
+                    expr_type=get_statement_type(aux,st);
                     if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
                         free_sym(s);
                         funcDecAndStats=funcDecAndStats->next;
