@@ -131,7 +131,6 @@ void handle_funcDefs(node* n) {
 
         //if params types are not equal
         if(!check_params_list_types(funcDef,get_sym(funcDef,st_root),n->next->next->tk->lineNum,n->next->next->tk->colNum)){
-            /*TODO:ACHO Q FALTA ANOTAR A ARVORE AQUI, N TENHO A CERTEZA..VERIFICAR AMANHA HJ TOU CANSADO*/
             free_sym(funcDef);
             return;
         }
