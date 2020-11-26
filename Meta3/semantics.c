@@ -113,7 +113,7 @@ void handle_funcDefs(node* n) {
     //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
     paramDec=aux->child; //paramDec
     if(paramDec!=NULL){
-        add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
+        add_param(funcDef,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
         paramDec=paramDec->next; //next paramdeclaration node
     }
     while(paramDec!=NULL){ //iterate through paramList childs
@@ -121,7 +121,7 @@ void handle_funcDefs(node* n) {
         if(str_to_type(paramDec->child->str)==voidlit) { //param type
                 printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);                
             }
-            add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
+            add_param(funcDef,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
             paramDec=paramDec->next;
     }
 
@@ -274,7 +274,7 @@ int isDeclared(sym *s, sym_table *st) {
     return 0; 
 }
 
-int check_params_list_types(sym *sym_defined, sym *sym_declared) {
+int check_params_list_types(sym *sym_defined, sym *sym_declared, int lineNum, int colNum) {
     param *list0=sym_defined->param_list;
     param *list1=sym_declared->param_list;
 
