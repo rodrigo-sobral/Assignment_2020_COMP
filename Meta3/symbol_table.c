@@ -110,18 +110,24 @@ void add_sym(sym_table* st, sym* s) {
 
 sym* get_sym(sym* s,sym_table* st) {
     sym *aux=st->sym_list;
-    while(aux!=NULL){
-        if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc){
-            if(s->param_list!=NULL&&aux->param_list!=NULL&& s->type==aux->type){ //is function
-                if(check_params_list_types(aux, s)){
-                    return aux;
+    if(s->isFunc){ //para funções
+        while(aux!=NULL){
+            if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc&&s->type==aux->type){
+                if(s->param_list!=NULL&&aux->param_list!=NULL){ //is function
+                    if(check_params_list_types(aux, s)){
+                        return aux;
+                    }
                 }
-            }else{
-                return aux;
-            }
-        } 
-        aux=aux->next;
-    } return NULL;
+            } 
+            aux=aux->next;
+        } return NULL;
+    }
+    else{ //para variaveis
+        while(aux!=NULL){
+            if(strcmp(aux->name,s->name)==0 && s->isFunc==aux->isFunc) return aux; 
+            aux=aux->next;
+        } return NULL;
+    }
 }
 
 
@@ -240,7 +246,7 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared) {
     param *list0=sym_defined->param_list;
     param *list1=sym_declared->param_list;
 
-    while(list0 && list1){
+    while(list0!=NULL && list1!=NULL){
         if(list1->type!=list0->type){
             //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", lineNum, colNum, type_to_str(list0->type), type_to_str(list1->type));
             return 0; //different param types
@@ -248,12 +254,12 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared) {
         list0=list0->next;
         list1=list1->next;
     }
-    if(list1 || list0) {
-        //throw error ? one sym has more parameters than the other
-        //printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", lineNum, colNum, sym_declared->name, paramsCounter(sym_defined->param_list), paramsCounter(sym_declared->param_list));
-        return 0;  //different para types
+    if(list1==NULL&&list0==NULL) {
+        return 1;
     }
-    return 1;    
+    else{
+        return 0;
+    }  
 }
 /*****************************************************/
 void freeTables(void){

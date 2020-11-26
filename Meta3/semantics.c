@@ -210,19 +210,19 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
     // ^^lista ligada de declarations and statements do func body
     while(funcDecAndStats){
         if(strcmp(funcDecAndStats->str,"Declaration")==0){
-            /*DONE:verificar se o symbolo já foi declarado */
+            /*verificar se o symbolo já foi declarado */
             aux=funcDecAndStats->child; //typedef 
             if(str_to_type(aux->str)==voidlit){printf("Line %d, col %d: Invalid use of void type in declaration\n",aux->tk->lineNum,aux->tk->colNum);}           
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
-            if(isDeclared(s,st)){
+            if(get_sym(s,st)!=NULL){
                 printf("Line %d, col %d: Symbol %s already defined\n", aux->tk->lineNum, aux->tk->colNum, aux->tk->value);
             }
             else{
                 if(aux->next!=NULL){
                     //var definition
                     aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st_root);
+                    expr_type=get_statement_type(aux,st);
                     if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
                         free_sym(s);
                         funcDecAndStats=funcDecAndStats->next;
