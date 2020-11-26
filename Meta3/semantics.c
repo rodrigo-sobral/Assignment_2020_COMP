@@ -148,8 +148,10 @@ void handle_funcDefs(node* n) {
             /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
             paramDec=aux->child; //paramDec
             if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}             
+                if(str_to_type(paramDec->child->str)!=voidlit) {
+                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}    
+                }         
                 paramDec=paramDec->next; //next paramdeclaration node
             }
             while(paramDec!=NULL){ //iterate through paramList childs
@@ -200,22 +202,32 @@ void handle_funcDefs(node* n) {
             /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
             paramDec=aux->child; //paramDec
             if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}  
-                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}            
+                if(str_to_type(paramDec->child->str)!=voidlit) {
+                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
+                }
                 paramDec=paramDec->next; //next paramdeclaration node
             }
             while(paramDec!=NULL){ //iterate through paramList childs
                 if(str_to_type(paramDec->child->str)==voidlit) { //param type
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum); 
-                    add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));               
+                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+                    //add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
                 }
                 else{
-                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}   
-                }                         
+                    if(paramDec->child->next!=NULL){
+                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                            add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));
+                        }
+                        else{
+                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                        }                        
+                    }
+                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}  
+                }                              
                 paramDec=paramDec->next; //next paramdeclaration node
             }            
-            /*************************/
+             /*************************/ 
                     
             /*ENTRAR NO FUNCBODY*/
             aux=aux->next; //funcBody node
