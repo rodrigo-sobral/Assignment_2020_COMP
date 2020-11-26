@@ -41,10 +41,10 @@ void handle_varDecs(node *n) {
     if(aux->next!=NULL){
         aux=aux->next; //expr
         expr_type=get_statement_type(aux,st_root);
-        if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
+        /*if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
             free_sym(s);
             return;
-        }
+        }*/
     }
 
     if (isDeclared(s, st_root)) {printf("Line %d, col %d: Symbol %s already defined\n",n->tk->lineNum, n->tk->colNum ,s->name);free_sym(s);return;}
@@ -259,11 +259,11 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                     //var definition
                     aux=aux->next; //expr
                     expr_type=get_statement_type(aux,st);
-                    if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
+                    /*if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
                         free_sym(s);
                         funcDecAndStats=funcDecAndStats->next;
                         continue;
-                    }
+                    }*/
                 }
                 add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
             }
