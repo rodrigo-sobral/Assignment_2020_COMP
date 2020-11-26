@@ -521,7 +521,7 @@ _type get_comparisons_type(node *operation, sym_table *st){
 _type get_store_type(node *store, sym_table*st) {
     node *n_aux= store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
-    _type t_aux,expr_type;
+    _type expr_type;
 
     if(strncmp(store->child->str,"Id",2)!=0){
         printf("Line %d, col %d: Lvalue required\n",store->child->tk->lineNum,store->child->tk->colNum);
@@ -546,19 +546,10 @@ _type get_store_type(node *store, sym_table*st) {
     }
     free(s_aux);
 
-    if(storedSym->type==charlit) { t_aux=intlit; } //chars são considerados ints
-    else { t_aux=storedSym->type; }
     expr_type=get_statement_type(n_aux->next, st);
-    if ( checkConflitingTypes(t_aux,expr_type,n_aux->next->tk->lineNum, n_aux->next->tk->colNum) ){
-        store->child->type=storedSym->type; //var node
-        store->child->next->type=expr_type;//expr node
-        return undef; 
-    } else {
-        store->child->type=storedSym->type; //var node
-        store->child->next->type=expr_type;//expr node
-        return storedSym->type;
-    }
-
+    store->child->type=storedSym->type; //var node
+    store->child->next->type=expr_type;//expr node
+    return storedSym->type;
 }
 
 _type get_funcCall_type(node *call,sym_table*st) {
