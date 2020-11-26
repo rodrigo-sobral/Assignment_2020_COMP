@@ -230,7 +230,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
         if(strcmp(funcDecAndStats->str,"Declaration")==0){
             /*DONE:verificar se o symbolo já foi declarado */
             aux=funcDecAndStats->child; //typedef 
-            if(str_to_type(aux->str)==voidlit){/*TODO: ERROR invalid use of void in declaration*/printf("%d%d\n",aux->tk->lineNum,aux->tk->colNum);}           
+            if(str_to_type(aux->str)==voidlit){printf("Line %d, col %d: Invalid use of void type in declaration\n",aux->tk->lineNum,aux->tk->colNum);}           
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
             if(isDeclared(s,st)){
@@ -343,8 +343,13 @@ _type get_statement_type(node* statement, sym_table *st) {
         statement->type=t_aux;
         return t_aux;
     }
-    else if(strcmp(statement->str,"Or")==0||strcmp(statement->str,"And")==0||strcmp(statement->str,"BitWiseAnd")==0||strcmp(statement->str,"BitWiseOr")==0||strcmp(statement->str,"BitWiseXor")==0||strcmp(statement->str,"Eq")==0||strcmp(statement->str,"Ne")==0||strcmp(statement->str,"Le")==0||strcmp(statement->str,"Ge")==0||strcmp(statement->str,"Lt")==0||strcmp(statement->str,"Gt")==0){
+    else if(strcmp(statement->str,"Or")==0||strcmp(statement->str,"And")==0||strcmp(statement->str,"Eq")==0||strcmp(statement->str,"Ne")==0||strcmp(statement->str,"Le")==0||strcmp(statement->str,"Ge")==0||strcmp(statement->str,"Lt")==0||strcmp(statement->str,"Gt")==0){
         t_aux=get_comparisons_type(statement, st);
+        statement->type=t_aux;
+        return t_aux;
+    }
+    else if(strcmp(statement->str,"BitWiseAnd")==0||strcmp(statement->str,"BitWiseOr")==0||strcmp(statement->str,"BitWiseXor")==0){
+        t_aux=get_bitwise_type(statement,st);
         statement->type=t_aux;
         return t_aux;
     }
@@ -389,19 +394,74 @@ _type get_operation_type(node * operation,sym_table *st){
         operation->type=undef;
         return undef;
     }
-    else if(type0==voidlit){
-        printf("Line %d, col %d: Invalid use of void type in declaration\n",n_aux->next->tk->lineNum,n_aux->next->tk->colNum);
-        operation->type=voidlit;
-        return voidlit;
+    else if(type0==voidlit&&type1!=voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0));
+        operation->type=undef;
+        return undef;
     }
-    else if(type1==voidlit){
-        printf("Line %d, col %d: Invalid use of void type in declaration\n",n_aux->next->tk->lineNum,n_aux->next->tk->colNum);
-        operation->type=voidlit;
-        return voidlit;
+    else if(type0!=voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type1));
+        operation->type=undef;
+        return undef;
+    }  
+    else if(type0==voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
+        operation->type=undef;
+        return undef;
     }    
     else if(type0==reallit||type1==reallit){
         operation->type=reallit;
         return reallit;
+    }
+    else if(type0==shortlit&&type1==shortlit){
+        operation->type=shortlit;
+        return shortlit;
+    }
+    else{
+        operation->type=intlit;
+        return intlit;
+    }
+}
+
+_type get_bitwise_type(node *operation, sym_table *st){
+    node *n_aux=operation->child;
+    _type type0, type1; //operation only has 2 nodes
+    type0=get_statement_type(n_aux,st);
+    type1=get_statement_type(n_aux->next,st);
+    if(type0==undef||type1==undef){
+        //operator cannot be applied to type....throw error?..
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0==voidlit&&type1!=voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0));
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0!=voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type1));
+        operation->type=undef;
+        return undef;
+    }  
+    else if(type0==voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0==reallit&&type1!=reallit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0));
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0!=reallit&&type1==reallit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type1));
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0==reallit&&type1==reallit){
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
+        operation->type=undef;
+        return undef;
     }
     else{
         operation->type=intlit;
@@ -418,15 +478,20 @@ _type get_comparisons_type(node *operation, sym_table *st){
         operation->type=undef;
         return undef;
     }
-    else if(type0==voidlit){
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
-        operation->type=voidlit;
-        return voidlit;
+    else if(type0==voidlit&&type1!=voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0));
+        operation->type=undef;
+        return undef;
     }
-    else if(type1==voidlit){
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->next->tk->lineNum,n_aux->next->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
-        operation->type=voidlit;
-        return voidlit;
+    else if(type0!=voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type1));
+        operation->type=undef;
+        return undef;
+    }  
+    else if(type0==voidlit&&type1==voidlit){
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s",n_aux->tk->lineNum,n_aux->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
+        operation->type=undef;
+        return undef;
     }
     else{
         operation->type=intlit;
@@ -475,16 +540,6 @@ _type get_store_type(node *store, sym_table*st) {
         return storedSym->type;
     }
 
-}
-int isDefined(sym *s){
-    //check if function is defined
-    sym_table *aux;
-    if(s!=NULL)
-        while(aux!=NULL){
-            if(strcmp(aux->name,s->name)==0){return 1;} //defined
-            aux=aux->next;
-        }
-    return 0; //not defined
 }
 
 _type get_funcCall_type(node *call,sym_table*st) {
