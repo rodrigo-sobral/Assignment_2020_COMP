@@ -41,10 +41,7 @@ void handle_varDecs(node *n) {
     if(aux->next!=NULL){
         aux=aux->next; //expr
         expr_type=get_statement_type(aux,st_root);
-        /*if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
-            free_sym(s);
-            return;
-        }*/
+        checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum);
     }
 
     if (isDeclared(s, st_root)) {printf("Line %d, col %d: Symbol %s already defined\n",n->tk->lineNum, n->tk->colNum ,s->name);free_sym(s);return;}
@@ -259,11 +256,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                     //var definition
                     aux=aux->next; //expr
                     expr_type=get_statement_type(aux,st);
-                    /*if(checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum)){
-                        free_sym(s);
-                        funcDecAndStats=funcDecAndStats->next;
-                        continue;
-                    }*/
+                    checkConflitingTypes(s->type,expr_type,aux->tk->lineNum, aux->tk->colNum);
                 }
                 add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
             }
@@ -521,7 +514,7 @@ _type get_comparisons_type(node *operation, sym_table *st){
 _type get_store_type(node *store, sym_table*st) {
     node *n_aux= store->child; //store variable node (Id) 
     sym *s_aux, *storedSym; 
-    _type expr_type;
+    _type t_aux,expr_type;
 
     if(strncmp(store->child->str,"Id",2)!=0){
         printf("Line %d, col %d: Lvalue required\n",store->child->tk->lineNum,store->child->tk->colNum);
@@ -546,10 +539,16 @@ _type get_store_type(node *store, sym_table*st) {
     }
     free(s_aux);
 
+    if(storedSym->type==charlit) { t_aux=intlit; } //chars são considerados ints
+    else { t_aux=storedSym->type; }
+
     expr_type=get_statement_type(n_aux->next, st);
+    checkConflitingTypes(t_aux,expr_type,n_aux->next->tk->lineNum, n_aux->next->tk->colNum) ;
     store->child->type=storedSym->type; //var node
     store->child->next->type=expr_type;//expr node
     return storedSym->type;
+
+
 }
 
 _type get_funcCall_type(node *call,sym_table*st) {
