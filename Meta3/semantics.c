@@ -328,14 +328,14 @@ _type get_statement_type(node* statement, sym_table *st) {
     _type t_aux;
     if(strcmp(statement->str,"Plus")==0 || strcmp(statement->str,"Minus")==0){
         //1 nó filho
-        t_aux=getTerminalType(aux->child,st);
+        t_aux=get_statement_type(aux->child,st);
         if(t_aux==undef){return t_aux;}
         statement->type=t_aux;
         return t_aux;
     }
     else if(strcmp(statement->str,"Not")==0){
         //1 nó filho
-        getTerminalType(aux->child,st);
+        get_statement_type(aux->child,st);
         statement->type=intlit;
         return intlit;
     }
