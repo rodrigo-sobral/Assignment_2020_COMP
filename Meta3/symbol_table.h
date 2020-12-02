@@ -25,6 +25,7 @@ typedef struct param{
 
 typedef struct sym_table{
     char* name; //e.g. Function main, Global, ...
+    int isDef;
     struct sym *sym_list; //list head
     struct sym_table *next;
 } sym_table;

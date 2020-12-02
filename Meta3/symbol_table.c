@@ -153,14 +153,16 @@ void printGlobal(sym_table* st) { //table
 void printFunctions(sym_table* st) { //tables
     sym* s;
     if(st!=NULL){
-        printf("===== Function %s Symbol Table =====\n", st->name);
-        s=st->sym_list;	
-        while(s != NULL) {
-            printf("%s\t%s",s->name,type_to_str(s->type));
-            if(!s->isFunc&&s->isParam){ printf("\tparam");}
-            printf("\n");
-            s = s->next;
-        } printf("\n");
+        if(st->isDef){
+            printf("===== Function %s Symbol Table =====\n", st->name);
+            s=st->sym_list;	
+            while(s != NULL) {
+                printf("%s\t%s",s->name,type_to_str(s->type));
+                if(!s->isFunc&&s->isParam){ printf("\tparam");}
+                printf("\n");
+                s = s->next;
+            } printf("\n");
+        }
         printFunctions(st->next);
     }
 }

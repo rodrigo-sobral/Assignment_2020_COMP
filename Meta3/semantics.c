@@ -45,15 +45,15 @@ void handle_varDecs(node *n) {
             printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
         }
     }
-
-    if (isDeclared(s, st_root)) {printf("Line %d, col %d: Symbol %s already defined\n",n->tk->lineNum, n->tk->colNum ,s->name); free_sym(s);}
-    else {add_sym(st_root,s);}
+    if(!isDeclared(s,st_root)){add_sym(st_root,s);}
+    else{free_sym(s);}
 }
 
 void handle_funcDecs(node* n) {
     //recebe head da lista ligada com nós:
     //typespec
     sym *funcDec;
+    sym_table *funcDefTable;
     node* aux=n, *paramDec;
     _type retType; //func return type
     char *funcName;
@@ -69,6 +69,39 @@ void handle_funcDecs(node* n) {
         free_sym(funcDec);
     }
     else{
+        //create new sym_table
+        funcDefTable=create_sym_table(funcName);
+        add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
+        funcDefTable->isDef=0; //not defined        
+        /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
+        /*
+        paramDec=aux->child; //paramDec
+        if(paramDec!=NULL){
+            if(str_to_type(paramDec->child->str)!=voidlit) {
+                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
+            }
+            paramDec=paramDec->next; //next paramdeclaration node
+        }
+        while(paramDec!=NULL){ //iterate through paramList childs
+            if(str_to_type(paramDec->child->str)==voidlit) { //param type
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+                //add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
+            }
+            else{
+                if(paramDec->child->next!=NULL){
+                    if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                    }
+                    else{
+                        add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                    }                        
+                }
+            }                              
+            paramDec=paramDec->next; //next paramdeclaration node
+        }      */      
+             /*************************/ 
+
         /*OBTER PARÂMETROS DOS NÓS DA DEFINIÇÃO*/
         aux=aux->next; //paramList
         //move to paramList childs (linked list nodes: paramdec-->paramdec-->paramdec-->(...))
@@ -87,6 +120,7 @@ void handle_funcDecs(node* n) {
         }
 
         add_sym(st_root,funcDec);
+        add_sym_table(funcDefTable);
     }
 }
 
@@ -100,7 +134,6 @@ void handle_funcDefs(node* n) {
     char *funcName;
 
     retType=str_to_type(aux->str); //get func return type from typespec node
-
 
     aux=aux->next;//id node
     funcName=strdup(aux->tk->value); //id(value)
@@ -123,183 +156,95 @@ void handle_funcDefs(node* n) {
             paramDec=paramDec->next;
     }
 
-
-    /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA*/
-    if(isDeclared(funcDef,st_root)) {
+    /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA ou definida*/
+    if((funcDefTable=get_sym_table(funcName))!=NULL){//SE JÁ EXISTIR TABELA DE SÍMBOLOS PARA ESTA TABELA É PQ ELA JÁ FOI DECLARADA OU DEFINIDA ANTERIORMENTE
 
         //if params types are not equal
         if(!check_params_list_types(funcDef,get_sym(funcDef,st_root),n->next->next->tk->lineNum,n->next->next->tk->colNum)){
             //printf("Line %d, col %d:\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
         }
-        
-        /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
-        if(get_sym_table(funcName)){ //SE JÁ EXISTIR TABELA DE SÍMBOLOS PARA ESTA TABELA É PQ ELA JÁ FOI DEFINIDA ANTERIORMENTE
+        if(funcDefTable->sym_list->next!=NULL){ //se a função já tiver sido definida
             printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
             /*******************SÓ PARA FAZER A ANOTAÇÃO DA ÁRVORE E ANÁLISE SEMÂNTICA DO CÓDIGO DA FUNÇÃO******************/
             /********NOTE: NÃO É ADICIONADA NENHUMA TABELA À LISTA DE TABELAS****************/
             funcDefTable=create_sym_table(funcName);
             add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
-
-            /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-            paramDec=aux->child; //paramDec
-            if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                //else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
-                paramDec=paramDec->next; //next paramdeclaration node
-            }
-            while(paramDec!=NULL){ //iterate through paramList childs
-                if(str_to_type(paramDec->child->str)==voidlit) { //param type
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);
-                     if(paramDec->child->next!=NULL){
-                         add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                     }                                 
-                }
-                else{
-                    if(paramDec->child->next!=NULL){
-                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
-                        }
-                        else{
-                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                        }                        
-                    }
-                }                              
-                paramDec=paramDec->next; //next paramdeclaration node
-            }            
-             /*************************/  
-                
-            /*ENTRAR NO FUNCBODY*/
-            aux=aux->next; //funcBody node
-            /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
-            add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
-            /***********************************************************************************************************************/
-            free_sym(funcDef);
-            return;
-        } else {
-            //create new sym_table
-            funcDefTable=create_sym_table(funcName);
-            add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
-
-            /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-            paramDec=aux->child; //paramDec
-            if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                //else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
-                paramDec=paramDec->next; //next paramdeclaration node
-            }
-            while(paramDec!=NULL){ //iterate through paramList childs
-                if(str_to_type(paramDec->child->str)==voidlit) { //param type
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);
-                     if(paramDec->child->next!=NULL){
-                         add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                     }                                 
-                }
-                else{
-                    if(paramDec->child->next!=NULL){
-                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
-                        }
-                        else{
-                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                        }                        
-                    }
-                }                              
-                paramDec=paramDec->next; //next paramdeclaration node
-            }            
-             /*************************/  
-                
-            /*ENTRAR NO FUNCBODY*/
-            aux=aux->next; //funcBody node
-            /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
-            add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
-            add_sym_table(funcDefTable);
         }
-    }
-    else{
-        add_sym(st_root,funcDef); //add to global table 
- 
-        /*checks if there's already a sym_table for this funcDef, if not create new sym_table for this funcdef, else throw error*/
-        if(get_sym_table(funcName)!=NULL){ //SE JÁ EXISTIR TABELA DE SÍMBOLOS PARA ESTA TABELA É PQ ELA JÁ FOI DEFINIDA ANTERIORMENTE
-            printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum,  n->next->tk->colNum, funcName);
-            /*******************SÓ PARA FAZER A ANOTAÇÃO DA ÁRVORE E ANÁLISE SEMÂNTICA DO CÓDIGO DA FUNÇÃO******************/
-            /********NOTE: NÃO É ADICIONADA NENHUMA TABELA À LISTA DE TABELAS****************/
-            funcDefTable=create_sym_table(funcName);
-            add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
-
-            /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-            paramDec=aux->child; //paramDec
-            if(paramDec!=NULL){
-                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                //else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
-                paramDec=paramDec->next; //next paramdeclaration node
+        /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
+        funcDefTable->isDef=1;//set as defined
+        paramDec=aux->child; //paramDec
+        if(paramDec!=NULL){
+            if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}        
+            paramDec=paramDec->next; //next paramdeclaration node
+        }
+        while(paramDec!=NULL){ //iterate through paramList childs
+            if(str_to_type(paramDec->child->str)==voidlit) { //param type
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);
+                if(paramDec->child->next!=NULL){
+                    add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                }                                 
             }
-            while(paramDec!=NULL){ //iterate through paramList childs
-                if(str_to_type(paramDec->child->str)==voidlit) { //param type
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);
-                     if(paramDec->child->next!=NULL){
-                         add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                     }                                 
-                }
-                else{
-                    if(paramDec->child->next!=NULL){
-                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
-                        }
-                        else{
-                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                        }                        
+            else{
+                if(paramDec->child->next!=NULL){
+                    if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
                     }
-                }                              
-                paramDec=paramDec->next; //next paramdeclaration node
-            }            
-             /*************************/  
-                
-            /*ENTRAR NO FUNCBODY*/
-            aux=aux->next; //funcBody node
-            /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
-            add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
-            /***********************************************************************************************************************/
-            free_sym(funcDef);
-            return;
-        } else {
-            //create new sym_table
-            funcDefTable=create_sym_table(funcName);
-            add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
-                
-            /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
-            paramDec=aux->child; //paramDec
-            if(paramDec!=NULL){
-                if(str_to_type(paramDec->child->str)!=voidlit) {
-                    if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
-                    else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
+                    else{
+                        add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                    }                        
                 }
-                paramDec=paramDec->next; //next paramdeclaration node
-            }
-            while(paramDec!=NULL){ //iterate through paramList childs
-                if(str_to_type(paramDec->child->str)==voidlit) { //param type
-                    printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
-                    //add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
-                }
-                else{
-                    if(paramDec->child->next!=NULL){
-                        if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                            printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
-                        }
-                        else{
-                            add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
-                        }                        
-                    }
-                }                              
-                paramDec=paramDec->next; //next paramdeclaration node
-            }            
-             /*************************/ 
+            }                              
+            paramDec=paramDec->next; //next paramdeclaration node
+        }            
+        /*************************/  
                     
-            /*ENTRAR NO FUNCBODY*/
-            aux=aux->next; //funcBody node
-            /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
-            add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
-            add_sym_table(funcDefTable);
-        } 
+        /*ENTRAR NO FUNCBODY*/
+        aux=aux->next; //funcBody node
+        /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
+        add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
+        /***********************************************************************************************************************/
+ 
+        //free_sym(funcDef);
+        return;
+    }
+    else{ //se ainda n tiver sido declarada ou definida
+        add_sym(st_root,funcDef); //add to global table 
+        //create new sym_table
+        funcDefTable=create_sym_table(funcName);
+        add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
+        funcDefTable->isDef=1;//set as defined        
+        /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
+        paramDec=aux->child; //paramDec
+        if(paramDec!=NULL){
+            if(str_to_type(paramDec->child->str)!=voidlit) {
+                if(paramDec->child->next!=NULL){add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));}
+                else{add_sym(funcDefTable,create_sym("undef",str_to_type(paramDec->child->str),0,1));}          
+            }
+            paramDec=paramDec->next; //next paramdeclaration node
+        }
+        while(paramDec!=NULL){ //iterate through paramList childs
+            if(str_to_type(paramDec->child->str)==voidlit) { //param type
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+                //add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));             
+            }
+            else{
+                if(paramDec->child->next!=NULL){
+                    if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                    }
+                    else{
+                        add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                    }                        
+                }
+            }                              
+            paramDec=paramDec->next; //next paramdeclaration node
+        }            
+        /*************************/           
+        /*ENTRAR NO FUNCBODY*/
+        aux=aux->next; //funcBody node
+        /*FAZER ANALISE SEMANTICA PARA DECLARATIONS AND STATEMENTS DO FUNCBODY!*/
+        add_funcBody_syms_to_table(funcDefTable,aux); //<-esta funcao deve fazer a analise semantica destes erros^
+        add_sym_table(funcDefTable);
     }
 }
 
@@ -316,29 +261,20 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             if(str_to_type(aux->str)==voidlit){printf("Line %d, col %d: Invalid use of void type in declaration\n",aux->tk->lineNum,aux->tk->colNum);}           
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
-            if(isDeclared(s,st)){
-                printf("Line %d, col %d: Symbol %s already defined\n", aux->tk->lineNum, aux->tk->colNum, aux->tk->value);
-                if(aux->next!=NULL){
-                    //var definition
-                    aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st);
-                    if(checkConflitingTypes(s->type,expr_type)){
-                        printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));                        
-                    }
-                }
-            }
-            else{
-                if(aux->next!=NULL){
-                    //var definition
-                    aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st);
-                    if(checkConflitingTypes(s->type,expr_type)){
-                        printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));                        
-                    }
-                }
-                add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
-            }
             
+            if(aux->next!=NULL){
+                //var definition
+                aux=aux->next; //expr
+                expr_type=get_statement_type(aux,st);
+                if(checkConflitingTypes(s->type,expr_type)){
+                    printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));                        
+                }
+            }
+            if(!isDeclared(s,st)){
+                add_sym(st,s); //adiciona sym à table  
+            }
+            else{free_sym(s);}
+              
         }
         else{
             expr_type=get_statement_type(funcDecAndStats, st);
@@ -492,29 +428,19 @@ void add_stat_decs_syms_to_table(sym_table* st, node* stats_decs) {
             if(str_to_type(aux->str)==voidlit){printf("Line %d, col %d: Invalid use of void type in declaration\n",aux->tk->lineNum,aux->tk->colNum);}           
             s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
             aux=aux->next; //id
-            if(isDeclared(s,st)){
-                printf("Line %d, col %d: Symbol %s already defined\n", aux->tk->lineNum, aux->tk->colNum, aux->tk->value);
-                if(aux->next!=NULL){
-                    //var definition
-                    aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st);
-                    if(checkConflitingTypes(s->type,expr_type)){
-                        printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
-                    }
+    
+            if(aux->next!=NULL){
+                //var definition
+                aux=aux->next; //expr
+                expr_type=get_statement_type(aux,st);
+                if(checkConflitingTypes(s->type,expr_type)){
+                    printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
                 }
             }
-            else{ 
-                if(aux->next!=NULL){
-                    //var definition
-                    aux=aux->next; //expr
-                    expr_type=get_statement_type(aux,st);
-                    if(checkConflitingTypes(s->type,expr_type)){
-                        printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type));
-                    }
-                }
-                add_sym(st,s); //adiciona sym à table apenas se este n tiver sido declarado!
+            if(!isDeclared(s,st)){
+                add_sym(st,s); //adiciona sym à table  
             }
-            
+            else{free_sym(s);}            
         }
         else{
             expr_type=get_statement_type(stat_dec, st);
