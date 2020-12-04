@@ -125,13 +125,13 @@ declarator: ID  {sprintf(buffer, "Id(%s)", $1->value); $$=createNode(buffer,$1);
     ;
 statement:  SEMI    {$$=createNode("Null",$1);}   
     |   exprComplete SEMI {$$=$1;}
-    |   LBRACE statementsAux RBRACE   {if($2!=NULL){if(($2)->next!=NULL){$$=createNode("StatList",$1); addChild($$,$2);} else{$$=$2;}} else{$$=createNode("Null",$1);}}
+    |   LBRACE statementsAux RBRACE   {if($2!=NULL){if(($2)->next!=NULL){$$=createNode("StatList",$1); addChild($$,$2);} else{$$=$2;}} else{$$=createNode("Null",getCopyToken($1));}}
     |   LBRACE error RBRACE {$$=NULL;}
     |   LBRACE RBRACE   {$$=createNode("Null",$1);}
-    |   IF LPAR exprComplete RPAR statError %prec THEN  {$$=createNode("If",$1); addChild($$,$3); addChild($$,$5); addChild($$,createNode("Null",$1));}
+    |   IF LPAR exprComplete RPAR statError %prec THEN  {$$=createNode("If",$1); addChild($$,$3); addChild($$,$5); addChild($$,createNode("Null",getCopyToken($1)));}
     |   IF LPAR exprComplete RPAR statError ELSE statError   {$$=createNode("If",$1); addChild($$,$3); addChild($$,$5); addChild($$,$7);}
     |   WHILE LPAR exprComplete RPAR statError   {$$=createNode("While",$1); addChild($$,$3); addChild($$,$5);}
-    |   RETURN SEMI {$$=createNode("Return",$1); addChild($$,createNode("Null",$1));}
+    |   RETURN SEMI {$$=createNode("Return",$1); addChild($$,createNode("Null",$2));}
     |   RETURN exprComplete SEMI    {$$=createNode("Return",$1); addChild($$,$2);}
     ;
 statementsAux:  statError   {if(isNullNode($1)){$$=NULL;} else{$$=$1;}}
@@ -168,8 +168,8 @@ expr:   expr ASSIGN expr    {$$= createNode("Store",$2); addChild($$,$1); addChi
     |   LPAR exprComplete RPAR  {$$=$2;}
     |   LPAR error RPAR {$$=NULL;}
     ;
-functionCall: ID LPAR RPAR {$$=createNode("Call",$1); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer,$1));}
-    |   ID LPAR exprList RPAR {$$=createNode("Call",$1); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer,$1)); addChild($$,$3);}
+functionCall: ID LPAR RPAR {$$=createNode("Call",getCopyToken($1)); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer,$1));}
+    |   ID LPAR exprList RPAR {$$=createNode("Call",getCopyToken($1)); sprintf(buffer, "Id(%s)", $1->value); addChild($$,createNode(buffer,$1)); addChild($$,$3);}
     |   ID LPAR error RPAR  {$$=NULL;}
     ;
 exprList:   expr {$$=$1;}

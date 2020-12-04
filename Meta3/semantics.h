@@ -21,7 +21,7 @@ void add_stat_decs_syms_to_table(sym_table* st, node* stats_decs);
 
 //  CHECKERS
 int isDeclared(sym *s, sym_table *st);
-int check_params_list_types(sym *s0, sym *s1, int lineNum, int colNum);
+int check_params_list_types(sym *s0, sym *s1);
 int isTerminal(node *n);
 int isBeforeMainFunc(sym *s);
 int checkConflitingTypes(_type expectedType,_type gotType);

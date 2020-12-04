@@ -136,7 +136,7 @@ void freeTree_(node *n) //used to be static :'(
             freeTree_(n->next);
         //free (heap) allocated memory
         free(n->str); //str
-        if(n->tk->value!=NULL){free(n->tk->value);}
+        if(n->tk->value!=NULL){freeToken(n->tk);}
         free_param_list(n->param_list);
         free(n);
     }
@@ -151,8 +151,6 @@ void add_param_to_node(node* n, _type type){
     }
     else n->param_list=create_param(type);
 }
-
-
 
 /*create token struct*/
 token* createToken(char* str, int lineNum, int colNum){
@@ -171,4 +169,13 @@ token* createToken(char* str, int lineNum, int colNum){
     tk->lineNum=lineNum;
     tk->colNum=colNum;
     return tk;
+}
+
+token* getCopyToken(token *tk){
+    return createToken(tk->value,tk->lineNum,tk->colNum);
+}
+
+void freeToken(token *tk){
+    free(tk->value);
+    free(tk);
 }

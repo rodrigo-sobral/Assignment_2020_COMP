@@ -38,5 +38,7 @@ void printTree(int anotate);
 void freeTree_(node *n); 
 void freeTree(void);
 token* createToken(char* str, int lineNum, int colNum);
+token* getCopyToken(token *tk);
+void freeToken(token *tk);
 void add_param_to_node(node *n, _type type);
 #endif

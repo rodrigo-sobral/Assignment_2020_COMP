@@ -60,6 +60,7 @@ void freeTables(void);
 void printFunctions(sym_table* st);
 void printGlobal(sym_table* st);
 void printSymTables(void);
+void print_param_list(sym *s);
 
 //CHECKERs
 int isVarNameInSymList(char* name ,sym_table* st);

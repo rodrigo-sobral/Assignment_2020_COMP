@@ -99,7 +99,7 @@ sym* get_sym(sym* s,sym_table* st) {
 
 
 void free_sym(sym *s) {
-    if (s) {
+    if (s!=NULL) {
         free(s->name);
         free_param_list(s->param_list);
         free(s);
@@ -130,21 +130,11 @@ void printSymTables(void) {
 }
 
 void printGlobal(sym_table* st) { //table
-    sym* s= st->sym_list;	
-    param* param_list;	
+    sym* s= st->sym_list;		
     printf("===== Global Symbol Table =====\n");
 	while(s != NULL) {
         printf("%s\t%s", s->name, type_to_str(s->type));
-        param_list= s->param_list;
-        if(param_list!=NULL){
-            printf("(%s",type_to_str(param_list->type));
-            param_list=param_list->next;
-            while(param_list!=NULL){
-                printf(",%s",type_to_str(param_list->type));
-                param_list=param_list->next;
-            }
-            printf(")");
-        }
+        print_param_list(s);
         printf("\n");
         s=s->next;
     } printf("\n");
@@ -183,10 +173,10 @@ void free_sym_table(sym_table* st){
     sym *s=st->sym_list,*s_aux;
     while(s!=NULL){
         s_aux=s->next;
-        free(st->name);
         free_sym(s);
         s=s_aux;
     }
+    free(st->name);
     free(st);
 }
 /**********************************************/
@@ -227,4 +217,19 @@ int isVarNameInSymList(char* name ,sym_table* st){
         aux=aux->next;
     }
     return 0;
+}
+
+/************************************************************/
+void print_param_list(sym *s){
+    param *param_list;
+    param_list= s->param_list;
+    if(param_list!=NULL){
+        printf("(%s",type_to_str(param_list->type));
+        param_list=param_list->next;
+        while(param_list!=NULL){
+            printf(",%s",type_to_str(param_list->type));
+            param_list=param_list->next;
+        }
+        printf(")");
+    }
 }
