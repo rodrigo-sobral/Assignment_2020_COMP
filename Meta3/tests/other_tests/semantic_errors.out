@@ -1,0 +1,20 @@
+Line 2, col 5: Lvalue required
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+f	int(void)
+
+===== Function f Symbol Table =====
+return	int
+
+Program
+..FuncDefinition
+....Int
+....Id(f)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Store - int
+........IntLit(1) - int
+........IntLit(2) - int
