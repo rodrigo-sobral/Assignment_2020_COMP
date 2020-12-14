@@ -1,12 +1,12 @@
 int main(void);
-int main(void, int);
+
 void chara(int integer, double, void a , double , int , char );
 int a =2;
 void as = 2+2;
-double a= 2-2-2-2*2*2,bs=((((((((((((2))))))+2)))))), test;
+double p= 2-2-2-2*2*2,bs=((((((((((((2))))))+2)))))), test;
 void a = 2-(as-(aasd) + 2*2), b;
 int test(void a, int);
-int abcde(int a, void b, void a){
+int abcde(int a, int b, int i){
 	return b;
 	while(i == 0){
 		if ((i=123&&((i<2&&i&1)))||((((((i|1))))))){
@@ -150,7 +150,7 @@ int chama(void) {
     return b;
 }
 
-int uauu(void, void) {
+int uauu(void) {
     char a= -4+3-(-3);
     int b=a+4-(-a);
     char a=5;
@@ -275,7 +275,6 @@ double pow(double i);
 double pow(double i);
 double pow(int i);
 int pow(int i){
-    return i*i;
 }
 char c1, c2;
 short s, t;

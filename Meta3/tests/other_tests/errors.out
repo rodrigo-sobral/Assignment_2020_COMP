@@ -1,4 +1,3 @@
-Line 2, col 10: Invalid use of void type in declaration
 Line 3, col 33: Invalid use of void type in declaration
 Line 5, col 6: Invalid use of void type in declaration
 Line 7, col 13: Unknown symbol as
@@ -9,7 +8,43 @@ Line 7, col 11: Operator - cannot be applied to types int, undef
 Line 7, col 6: Invalid use of void type in declaration
 Line 7, col 31: Invalid use of void type in declaration
 Line 8, col 10: Invalid use of void type in declaration
-Line 9, col 18: Invalid use of void type in declaration
+Line 15, col 20: Unknown symbol c
+Line 15, col 21: Operator >= cannot be applied to types undef, int
+Line 15, col 26: Unknown symbol d
+Line 15, col 27: Operator ^ cannot be applied to types undef, int
+Line 15, col 31: Unknown symbol x
+Line 15, col 32: Operator | cannot be applied to types undef, int
+Line 15, col 36: Unknown symbol x
+Line 15, col 37: Operator & cannot be applied to types undef, int
+Line 17, col 5: Unknown symbol c
+Line 17, col 10: Unknown symbol c
+Line 17, col 9: Operator - cannot be applied to type undef
+Line 17, col 7: Operator = cannot be applied to types undef, undef
+Line 18, col 5: Unknown symbol c
+Line 18, col 10: Unknown symbol c
+Line 18, col 9: Operator - cannot be applied to type undef
+Line 18, col 13: Unknown symbol d
+Line 18, col 12: Operator - cannot be applied to type undef
+Line 18, col 11: Operator % cannot be applied to types undef, undef
+Line 18, col 7: Operator = cannot be applied to types undef, int
+Line 23, col 11: Unknown symbol c
+Line 23, col 12: Operator = cannot be applied to types undef, int
+Line 23, col 15: Unknown symbol d
+Line 23, col 16: Operator = cannot be applied to types undef, int
+Line 25, col 3: Unknown symbol e
+Line 25, col 4: Operator = cannot be applied to types undef, int
+Line 30, col 3: Unknown symbol f
+Line 30, col 4: Operator = cannot be applied to types undef, int
+Line 42, col 3: Unknown symbol x
+Line 42, col 4: Operator = cannot be applied to types undef, int
+Line 42, col 7: Unknown symbol y
+Line 42, col 8: Operator = cannot be applied to types undef, int
+Line 46, col 5: Unknown symbol c
+Line 46, col 5: Conflicting types (got undef, expected int)
+Line 50, col 5: Unknown symbol d
+Line 50, col 5: Conflicting types (got undef, expected int)
+Line 51, col 11: Unknown symbol c
+Line 51, col 12: Operator = cannot be applied to types undef, int
 Line 56, col 8: Unknown symbol i
 Line 56, col 10: Unknown symbol i
 Line 56, col 9: Operator + cannot be applied to types undef, undef
@@ -52,50 +87,56 @@ Line 139, col 12: Unknown symbol e
 Line 141, col 16: Unknown symbol abcd
 Line 141, col 16: Conflicting types (got undef, expected int)
 Line 149, col 6: Wrong number of arguments to function chama (got 1, required 0)
-Line 153, col 10: Invalid use of void type in declaration
+Line 156, col 10: Symbol a already defined
+Line 163, col 16: Unknown symbol r
+Line 163, col 15: Operator = cannot be applied to types char, undef
+Line 174, col 18: Unknown symbol e
+Line 174, col 19: Operator == cannot be applied to types undef, int
 Line 201, col 9: Unknown symbol weird_char
 Line 201, col 9: Wrong number of arguments to function weird_char (got 2, required 0)
 Line 201, col 26: Operator < cannot be applied to types undef, char
 Line 276, col 8: Conflicting types (got double(int), expected double(double))
 Line 277, col 5: Conflicting types (got int(int), expected double(double))
-Line 281, col 10: Conflicting types (got short, expected double)
-Line 288, col 12: Symbol d already defined
-Line 289, col 16: Symbol a already defined
-Line 290, col 11: Symbol b already defined
-Line 290, col 13: Symbol a already defined
-Line 303, col 9: Unknown symbol infinite_putchar
-Line 303, col 9: Wrong number of arguments to function infinite_putchar (got 1, required 0)
-Line 304, col 12: Unknown symbol infinite_putchar
-Line 304, col 12: Wrong number of arguments to function infinite_putchar (got 1, required 0)
-Line 310, col 10: Symbol d already defined
-Line 313, col 6: Symbol a already defined
-Line 313, col 10: Symbol b already defined
-Line 313, col 14: Symbol c already defined
-Line 315, col 8: Symbol d already defined
-Line 317, col 7: Symbol c already defined
-Line 320, col 15: Symbol a already defined
-Line 321, col 10: Symbol c already defined
-Line 323, col 5: Unknown symbol function
-Line 323, col 5: Wrong number of arguments to function function (got 1, required 0)
-Line 323, col 19: Unknown symbol function
-Line 323, col 19: Wrong number of arguments to function function (got 1, required 0)
-Line 323, col 17: Operator + cannot be applied to types undef, undef
-Line 325, col 15: Unknown symbol function
-Line 325, col 15: Wrong number of arguments to function function (got 1, required 0)
-Line 325, col 13: Operator < cannot be applied to types int, undef
-Line 327, col 11: Unknown symbol nao_existe
-Line 327, col 9: Operator % cannot be applied to types double, undef
-Line 337, col 9: Operator ^ cannot be applied to types double, int
-Line 345, col 7: Operator = cannot be applied to types int, double
-Line 346, col 15: Unknown symbol e
-Line 346, col 15: Conflicting types (got undef, expected double)
+Line 280, col 10: Conflicting types (got short, expected double)
+Line 287, col 12: Symbol d already defined
+Line 288, col 16: Symbol a already defined
+Line 289, col 11: Symbol b already defined
+Line 289, col 13: Symbol a already defined
+Line 302, col 9: Unknown symbol infinite_putchar
+Line 302, col 9: Wrong number of arguments to function infinite_putchar (got 1, required 0)
+Line 303, col 12: Unknown symbol infinite_putchar
+Line 303, col 12: Wrong number of arguments to function infinite_putchar (got 1, required 0)
+Line 309, col 10: Symbol d already defined
+Line 312, col 6: Symbol a already defined
+Line 312, col 10: Symbol b already defined
+Line 312, col 14: Symbol c already defined
+Line 314, col 8: Symbol d already defined
+Line 316, col 7: Symbol c already defined
+Line 319, col 15: Symbol a already defined
+Line 320, col 10: Symbol c already defined
+Line 322, col 5: Unknown symbol function
+Line 322, col 5: Wrong number of arguments to function function (got 1, required 0)
+Line 322, col 19: Unknown symbol function
+Line 322, col 19: Wrong number of arguments to function function (got 1, required 0)
+Line 322, col 17: Operator + cannot be applied to types undef, undef
+Line 324, col 15: Unknown symbol function
+Line 324, col 15: Wrong number of arguments to function function (got 1, required 0)
+Line 324, col 13: Operator < cannot be applied to types int, undef
+Line 326, col 11: Unknown symbol nao_existe
+Line 326, col 9: Operator % cannot be applied to types double, undef
+Line 336, col 9: Operator ^ cannot be applied to types double, int
+Line 344, col 7: Operator = cannot be applied to types int, double
+Line 345, col 15: Unknown symbol e
+Line 345, col 15: Conflicting types (got undef, expected double)
 ===== Global Symbol Table =====
 putchar	int(int)
 getchar	int(void)
 main	int(void)
 a	int
+p	double
 bs	double
 test	double
+abcde	int(int,int,int)
 okokok	int(void)
 new	void(void)
 factorial	int(int)
@@ -108,6 +149,7 @@ d	int
 c	int
 t	double
 chama	int(void)
+uauu	int(void)
 ctoi	int(char)
 block	char(char,char)
 check_your_priorities	int(int,int,int)
@@ -135,6 +177,12 @@ df	double(double,double)
 return	int
 i	int
 
+===== Function abcde Symbol Table =====
+return	int
+a	int	param
+b	int	param
+i	int	param
+
 ===== Function okokok Symbol Table =====
 return	int
 i	int
@@ -157,6 +205,11 @@ i	int
 
 ===== Function chama Symbol Table =====
 return	int
+
+===== Function uauu Symbol Table =====
+return	int
+a	char
+b	int
 
 ===== Function ctoi Symbol Table =====
 return	int
@@ -216,14 +269,6 @@ Program
 ......ParamDeclaration
 ........Void
 ..FuncDeclaration
-....Int
-....Id(main)
-....ParamList
-......ParamDeclaration
-........Void
-......ParamDeclaration
-........Int
-..FuncDeclaration
 ....Void
 ....Id(chara)
 ....ParamList
@@ -253,7 +298,7 @@ Program
 ......IntLit(2) - int
 ..Declaration
 ....Double
-....Id(a)
+....Id(p)
 ....Sub - int
 ......Sub - int
 ........Sub - int
@@ -306,140 +351,140 @@ Program
 ........Int
 ........Id(a)
 ......ParamDeclaration
-........Void
+........Int
 ........Id(b)
 ......ParamDeclaration
-........Void
-........Id(a)
+........Int
+........Id(i)
 ....FuncBody
 ......Return
-........Id(b)
+........Id(b) - int
 ......While
-........Eq
-..........Id(i)
-..........IntLit(0)
+........Eq - int
+..........Id(i) - int
+..........IntLit(0) - int
 ........If
-..........Or
-............Store
-..............Id(i)
-..............And
-................IntLit(123)
-................And
-..................Lt
-....................Id(i)
-....................IntLit(2)
-..................BitWiseAnd
-....................Id(i)
-....................IntLit(1)
-............BitWiseOr
-..............Id(i)
-..............IntLit(1)
-..........Store
-............Id(i)
-............IntLit(0123)
+..........Or - int
+............Store - int
+..............Id(i) - int
+..............And - int
+................IntLit(123) - int
+................And - int
+..................Lt - int
+....................Id(i) - int
+....................IntLit(2) - int
+..................BitWiseAnd - int
+....................Id(i) - int
+....................IntLit(1) - int
+............BitWiseOr - int
+..............Id(i) - int
+..............IntLit(1) - int
+..........Store - int
+............Id(i) - int
+............IntLit(0123) - int
 ..........If
-............Or
-..............Eq
-................Id(a)
-................IntLit(2)
-..............And
-................Le
-..................Id(b)
-..................IntLit(2)
-................Or
-..................And
-....................Ge
-......................Id(c)
-......................IntLit(3)
-....................BitWiseXor
-......................Id(d)
-......................IntLit(0)
-..................And
-....................BitWiseOr
-......................Id(x)
-......................IntLit(1)
-....................BitWiseAnd
-......................Id(x)
-......................IntLit(0)
+............Or - int
+..............Eq - int
+................Id(a) - int
+................IntLit(2) - int
+..............And - int
+................Le - int
+..................Id(b) - int
+..................IntLit(2) - int
+................Or - int
+..................And - int
+....................Ge - int
+......................Id(c) - undef
+......................IntLit(3) - int
+....................BitWiseXor - int
+......................Id(d) - undef
+......................IntLit(0) - int
+..................And - int
+....................BitWiseOr - int
+......................Id(x) - undef
+......................IntLit(1) - int
+....................BitWiseAnd - int
+......................Id(x) - undef
+......................IntLit(0) - int
 ............StatList
-..............Store
-................Id(b)
-................Not
-..................Id(b)
-..............Store
-................Id(c)
-................Minus
-..................Id(c)
-..............Store
-................Id(c)
-................Mod
-..................Minus
-....................Id(c)
-..................Minus
-....................Id(d)
+..............Store - int
+................Id(b) - int
+................Not - int
+..................Id(b) - int
+..............Store - undef
+................Id(c) - undef
+................Minus - undef
+..................Id(c) - undef
+..............Store - undef
+................Id(c) - undef
+................Mod - int
+..................Minus - undef
+....................Id(c) - undef
+..................Minus - undef
+....................Id(d) - undef
 ............Null
 ......StatList
-........Store
-..........Id(a)
-..........IntLit(1)
-........Store
-..........Id(b)
-..........IntLit(2)
+........Store - int
+..........Id(a) - int
+..........IntLit(1) - int
+........Store - int
+..........Id(b) - int
+..........IntLit(2) - int
 ......StatList
-........Store
-..........Id(a)
-..........IntLit(1)
-........Store
-..........Id(b)
-..........IntLit(2)
-........Store
-..........Id(c)
-..........IntLit(3)
-........Store
-..........Id(d)
-..........IntLit(4)
-......Store
-........Id(e)
-........IntLit(4)
-......Store
-........Id(f)
-........IntLit(5)
+........Store - int
+..........Id(a) - int
+..........IntLit(1) - int
+........Store - int
+..........Id(b) - int
+..........IntLit(2) - int
+........Store - undef
+..........Id(c) - undef
+..........IntLit(3) - int
+........Store - undef
+..........Id(d) - undef
+..........IntLit(4) - int
+......Store - undef
+........Id(e) - undef
+........IntLit(4) - int
+......Store - undef
+........Id(f) - undef
+........IntLit(5) - int
 ......If
-........Id(a)
+........Id(a) - int
 ........Null
 ........StatList
-..........Store
-............Id(a)
-............IntLit(1)
-..........Store
-............Id(b)
-............IntLit(2)
+..........Store - int
+............Id(a) - int
+............IntLit(1) - int
+..........Store - int
+............Id(b) - int
+............IntLit(2) - int
 ......If
-........Id(b)
+........Id(b) - int
 ........Null
 ........StatList
-..........Store
-............Id(x)
-............IntLit(1)
-..........Store
-............Id(y)
-............IntLit(2)
+..........Store - undef
+............Id(x) - undef
+............IntLit(1) - int
+..........Store - undef
+............Id(y) - undef
+............IntLit(2) - int
 ......If
-........Id(c)
+........Id(c) - undef
 ........Null
 ........Null
 ......If
-........Id(d)
+........Id(d) - undef
 ........StatList
-..........Store
-............Id(a)
-............IntLit(1)
-..........Store
-............Id(b)
-............IntLit(2)
-..........Store
-............Id(c)
-............IntLit(3)
+..........Store - int
+............Id(a) - int
+............IntLit(1) - int
+..........Store - int
+............Id(b) - int
+............IntLit(2) - int
+..........Store - undef
+............Id(c) - undef
+............IntLit(3) - int
 ........Null
 ..FuncDefinition
 ....Int
@@ -713,96 +758,94 @@ Program
 ....ParamList
 ......ParamDeclaration
 ........Void
-......ParamDeclaration
-........Void
 ....FuncBody
 ......Declaration
 ........Char
 ........Id(a)
-........Sub
-..........Add
-............Minus
-..............IntLit(4)
-............IntLit(3)
-..........Minus
-............IntLit(3)
+........Sub - int
+..........Add - int
+............Minus - int
+..............IntLit(4) - int
+............IntLit(3) - int
+..........Minus - int
+............IntLit(3) - int
 ......Declaration
 ........Int
 ........Id(b)
-........Sub
-..........Add
-............Id(a)
-............IntLit(4)
-..........Minus
-............Id(a)
+........Sub - int
+..........Add - int
+............Id(a) - char
+............IntLit(4) - int
+..........Minus - char
+............Id(a) - char
 ......Declaration
 ........Char
 ........Id(a)
-........IntLit(5)
-......Store
-........Id(a)
-........IntLit(5)
-......Eq
-........Id(a)
-........IntLit(5)
-......Lt
-........Id(a)
-........IntLit(5)
+........IntLit(5) - int
+......Store - char
+........Id(a) - char
+........IntLit(5) - int
+......Eq - int
+........Id(a) - char
+........IntLit(5) - int
+......Lt - int
+........Id(a) - char
+........IntLit(5) - int
 ......While
-........Not
-..........Id(a)
+........Not - int
+..........Id(a) - char
 ........If
-..........IntLit(2)
-..........Store
-............Id(a)
-............Add
-..............IntLit(3)
-..............IntLit(3)
-..........Store
-............Id(a)
-............Id(r)
+..........IntLit(2) - int
+..........Store - char
+............Id(a) - char
+............Add - int
+..............IntLit(3) - int
+..............IntLit(3) - int
+..........Store - char
+............Id(a) - char
+............Id(r) - undef
 ......While
-........Or
-..........And
-............Eq
-..............Id(a)
-..............IntLit(3)
-............Lt
-..............Id(b)
-..............Id(a)
-..........Lt
-............Id(a)
-............IntLit(3)
+........Or - int
+..........And - int
+............Eq - int
+..............Id(a) - char
+..............IntLit(3) - int
+............Lt - int
+..............Id(b) - int
+..............Id(a) - char
+..........Lt - int
+............Id(a) - char
+............IntLit(3) - int
 ........StatList
-..........Store
-............Id(a)
-............Id(b)
-..........Store
-............Id(b)
-............IntLit(3)
+..........Store - char
+............Id(a) - char
+............Id(b) - int
+..........Store - int
+............Id(b) - int
+............IntLit(3) - int
 ..........While
-............IntLit(1)
-............Store
-..............Id(a)
-..............IntLit(0)
-..........Store
-............Id(c)
-............IntLit(5)
+............IntLit(1) - int
+............Store - char
+..............Id(a) - char
+..............IntLit(0) - int
+..........Store - int
+............Id(c) - int
+............IntLit(5) - int
 ......If
-........And
-..........Eq
-............Id(a)
-............IntLit(3)
-..........BitWiseAnd
-............Eq
-..............Id(e)
-..............IntLit(3)
-............IntLit(5)
+........And - int
+..........Eq - int
+............Id(a) - char
+............IntLit(3) - int
+..........BitWiseAnd - int
+............Eq - int
+..............Id(e) - undef
+..............IntLit(3) - int
+............IntLit(5) - int
 ........Return
-..........Id(b)
+..........Id(b) - int
 ........Null
 ......Return
-........Id(a)
+........Id(a) - char
 ..FuncDefinition
 ....Int
 ....Id(ctoi)
@@ -1068,10 +1111,6 @@ Program
 ........Int
 ........Id(i)
 ....FuncBody
-......Return
-........Mul
-..........Id(i)
-..........Id(i)
 ..Declaration
 ....Char
 ....Id(c1)
