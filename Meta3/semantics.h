@@ -27,7 +27,7 @@ int isBeforeMainFunc(sym *s);
 int checkConflitingTypes(_type expectedType,_type gotType);
 
 //  COUNTERS
-int paramsCounter(struct param* param_list);
+int paramsCounter(struct param* param_list, int flag);
 
 //  GETTERS
 _type get_statement_type(node* statement, sym_table *st);
