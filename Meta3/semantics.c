@@ -34,7 +34,7 @@ void buildSymbolTables(node* ast_root) {
 void handle_varDecs(node *n) {
     node *aux=n;//typedef
     _type expr_type;
-    sym *s;
+    sym *s, *s_aux;
     int flag=0; //
     if(str_to_type(aux->str)==voidlit) {flag=1;}
     s=create_sym(aux->next->tk->value,str_to_type(aux->str),0,0); 
@@ -44,11 +44,20 @@ void handle_varDecs(node *n) {
         aux=aux->next; //expr
         expr_type=get_statement_type(aux,st_root);
         if(!flag)
-            if(checkConflitingTypes(s->type,expr_type)){                    
-                    //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type)); //TODO:
+            if(checkConflitingTypes(s->type,expr_type)){ 
+                //TODO: ?
+                //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type)); //TODO:
             }
     }
-    if(!isDeclared(s,st_root)&&!flag){add_sym(st_root,s);}
+    if((s_aux=get_sym(s,st_root))==NULL){
+        if(!flag)
+            add_sym(st_root,s);
+    }
+    else{ //already declared
+        if(!flag&&checkConflitingTypes(s->type,s_aux->type)){
+           printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(s->type),type_to_str(s_aux->type)); 
+        }
+    }
     if(flag){ printf("Line %d, col %d: Invalid use of void type in declaration\n",n->next->tk->lineNum, n->next->tk->colNum); free_sym(s);}
 }
 
@@ -89,7 +98,7 @@ void handle_funcDecs(node* n) {
             paramDec=paramDec->next;
         }
 
-        /*COMPARE PARAMETER TYPES WITH DECLARED ONES*/
+        /*COMPARE return types and PARAMETER TYPES WITH DECLARED ONES*/
         if(!flag&&(!check_params_list_types(funcDec,sym_aux)||sym_aux->type!=funcDec->type)){ 
             printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDec->type)); 
             print_param_list(funcDec);
@@ -348,14 +357,18 @@ _type get_statement_type(node* statement, sym_table *st) {
     if(strcmp(statement->str,"Plus")==0 || strcmp(statement->str,"Minus")==0){
         //1 nó filho
         t_aux=get_statement_type(aux->child,st);
-        //TODO: 
+        if(t_aux==undef||t_aux==voidlit){
+            printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
+        }
         statement->type=t_aux;
         return t_aux;
     }
     else if(strcmp(statement->str,"Not")==0){
         //1 nó filho
         t_aux=get_statement_type(aux->child,st);
-        //if(t_aux==voidlit || t_aux==undef){}//TODO: operator canot be applied to type ?
+        if(t_aux==voidlit || t_aux==undef || t_aux==reallit){
+            printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
+        }
         statement->type=intlit;
         return intlit;
     }
@@ -407,7 +420,7 @@ _type get_statement_type(node* statement, sym_table *st) {
     }
     else if(strcmp(statement->str,"If")==0){        
         t_aux=get_statement_type(statement->child,st);
-        if(t_aux!=undef&&checkConflitingTypes(intlit,t_aux)){
+        if(checkConflitingTypes(intlit,t_aux)){
             printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->child->tk->lineNum, statement->child->tk->colNum,type_to_str(t_aux),type_to_str(intlit));
         }
         add_stat_decs_syms_to_table(st, statement->child->next); 
@@ -417,7 +430,12 @@ _type get_statement_type(node* statement, sym_table *st) {
         //verificar se tipo coincide q se espera returnar, coincide
         t_aux=get_statement_type(statement->child,st);
         if(checkConflitingTypes(st->sym_list->type,t_aux)){
-            printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->tk->lineNum, statement->tk->colNum, type_to_str(t_aux), type_to_str(st->sym_list->type));
+            if(strcmp(statement->child->str,"Null")==0){
+                printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->tk->lineNum, statement->tk->colNum, type_to_str(t_aux), type_to_str(st->sym_list->type));
+            }
+            else{
+                printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->child->tk->lineNum, statement->child->tk->colNum, type_to_str(t_aux), type_to_str(st->sym_list->type));
+            }
         }
         return st->sym_list->type; //doesnt matter here..
     }
@@ -571,7 +589,7 @@ _type get_store_type(node *store, sym_table*st) {
     expr_type=get_statement_type(n_aux->next, st);
     store->child->next->type=expr_type;//expr node
 
-    if(checkConflitingTypes(store->child->type,expr_type)){
+    if(checkConflitingTypes(store->child->type,expr_type)||store->child->type==undef){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",store->tk->lineNum,store->tk->colNum,store->tk->value,type_to_str(store->child->type),type_to_str(expr_type));
     }
 
