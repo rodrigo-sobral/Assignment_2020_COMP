@@ -182,16 +182,19 @@ void handle_funcDefs(node* n) {
     /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA ou definida*/
     if((funcDefTable=get_sym_table(funcName))!=NULL){//SE JÁ EXISTIR TABELA DE SÍMBOLOS PARA ESTA TABELA É PQ ELA JÁ FOI DECLARADA OU DEFINIDA ANTERIORMENTE
 
-        sym_aux=get_sym(funcDef,st_root);
-        //if params types are not equal
-        if(!flag&&(!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
-            printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
-            print_param_list(funcDef);
-            printf(", expected %s",type_to_str(sym_aux->type));
-            print_param_list(sym_aux);
-            printf(")\n");
-            flag=1;
+        if(!funcDefTable->isDef){
+            sym_aux=get_sym(funcDef,st_root); 
+            //if params types are not equal
+            if(!flag&&(!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
+                printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
+                print_param_list(funcDef);
+                printf(", expected %s",type_to_str(sym_aux->type));
+                print_param_list(sym_aux);
+                printf(")\n");
+                flag=1;
+            }
         }
+        
         if(funcDefTable->sym_list->next!=NULL){ //se a função já tiver sido definida
             printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
             /*******************SÓ PARA FAZER A ANOTAÇÃO DA ÁRVORE E ANÁLISE SEMÂNTICA DO CÓDIGO DA FUNÇÃO******************/
@@ -341,11 +344,16 @@ int check_params_list_types(sym *sym_defined, sym *sym_declared) {
     }  
 }
 
-int paramsCounter(struct param* param_list) {
+int paramsCounter(struct param* param_list, int flag) {
     int counter=0;
     param* param_list_aux= param_list;
     while (param_list_aux) {
-        if(param_list_aux->type!=voidlit){counter++;}
+        if(flag){// não conta voids nos parametros
+            if(param_list_aux->type!=voidlit){counter++;}
+        } 
+        else{ //conta voids nos parametros
+            counter++;
+        }
         param_list_aux= param_list_aux->next;
     }
     return counter;    
@@ -611,7 +619,7 @@ _type get_funcCall_type(node *call,sym_table*st) {
     int flag=0;
 
     //calcular tipos dos parametros dos argumentos da funccall e add à lista de param do sym_auxiliar
-    if(n_aux==NULL){add_param(s_aux,voidlit);} //se a func n tiver argumentos..add param type void
+    //if(n_aux==NULL){add_param(s_aux,voidlit);} //se a func n tiver argumentos..add param type void
     while(n_aux!=NULL){
         t_aux=get_statement_type(n_aux,st); 
         add_param(s_aux,t_aux);
@@ -623,25 +631,26 @@ _type get_funcCall_type(node *call,sym_table*st) {
     if(funcSym!=NULL){//se a funcao estiver declarada
         //verificar tipos dos parametros
         p_aux0=funcSym->param_list; //lista com tipos de parametros da funcao declarada no global
-        if(paramsCounter(p_aux0) != paramsCounter(p_aux1)){
-            //DONE:  THROW ERROR nr de parametros da function call diferente do nr de parametros declarados para esssa funcção
-            printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, funcSym->name, paramsCounter(p_aux1), paramsCounter(p_aux0));
-        }
-        else{
-            if(p_aux1->type==voidlit){count--;}
-            while(p_aux0&&p_aux1){
-                /*get node line and col*/
-                count++;
-                n_aux=call; n_aux=n_aux->child; //1º nome da funcao
-                for(i=1;i<=count;i++) n_aux=n_aux->next; 
-                /************************/
+        while(p_aux0&&p_aux1){
+            /*get node line and col*/
+            count++;
+            n_aux=call; n_aux=n_aux->child; //1º nome da funcao
+            for(i=1;i<=count;i++) n_aux=n_aux->next; 
+            /************************/
+            if(p_aux0->type!=voidlit)
                 if(checkConflitingTypes(p_aux0->type,p_aux1->type)){
                     printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", n_aux->tk->lineNum, n_aux->tk->colNum, type_to_str(p_aux1->type), type_to_str(p_aux0->type));
                 }       
-                p_aux1=p_aux1->next;
-                p_aux0=p_aux0->next;
-            }
+            p_aux1=p_aux1->next;
+            p_aux0=p_aux0->next;
         }
+        p_aux1=s_aux->param_list;
+        p_aux0=funcSym->param_list;
+        if(paramsCounter(p_aux0,1) != paramsCounter(p_aux1,0)){
+            //DONE:  THROW ERROR nr de parametros da function call diferente do nr de parametros declarados para esssa funcção
+            printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, funcSym->name, paramsCounter(p_aux1,0), paramsCounter(p_aux0,1));
+        }
+        
         free_sym(s_aux);
         call->child->param_list=funcSym->param_list;
         call->child->type=funcSym->type;
@@ -653,13 +662,13 @@ _type get_funcCall_type(node *call,sym_table*st) {
         if(funcSym!=NULL){ //declared as variable (not as function)
             flag=1;
             //printf("Line %d, col %d: Symbol %s is not a function\n", call->tk->lineNum, call->tk->colNum, call->tk->value);
-            if(paramsCounter(p_aux1)!=0)
-                printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, s_aux->name, paramsCounter(p_aux1), 0);
+            if(paramsCounter(p_aux1,0)!=0)
+                printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, s_aux->name, paramsCounter(p_aux1,0), 0);
         }
         else{
             printf("Line %d, col %d: Unknown symbol %s\n", call->tk->lineNum, call->tk->colNum, call->tk->value);
-            if(paramsCounter(p_aux1)!=0)
-                printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, s_aux->name, paramsCounter(p_aux1), 0);
+            if(paramsCounter(p_aux1,0)!=0)
+                printf("Line %d, col %d: Wrong number of arguments to function %s (got %d, required %d)\n", call->child->tk->lineNum, call->child->tk->colNum, s_aux->name, paramsCounter(p_aux1,0), 0);
         }
         free_sym(s_aux);
         /*anotate func args types*/
