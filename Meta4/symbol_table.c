@@ -179,6 +179,7 @@ void free_sym_table(sym_table* st){
     free(st->name);
     free(st);
 }
+
 /**********************************************/
 _type str_to_type(char* str) {
     if(strcmp(str,"Char")==0||strcmp(str,"char")==0) return charlit;

@@ -142,16 +142,6 @@ void freeTree_(node *n) //used to be static :'(
     }
 }
 
-void add_param_to_node(node* n, _type type){
-    param *aux;
-    if(n->param_list){
-        aux=n->param_list;
-        while(aux->next)  aux=aux->next;
-        aux->next=create_param(type);
-    }
-    else n->param_list=create_param(type);
-}
-
 /*create token struct*/
 token* createToken(char* str, int lineNum, int colNum){
     token *tk;
@@ -178,4 +168,17 @@ token* getCopyToken(token *tk){
 void freeToken(token *tk){
     free(tk->value);
     free(tk);
+}
+
+void print_param_list_node(node *n){
+    param *p=n->param_list;
+    if(p!=NULL){
+        printf("(%s",type_to_str(p->type));
+        p=p->next;
+        while(p!=NULL){
+            printf(",%s",type_to_str(p->type));
+            p=p->next;
+        }
+        printf(")");
+    }
 }
