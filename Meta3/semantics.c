@@ -132,11 +132,29 @@ void handle_funcDecs(node* n) {
                 printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum); 
                 flag=1;               
             }
+            else{
+                if(paramDec->child->next!=NULL){
+                    if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
+                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                    }
+                    else{
+                        add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
+                    }                        
+                }
+            }
             add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
             paramDec=paramDec->next;
         }
+
+        free_sym_table(funcDefTable);
+
         if(!flag){
             add_sym(st_root,funcDec);
+
+            //create new sym_table
+            funcDefTable=create_sym_table(funcName);
+            add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
+            funcDefTable->isDef=0; //not defined
             add_sym_table(funcDefTable);
         }
     }
