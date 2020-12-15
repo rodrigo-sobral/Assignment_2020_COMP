@@ -45,8 +45,7 @@ void handle_varDecs(node *n) {
         expr_type=get_statement_type(aux,st_root);
         if(!flag)
             if(checkConflitingTypes(s->type,expr_type)){ 
-                //TODO: ?
-                //printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum, type_to_str(expr_type), type_to_str(s->type)); //TODO:
+                 printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->next->tk->lineNum,  aux->next->tk->colNum,type_to_str(expr_type),type_to_str(s->type));//TODO:
             }
     }
     if((s_aux=get_sym(s,st_root))==NULL){
@@ -523,7 +522,17 @@ _type get_operation_type(node * operation,sym_table *st){
     _type type0, type1; //operation only has 2 nodes
     type0=get_statement_type(n_aux,st);
     type1=get_statement_type(n_aux->next,st);
-    if(type0==undef||type1==undef){
+    if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
+        //se algum dos nós for o ids de uma função
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
+        print_param_list(n_aux);
+        printf(", %s",type_to_str(type1));
+        print_param_list(n_aux->next);
+        printf("\n");
+        operation->type=undef;
+        return undef;
+    }
+    else if(type0==undef||type1==undef){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
         operation->type=undef;
         return undef;
@@ -564,6 +573,14 @@ _type get_bitwise_type(node *operation, sym_table *st){
     _type type0, type1; //operation only has 2 nodes
     type0=get_statement_type(n_aux,st);
     type1=get_statement_type(n_aux->next,st);
+    if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
+        //se algum dos nós for o ids de uma função
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
+        print_param_list(n_aux);
+        printf(", %s",type_to_str(type1));
+        print_param_list(n_aux->next);
+        printf("\n");
+    }
     if(type0==reallit||type1==reallit||type0==voidlit||type1==voidlit||type0==undef||type1==undef){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
     }
@@ -576,6 +593,14 @@ _type get_comparisons_type(node *operation, sym_table *st){
     _type type0, type1; //comparison only has 2 nodes
     type0=get_statement_type(n_aux,st);
     type1=get_statement_type(n_aux->next,st);
+    if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
+        //se algum dos nós for o ids de uma função
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
+        print_param_list(n_aux);
+        printf(", %s",type_to_str(type1));
+        print_param_list(n_aux->next);
+        printf("\n");
+    }
     if(type0==voidlit||type1==voidlit||(type0==undef&&type1!=undef)||(type0!=undef&&type1==undef)){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
     }
@@ -601,10 +626,20 @@ _type get_store_type(node *store, sym_table*st) {
     storedSym= get_sym(s_aux, st);
     if(storedSym==NULL){
         storedSym=get_sym(s_aux,st_root);
-        if(storedSym==NULL){ 
-            //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA 
-            printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);        
-            flag=1; 
+        if(storedSym==NULL){
+            free(s_aux);
+            s_aux= create_sym(n_aux->tk->value, undef, 1, 0);
+            storedSym= get_sym(s_aux, st_root);
+            if(storedSym==NULL){
+                //DONE: THROW ERROR VARIÁVEL NAO ESTÀ DECLARADA 
+                printf("Line %d, col %d: Unknown symbol %s\n",n_aux->tk->lineNum, n_aux->tk->colNum , n_aux->tk->value);
+                flag=1; 
+            }
+            else{
+                //declared as function
+                flag=2;
+            }
+            
         }
     }
     free(s_aux);
@@ -615,7 +650,15 @@ _type get_store_type(node *store, sym_table*st) {
     expr_type=get_statement_type(n_aux->next, st);
     store->child->next->type=expr_type;//expr node
 
-    if(checkConflitingTypes(store->child->type,expr_type)||store->child->type==undef){
+    if(flag==2||store->child->next->param_list!=NULL){
+        //se algum dos nós for o ids de uma função
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s",store->tk->lineNum,store->tk->colNum,store->tk->value,type_to_str(store->child->type)); 
+        print_param_list(n_aux);
+        printf(", %s",type_to_str(expr_type));
+        print_param_list(n_aux->next);
+        printf("\n");
+    }
+    else if(checkConflitingTypes(store->child->type,expr_type)||store->child->type==undef){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",store->tk->lineNum,store->tk->colNum,store->tk->value,type_to_str(store->child->type),type_to_str(expr_type));
     }
 
@@ -713,17 +756,33 @@ _type getTerminalType(node *n,sym_table *st) {
         aux1=create_sym(n->tk->value,undef,0,0);
         if((aux0=get_sym(aux1,st))==NULL){ //if not in local table, search in global table
             if((aux0=get_sym(aux1, st_root))==NULL) {
-                //not in global table...
-                printf("Line %d, col %d: Unknown symbol %s\n", n->tk->lineNum, n->tk->colNum, aux1->name);
-                n->type=undef;
-                return undef;
-            } else{
-                n->type=aux0->type; return aux0->type;
+                //if variable not in global table
+                //search for function with equal variable name
+                free_sym(aux1);
+                aux1=create_sym(n->tk->value,undef,1,0); //as function
+                if((aux0=get_sym(aux1,st_root))==NULL){
+                    //not in global table as a variable or as a function...
+                    printf("Line %d, col %d: Unknown symbol %s\n", n->tk->lineNum, n->tk->colNum, n->tk->value);
+                    n->type=undef;
+                    free_sym(aux1);
+                    return undef;
+                }
+                else{
+                    n->type=aux0->type;
+                    n->param_list=aux0->param_list;
+                    free_sym(aux1);
+                    return aux0->type;
+                }
+            } 
+            else{
+                n->type=aux0->type; free_sym(aux1); return aux0->type;
             }
-        } else {
-            n->type=aux0->type; return aux0->type;
         }
-        free_sym(aux1);
+        else {
+            n->type=aux0->type;
+            free_sym(aux1);
+            return aux0->type;
+        }
     } else if(strncmp(n->str,"ChrLit",6)==0){
         //return charlit;
         n->type=intlit;

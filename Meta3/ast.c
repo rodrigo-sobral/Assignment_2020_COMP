@@ -142,16 +142,6 @@ void freeTree_(node *n) //used to be static :'(
     }
 }
 
-void add_param_to_node(node* n, _type type){
-    param *aux;
-    if(n->param_list){
-        aux=n->param_list;
-        while(aux->next)  aux=aux->next;
-        aux->next=create_param(type);
-    }
-    else n->param_list=create_param(type);
-}
-
 /*create token struct*/
 token* createToken(char* str, int lineNum, int colNum){
     token *tk;
