@@ -15,6 +15,7 @@
     
     extern struct node *root;
     extern int sintaxErrorFlag;
+    int lexicalErrorFlag=0;
 %}
 
 
@@ -68,8 +69,8 @@ return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFla
 "%"         {if(printTokenFlag){printf("MOD\n");} colNum++; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum-yyleng);return MOD;}}
  
 '{char}'		        {if(printTokenFlag) printf("CHRLIT(%s)\n", yytext); colNum+=yyleng; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum-yyleng); return CHRLIT;}}
-'([^\n\'\\]|\\.)*'		{printf("Line %d, col %d: invalid char constant (%s)\n", lineNum, colNum, yytext); colNum+=yyleng;}
-'([^\n\'\\]|\\.)*(\\)?	{printf("Line %d, col %d: unterminated char constant\n", lineNum, colNum); colNum+=yyleng;}
+'([^\n\'\\]|\\.)*'		{printf("Line %d, col %d: invalid char constant (%s)\n", lineNum, colNum, yytext); colNum+=yyleng; lexicalErrorFlag=1;}
+'([^\n\'\\]|\\.)*(\\)?	{printf("Line %d, col %d: unterminated char constant\n", lineNum, colNum); colNum+=yyleng; lexicalErrorFlag=1;}
 
 ({digits}(("."{digits}?{exp}?)|{exp}))|("."{digits}{exp}?)  {if(printTokenFlag){printf("REALLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum-yyleng); return REALLIT;}}
 {digits}                                                    {if(printTokenFlag){printf("INTLIT(%s)\n",yytext);} colNum+=yyleng; if(parseFlag){yylval.tk = createToken(yytext,lineNum,colNum-yyleng); return INTLIT;}}
@@ -80,13 +81,13 @@ return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFla
 "/*"                {BEGIN COMMENT; auxL=lineNum; auxC=colNum; colNum+=yyleng;}
 <COMMENT>"*/"       {BEGIN 0; colNum+=yyleng;}
 <COMMENT>\r?\n|\r   {colNum=1;lineNum++;}
-<COMMENT><<EOF>>    {printf("Line %d, col %d: unterminated comment\n",auxL,auxC); return 0;}
+<COMMENT><<EOF>>    {printf("Line %d, col %d: unterminated comment\n",auxL,auxC); return 0; lexicalErrorFlag=1;}
 <COMMENT>.          {colNum++;}
 
 {ws}        {colNum+=yyleng;}
 \r?\n|\r    {colNum=1;lineNum++;}
 <<EOF>>     {return 0;}
-.           {printf("Line %d, col %d: illegal character (%s)\n",lineNum,colNum,yytext); colNum++;}
+.           {printf("Line %d, col %d: illegal character (%s)\n",lineNum,colNum,yytext); colNum++; lexicalErrorFlag=1;}
 
 
 %%
@@ -104,13 +105,13 @@ int main(int argc, char *argv[]){
         } else if(strcmp(argv[1],"-t")==0){
             //do lexical and sintax analysis
             yyparse();   
-            
-            if(!errorFlag) { //if no syntax error occurred 
+            if(!sintaxErrorFlag) { //if no LEXIAL error occurred 
                 printTree();
             }
-            freeAll();//dont forget to free up memory!            
+            freeTree();//dont forget to free up memory!            
         } else if(strcmp(argv[1],"-e2")==0) {
             yyparse(); //stdout lexical and sintax errors
+            freeTree();//dont forget to free up memory!  
         } else if(strcmp(argv[1],"-s")==0){
             yyparse(); //stdout lexical and sintax errors 
             if(!sintaxErrorFlag){ //if no syntax error occurred 
@@ -124,13 +125,39 @@ int main(int argc, char *argv[]){
             freeTree();
             freeTables();
         } else if(strcmp(argv[1],"-e3")==0) {
-            
+            yyparse(); //stdout lexical and sintax errors 
+            if(!sintaxErrorFlag){ //if no syntax error occurred 
+                /*FAZER ANÁLISE SEMÂNTICA se n houverem erros sintaticos*/
+                startSemanticAnalysis(root);
+            }
+            freeTree();
+            freeTables();
         } 
     } else{
         yyparse(); //stdout lexical and sintax errors 
-        if(!sintaxErrorFlag) { //if no syntax error occurred 
+        if(!sintaxErrorFlag&&!lexicalErrorFlag) { //if no syntax error occurred 
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
+            if(/*se n houver nenhum erro semantico*/){
+
+                /*GERAR CÓDIGO LLVM*/
+
+            }
         }
+
+        /*
+        SÓ DEVE SER GERADO CÓDIGO LLVM
+        CASO NÃO HAJA NENHUM ERRO,
+        NEM SEMANTICO NEM LEXICAL NEM SINTATICO
+        */
+
+        /*
+        TODO:
+        implementar deteção de ocorrência de erros semânticos,
+        utilizando uma flag, 
+        APÓS TERMINADAS A META 3!
+        */
+
+
         freeTree();
         freeTables();
     }
