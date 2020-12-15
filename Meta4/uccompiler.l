@@ -92,7 +92,26 @@ return      {if(printTokenFlag){printf("RETURN\n");} colNum+=yyleng; if(parseFla
 %%
 int main(int argc, char *argv[]){
     if(argc==2){
-        if(strcmp(argv[1],"-s")==0){
+        if(strcmp(argv[1],"-l")==0){
+            //do only lexical analysis and stdout tokens and error_messages from lexical analysis   
+            printTokenFlag=1; 
+            parseFlag=0; //parsing off
+            yylex(); 
+        } else if(strcmp(argv[1],"-e1")==0) {
+            //do lexical analysis only and stdout lexical errors
+            parseFlag=0; //parsing off
+            yylex();
+        } else if(strcmp(argv[1],"-t")==0){
+            //do lexical and sintax analysis
+            yyparse();   
+            
+            if(!errorFlag) { //if no syntax error occurred 
+                printTree();
+            }
+            freeAll();//dont forget to free up memory!            
+        } else if(strcmp(argv[1],"-e2")==0) {
+            yyparse(); //stdout lexical and sintax errors
+        } else if(strcmp(argv[1],"-s")==0){
             yyparse(); //stdout lexical and sintax errors 
             if(!sintaxErrorFlag){ //if no syntax error occurred 
                 /*FAZER ANÁLISE SEMÂNTICA*/
@@ -104,20 +123,12 @@ int main(int argc, char *argv[]){
             }
             freeTree();
             freeTables();
-        }
-        else if(strcmp(argv[1],"-t")==0){
-            //do lexical and sintax analysis
-            yyparse();   
+        } else if(strcmp(argv[1],"-e3")==0) {
             
-            if(!sintaxErrorFlag){ //if no syntax error occurred 
-                printTree(0); //no anotations
-            }
-            freeTree();//dont forget to free up memory!            
-        }      
-    }
-    else{
+        } 
+    } else{
         yyparse(); //stdout lexical and sintax errors 
-        if(!sintaxErrorFlag){ //if no syntax error occurred 
+        if(!sintaxErrorFlag) { //if no syntax error occurred 
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
         }
         freeTree();
