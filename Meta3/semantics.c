@@ -45,7 +45,7 @@ void handle_varDecs(node *n) {
         expr_type=get_statement_type(aux,st_root);
         if(!flag)
             if(checkConflitingTypes(s->type,expr_type)){ 
-                 printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->next->tk->lineNum,  aux->next->tk->colNum,type_to_str(expr_type),type_to_str(s->type));//TODO:
+                printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", aux->tk->lineNum,  aux->tk->colNum,type_to_str(expr_type),type_to_str(s->type));//TODO:
             }
     }
     if((s_aux=get_sym(s,st_root))==NULL){
