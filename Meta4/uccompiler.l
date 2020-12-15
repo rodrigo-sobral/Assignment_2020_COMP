@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
         } else if(strcmp(argv[1],"-t")==0){
             //do lexical and sintax analysis
             yyparse();   
-            if(!sintaxErrorFlag) { //if no LEXIAL error occurred 
+            if(!sintaxErrorFlag) { //print tree if no sintax error occurred 
                 printTree();
             }
             freeTree();//dont forget to free up memory!            
