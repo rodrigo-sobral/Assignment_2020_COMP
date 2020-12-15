@@ -525,9 +525,9 @@ _type get_operation_type(node * operation,sym_table *st){
     if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
         //se algum dos nós for o ids de uma função
         printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
-        print_param_list(n_aux);
+        print_param_list_node(n_aux);
         printf(", %s",type_to_str(type1));
-        print_param_list(n_aux->next);
+        print_param_list_node(n_aux->next);
         printf("\n");
         operation->type=undef;
         return undef;
@@ -576,9 +576,9 @@ _type get_bitwise_type(node *operation, sym_table *st){
     if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
         //se algum dos nós for o ids de uma função
         printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
-        print_param_list(n_aux);
+        print_param_list_node(n_aux);
         printf(", %s",type_to_str(type1));
-        print_param_list(n_aux->next);
+        print_param_list_node(n_aux->next);
         printf("\n");
     }
     if(type0==reallit||type1==reallit||type0==voidlit||type1==voidlit||type0==undef||type1==undef){
@@ -596,9 +596,9 @@ _type get_comparisons_type(node *operation, sym_table *st){
     if(n_aux->param_list!=NULL||n_aux->next->param_list!=NULL){
         //se algum dos nós for o ids de uma função
         printf("Line %d, col %d: Operator %s cannot be applied to types %s",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0)); 
-        print_param_list(n_aux);
+        print_param_list_node(n_aux);
         printf(", %s",type_to_str(type1));
-        print_param_list(n_aux->next);
+        print_param_list_node(n_aux->next);
         printf("\n");
     }
     if(type0==voidlit||type1==voidlit||(type0==undef&&type1!=undef)||(type0!=undef&&type1==undef)){
@@ -653,9 +653,9 @@ _type get_store_type(node *store, sym_table*st) {
     if(flag==2||store->child->next->param_list!=NULL){
         //se algum dos nós for o ids de uma função
         printf("Line %d, col %d: Operator %s cannot be applied to types %s",store->tk->lineNum,store->tk->colNum,store->tk->value,type_to_str(store->child->type)); 
-        print_param_list(n_aux);
+        print_param_list_node(n_aux);
         printf(", %s",type_to_str(expr_type));
-        print_param_list(n_aux->next);
+        print_param_list_node(n_aux->next);
         printf("\n");
     }
     else if(checkConflitingTypes(store->child->type,expr_type)||store->child->type==undef){

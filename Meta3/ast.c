@@ -169,3 +169,16 @@ void freeToken(token *tk){
     free(tk->value);
     free(tk);
 }
+
+void print_param_list_node(node *n){
+    param *p=n->param_list;
+    if(p!=NULL){
+        printf("(%s",type_to_str(p->type));
+        p=p->next;
+        while(p!=NULL){
+            printf(",%s",type_to_str(p->type));
+            p=p->next;
+        }
+        printf(")");
+    }
+}
