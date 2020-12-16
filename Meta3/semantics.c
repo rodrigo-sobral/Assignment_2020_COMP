@@ -480,7 +480,13 @@ _type get_statement_type(node* statement, sym_table *st) {
     else if(strcmp(statement->str,"Return")==0){
         //verificar se tipo coincide q se espera returnar, coincide
         t_aux=get_statement_type(statement->child,st);
-        if(checkConflitingTypes(st->sym_list->type,t_aux)){
+        if(strcmp(statement->child,"Call")!=0 && statement->child->param_list!=NULL){
+            printf("Line %d, col %d: Conflicting types (got %s", statement->tk->lineNum, statement->tk->colNum,type_to_str(t_aux)); 
+            print_param_list(statement->child);
+            printf(", expected %s",type_to_str(st->sym_list->type);
+            printf(")\n");
+        }
+        else if(checkConflitingTypes(st->sym_list->type,t_aux)){
             if(strcmp(statement->child->str,"Null")==0){
                 printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->tk->lineNum, statement->tk->colNum, type_to_str(t_aux), type_to_str(st->sym_list->type));
             }
