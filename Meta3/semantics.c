@@ -493,7 +493,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         if(strcmp(statement->child,"Call")!=0 && statement->child->param_list!=NULL){
             printf("Line %d, col %d: Conflicting types (got %s", statement->tk->lineNum, statement->tk->colNum,type_to_str(t_aux)); 
             print_param_list(statement->child);
-            printf(", expected %s",type_to_str(st->sym_list->type);
+            printf(", expected %s",type_to_str(st->sym_list->type));
             printf(")\n");
         }
         else if(checkConflitingTypes(st->sym_list->type,t_aux)){
