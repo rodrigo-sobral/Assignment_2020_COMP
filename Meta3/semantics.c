@@ -221,7 +221,7 @@ void handle_funcDefs(node* n) {
                 printf(")\n");
                 flag=1;
             }
-            
+
 
 
 
@@ -331,8 +331,9 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
                     }
             }
 
-            if(!isDeclared(s,st)&&!flag){
-                add_sym(st,s); //adiciona sym à table  
+            if(!isDeclared(s,st)){
+                if(!flag)
+                    add_sym(st,s); //adiciona sym à table  
             }
             else{
                 printf("Line %d, col %d: Symbol %s already defined\n", funcDecAndStats->child->next->tk->lineNum, funcDecAndStats->child->next->tk->colNum, funcDecAndStats->child->next->tk->value);
@@ -526,8 +527,9 @@ void add_stat_decs_syms_to_table(sym_table* st, node* stats_decs) {
                         printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", stat_dec->child->next->tk->lineNum,  stat_dec->child->next->tk->colNum, type_to_str(expr_type), type_to_str(s->type)); //TODO:
                     }
             }
-            if(!isDeclared(s,st)&&!flag){
-                add_sym(st,s); //adiciona sym à table  
+            if(!isDeclared(s,st)){
+                if(!flag)
+                    add_sym(st,s); //adiciona sym à table  
             }
             else{
                 printf("Line %d, col %d: Symbol %s already defined\n", stat_dec->child->next->tk->lineNum, stat_dec->child->next->tk->colNum, stat_dec->child->next->tk->value);
