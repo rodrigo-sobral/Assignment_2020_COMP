@@ -105,7 +105,7 @@ void handle_funcDecs(node* n) {
         while(paramDec!=NULL){ //iterate through paramList childs
             //paramDec content (typespec-->[option: id])
             if(str_to_type(paramDec->child->str)==voidlit&&!flag) { //param type
-               flag=1; printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);                
+               flag=1; printf("Line %d, col %d: Invalid use of void type in declaration\n", aux->child->child->tk->lineNum, aux->child->child->tk->colNum);                
             }
             if(paramDec->child->next!=NULL){
                 if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
@@ -149,13 +149,13 @@ void handle_funcDecs(node* n) {
         while(paramDec!=NULL){ //iterate through paramList childs
             //paramDec content (typespec-->[option: id])
             if(str_to_type(paramDec->child->str)==voidlit&&!flag) { //param type
-                printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+                printf("Line %d, col %d: Invalid use of void type in declaration\n", aux->child->child->tk->lineNum, aux->child->child->tk->colNum);   
                 flag=1;             
             }
             add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
             paramDec=paramDec->next;
         }
-        
+
         s_aux0=create_sym(funcName,retType,0,0);
         if((sym_aux=get_sym(s_aux0,st_root))!=NULL){
             //declared as a variable
@@ -243,7 +243,7 @@ void handle_funcDefs(node* n) {
     while(paramDec!=NULL){ //iterate through paramList childs
         //paramDec content (typespec-->[option: id])
         if(str_to_type(paramDec->child->str)==voidlit&&!flag) { //param type
-            printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);   
+            printf("Line %d, col %d: Invalid use of void type in declaration\n", aux->child->child->tk->lineNum, aux->child->child->tk->colNum);   
             flag=1;             
         }
         add_param(funcDef,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol
