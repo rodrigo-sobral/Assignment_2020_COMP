@@ -399,7 +399,12 @@ _type get_statement_type(node* statement, sym_table *st) {
     if(strcmp(statement->str,"Plus")==0 || strcmp(statement->str,"Minus")==0){
         //1 nó filho
         t_aux=get_statement_type(aux->child,st);
-        if(t_aux==undef||t_aux==voidlit){
+        if(strcmp(statement->child,"Call")!=0 && statement->child->param_list!=NULL){
+            printf("Line %d, col %d: Operator %s cannot be applied to type %s",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
+            print_param_list(statement->child);
+            printf("\n");
+        }
+        else if(t_aux==undef||t_aux==voidlit){
             printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
         }
         statement->type=t_aux;
@@ -408,7 +413,12 @@ _type get_statement_type(node* statement, sym_table *st) {
     else if(strcmp(statement->str,"Not")==0){
         //1 nó filho
         t_aux=get_statement_type(aux->child,st);
-        if(t_aux==voidlit || t_aux==undef || t_aux==reallit){
+        if(strcmp(statement->child,"Call")!=0 && statement->child->param_list!=NULL){
+            printf("Line %d, col %d: Operator %s cannot be applied to type %s",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
+            print_param_list(statement->child);
+            printf("\n");
+        }
+        else if(t_aux==voidlit || t_aux==undef || t_aux==reallit){
             printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",statement->tk->lineNum,statement->tk->colNum,statement->tk->value,type_to_str(t_aux));
         }
         statement->type=intlit;
