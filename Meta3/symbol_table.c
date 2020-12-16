@@ -234,3 +234,25 @@ void print_param_list(sym *s){
         printf(")");
     }
 }
+
+/*********************************************************************/
+
+void delete_sym_from_table(char *name,sym_table *st){
+    sym *aux;
+    sym *bef;
+    if(st->sym_list!=NULL){
+        aux=st->sym_list;
+        bef=aux;
+        aux=aux->next;
+        while(aux!=NULL){
+            if(strcmp(aux->name,name)==0){
+                //delete
+                bef->next=aux->next;
+                free_sym(aux);
+                return;
+            }
+            bef=aux;
+            aux=aux->next;
+        }
+    }
+}

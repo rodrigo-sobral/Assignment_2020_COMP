@@ -56,11 +56,14 @@ void handle_varDecs(node *n) {
                 add_sym(st_root,s);
         }
         else{
+            //TODO:
+            /*
             printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(s->type)); 
             printf(", expected %s",type_to_str(s_aux->type));
             print_param_list(s_aux);
             printf(")\n");
             return;
+            */
         }
     }
     else{ //already declared
@@ -158,7 +161,9 @@ void handle_funcDecs(node* n) {
 
         s_aux0=create_sym(funcName,retType,0,0);
         if((sym_aux=get_sym(s_aux0,st_root))!=NULL){
-            //declared as a variable
+            delete_sym_from_table(sym_aux->name,st_root);
+            /*
+            //declared as a variable TODO:
             printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDec->type)); 
             print_param_list(funcDec);
             printf(", expected %s",type_to_str(s_aux0->type));
@@ -166,6 +171,7 @@ void handle_funcDecs(node* n) {
             free_sym(s_aux0);
             free_sym(funcDec);
             return;
+            */
         }
     /***************************************************************************/
 
@@ -313,7 +319,9 @@ void handle_funcDefs(node* n) {
 
         s_aux0=create_sym(funcName,retType,0,0);
         if((sym_aux=get_sym(s_aux0,st_root))!=NULL){
-            //declared as a variable
+            delete_sym_from_table(sym_aux->name,st_root); //delete var from table to be replaced with funcdefinition
+            /*
+            //declared as a variable TODO:
             printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
             print_param_list(funcDef);
             printf(", expected %s",type_to_str(s_aux0->type));
@@ -321,6 +329,7 @@ void handle_funcDefs(node* n) {
             free_sym(s_aux0);
             free_sym(funcDef);
             return;
+            */
         }
 
 

@@ -65,4 +65,6 @@ void print_param_list(sym *s);
 //CHECKERs
 int isVarNameInSymList(char* name ,sym_table* st);
 
+
+void delete_sym_from_table(char *name,sym_table *st);
 #endif
