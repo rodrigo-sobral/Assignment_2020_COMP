@@ -211,7 +211,7 @@ void handle_funcDefs(node* n) {
     /*VERIFICAÇÃO SE A FUNC JÁ FOI DECLARADA ou definida*/
     if((funcDefTable=get_sym_table(funcName))!=NULL){//SE JÁ EXISTIR TABELA DE SÍMBOLOS PARA ESTA TABELA É PQ ELA JÁ FOI DECLARADA OU DEFINIDA ANTERIORMENTE
 
-        if(!funcDefTable->isDef){
+        if(!funcDefTable->isDef){ //se a função so tiver sido declarada
             sym_aux=get_sym(funcDef,st_root); 
             //if params types are not equal
             if(!flag&&(!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
@@ -222,9 +222,13 @@ void handle_funcDefs(node* n) {
                 printf(")\n");
                 flag=1;
             }
+            
+
+
+
         }
         
-        if(funcDefTable->sym_list->next!=NULL){ //se a função já tiver sido definida
+        if(!flag&&funcDefTable->sym_list->next!=NULL){ //se a função já tiver sido definida
             printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
             /*******************SÓ PARA FAZER A ANOTAÇÃO DA ÁRVORE E ANÁLISE SEMÂNTICA DO CÓDIGO DA FUNÇÃO******************/
             /********NOTE: NÃO É ADICIONADA NENHUMA TABELA À LISTA DE TABELAS****************/
