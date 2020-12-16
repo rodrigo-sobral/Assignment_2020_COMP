@@ -1,0 +1,53 @@
+Line 1, col 8: Invalid use of void type in declaration
+Line 3, col 10: Invalid use of void type in declaration
+Line 4, col 12: Unknown symbol v
+Line 4, col 12: Conflicting types (got undef, expected void)
+Line 7, col 10: Invalid use of void type in declaration
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+g	void(void)
+
+===== Function g Symbol Table =====
+return	void
+
+Program
+..FuncDeclaration
+....Void
+....Id(v)
+....ParamList
+......ParamDeclaration
+........Void
+........Id(b)
+..FuncDefinition
+....Void
+....Id(g)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Declaration
+........Void
+........Id(l)
+......Return
+........Call - undef
+..........Id(v) - undef
+..FuncDefinition
+....Int
+....Id(main)
+....ParamList
+......ParamDeclaration
+........Void
+........Id(x)
+....FuncBody
+......If
+........IntLit(2)
+........Return
+..........IntLit(1)
+........Null
+......If
+........IntLit(1)
+........Return
+..........IntLit(5)
+........Return
+..........IntLit(9)

@@ -1,3 +1,16 @@
+Line 3, col 8: Invalid use of void type in declaration
+Line 26, col 5: Symbol D already defined
+Line 33, col 5: Symbol E already defined
+Line 34, col 8: Symbol E already defined
+Line 38, col 5: Conflicting types (got int(int), expected int(double))
+Line 43, col 7: Conflicting types (got short(int), expected int(short))
+Line 49, col 5: Conflicting types (got int(short,short), expected int(short))
+Line 53, col 5: Conflicting types (got int(int), expected int(int,int))
+Line 57, col 9: Conflicting types (got double, expected int)
+Line 59, col 5: Symbol J already defined
+Line 60, col 6: Symbol a already defined
+Line 60, col 9: Symbol b already defined
+Line 69, col 5: Symbol K already defined
 ===== Global Symbol Table =====
 putchar	int(int)
 getchar	int(void)
@@ -12,11 +25,6 @@ H	int(short)
 I	int(int,int)
 J	int(short)
 K	int(short,short)
-
-===== Function A Symbol Table =====
-return	void
-a	void	param
-x	int
 
 ===== Function B Symbol Table =====
 return	int
@@ -35,21 +43,18 @@ a	int	param
 return	int
 a	int	param
 
-===== Function F Symbol Table =====
-return	int
-a	int	param
-
-===== Function G Symbol Table =====
-return	short
-
 ===== Function J Symbol Table =====
 return	int
 a	short	param
+d	double
+b	double
 
 ===== Function K Symbol Table =====
 return	int
 a	short	param
 b	short	param
+o	int
+p	int
 
 Program
 ..FuncDeclaration
@@ -159,6 +164,14 @@ Program
 ....Id(E)
 ....ParamList
 ......ParamDeclaration
+........Double
+........Id(b)
+....FuncBody
+..FuncDefinition
+....Double
+....Id(E)
+....ParamList
+......ParamDeclaration
 ........Int
 ........Id(a)
 ....FuncBody
@@ -190,6 +203,14 @@ Program
 ......ParamDeclaration
 ........Int
 ....FuncBody
+......Declaration
+........Int
+........Id(y)
+......Declaration
+........Int
+........Id(v)
+......Return
+........Id(v)
 ..FuncDeclaration
 ....Int
 ....Id(H)
@@ -229,6 +250,14 @@ Program
 ........Short
 ........Id(a)
 ....FuncBody
+......Declaration
+........Double
+........Id(d)
+......Declaration
+........Double
+........Id(b)
+......Return
+........Id(b) - double
 ..FuncDefinition
 ....Int
 ....Id(J)
@@ -240,6 +269,14 @@ Program
 ........Short
 ........Id(b)
 ....FuncBody
+......Declaration
+........Int
+........Id(a)
+......Declaration
+........Int
+........Id(b)
+......Return
+........Id(b) - short
 ..FuncDefinition
 ....Int
 ....Id(K)
@@ -251,6 +288,14 @@ Program
 ........Short
 ........Id(b)
 ....FuncBody
+......Declaration
+........Int
+........Id(o)
+......Declaration
+........Int
+........Id(p)
+......Return
+........Id(p) - int
 ..FuncDefinition
 ....Int
 ....Id(K)
@@ -259,3 +304,11 @@ Program
 ........Short
 ........Id(a)
 ....FuncBody
+......Declaration
+........Int
+........Id(t)
+......Declaration
+........Int
+........Id(r)
+......Return
+........Id(t) - int

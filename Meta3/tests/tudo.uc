@@ -1,5 +1,6 @@
-void v(void);
+void v(void b);
 void g(void) {
+    void l;
     return v();
 }
 

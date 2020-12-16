@@ -1,0 +1,141 @@
+Line 3, col 34: Symbol b already defined
+Line 11, col 5: Symbol f2 already defined
+Line 12, col 6: Symbol f3 already defined
+Line 13, col 5: Symbol f2 already defined
+Line 16, col 5: Conflicting types (got double, expected int)
+Line 17, col 6: Conflicting types (got double, expected char)
+Line 18, col 5: Conflicting types (got double, expected int)
+Line 25, col 7: Operator + cannot be applied to types int(void), int(void)
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+f7	double(short,double,int)
+f1	char(void)
+f2	double(double)
+f3	void(char)
+t	int
+h	char
+d	int
+f	int(void)
+main	int(void)
+
+===== Function f1 Symbol Table =====
+return	char
+
+===== Function f2 Symbol Table =====
+return	double
+a	double	param
+
+===== Function f3 Symbol Table =====
+return	void
+a	char	param
+
+===== Function f Symbol Table =====
+return	int
+
+===== Function main Symbol Table =====
+return	int
+
+Program
+..FuncDeclaration
+....Double
+....Id(f7)
+....ParamList
+......ParamDeclaration
+........Short
+........Id(a)
+......ParamDeclaration
+........Double
+........Id(b)
+......ParamDeclaration
+........Int
+........Id(b)
+..FuncDefinition
+....Char
+....Id(f1)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+..FuncDefinition
+....Double
+....Id(f2)
+....ParamList
+......ParamDeclaration
+........Double
+........Id(a)
+....FuncBody
+..FuncDefinition
+....Void
+....Id(f3)
+....ParamList
+......ParamDeclaration
+........Char
+........Id(a)
+....FuncBody
+..FuncDefinition
+....Int
+....Id(f2)
+....ParamList
+......ParamDeclaration
+........Int
+........Id(a)
+......ParamDeclaration
+........Int
+........Id(b)
+....FuncBody
+..FuncDefinition
+....Void
+....Id(f3)
+....ParamList
+......ParamDeclaration
+........Char
+........Id(a)
+......ParamDeclaration
+........Char
+........Id(b)
+....FuncBody
+..FuncDefinition
+....Int
+....Id(f2)
+....ParamList
+......ParamDeclaration
+........Int
+........Id(a)
+......ParamDeclaration
+........Int
+........Id(p)
+....FuncBody
+..Declaration
+....Int
+....Id(t)
+....Add - double
+......IntLit(1) - int
+......RealLit(2.0) - double
+..Declaration
+....Char
+....Id(h)
+....RealLit(15.0) - double
+..Declaration
+....Int
+....Id(d)
+....Add - double
+......RealLit(.04e23) - double
+......IntLit(2) - int
+..FuncDefinition
+....Int
+....Id(f)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+..FuncDefinition
+....Int
+....Id(main)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Add - undef
+........Id(f) - int(void)
+........Id(main) - int(void)
