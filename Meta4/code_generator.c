@@ -58,14 +58,30 @@ void get_funcDecs_code(node *n){ //FUNC DECS
 }
 
 void get_varDecs_code(node *n){ //VAR DECS
-
 //COMO DECLARAR VARIAVEIS GLOBAIS EM LLVM? :(
-
+    node *aux=n; //typespec node
+	printf("@%s = common global %s 0\n", aux->next->tk->value,type_to_llvm(str_to_type(aux->str)));
 }
 /******************************************************************************************/
 void print_funcBody_code(node* funcBody){
+    node *funcDecAndStats=funcBody->child,*aux; 
+    _type t;
+    // ^^lista ligada de declarations and statements do func body
+    while(funcDecAndStats){
+        if(strcmp(funcDecAndStats->str,"Declaration")==0){
+            aux=funcDecAndStats->child; //typedef 
+            
+            printf("%%%s = alloca %s\n", aux->next->tk->value, type_to_llvm(str_to_type(aux->str)));
+        }
+        else{
+            //pode ser:
+            //while, if else, statlist, return 
 
-    
+        }
+
+        funcDecAndStats=funcDecAndStats->next;
+    }
+
 
 }
 
