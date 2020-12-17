@@ -1,41 +1,49 @@
 Line 12, col 34: Symbol b already defined
 Line 14, col 8: Conflicting types (got double(short,double,double), expected double(short,double,int))
-Line 17, col 7: Operator = cannot be applied to types int(void), int
-Line 20, col 34: Symbol a already defined
-Line 23, col 5: Lvalue required
-Line 25, col 7: Lvalue required
-Line 31, col 15: Operator , cannot be applied to types int, int(void)
-Line 31, col 27: Operator , cannot be applied to types undef, double
-Line 32, col 19: Operator * cannot be applied to types int, double(short,int,char)
-Line 32, col 15: Operator , cannot be applied to types int, undef
-Line 32, col 25: Operator , cannot be applied to types undef, int
-Line 32, col 30: Unknown symbol main
-Line 32, col 28: Operator , cannot be applied to types undef, undef
-Line 34, col 12: Conflicting types (got double, expected int)
-Line 38, col 5: Conflicting types (got int(char), expected int(int,double))
-Line 40, col 7: Conflicting types (got short(void), expected int(int,double))
-Line 43, col 9: Conflicting types (got double, expected int)
-Line 44, col 10: Conflicting types (got double, expected char)
-Line 45, col 9: Conflicting types (got double, expected int)
-Line 45, col 9: Symbol d already defined
-Line 48, col 5: Lvalue required
-Line 50, col 10: Operator = cannot be applied to types int(int,double), int
-Line 52, col 9: Operator ! cannot be applied to type int(int,double)
-Line 54, col 11: Lvalue required
-Line 57, col 17: Operator = cannot be applied to types int(int,double), int
-Line 57, col 17: Conflicting types (got undef, expected int)
-Line 61, col 5: Conflicting types (got void, expected int)
-Line 80, col 5: Symbol main already defined
-Line 83, col 5: Conflicting types (got int(int,double,char), expected double(short,int,char))
-Line 84, col 5: Symbol func already defined
-Line 87, col 10: Invalid use of void type in declaration
-Line 88, col 30: Symbol a already defined
-Line 88, col 5: Conflicting types (got int(int,double,char), expected int(int,double))
-Line 90, col 25: Symbol a already defined
+Line 16, col 34: Symbol a already defined
+Line 19, col 5: Lvalue required
+Line 21, col 7: Lvalue required
+Line 27, col 15: Operator , cannot be applied to types int, int(void)
+Line 27, col 27: Operator , cannot be applied to types undef, double
+Line 28, col 19: Operator * cannot be applied to types int, double(short,int,char)
+Line 28, col 15: Operator , cannot be applied to types int, undef
+Line 28, col 25: Operator , cannot be applied to types undef, int
+Line 28, col 30: Unknown symbol main
+Line 28, col 28: Operator , cannot be applied to types undef, undef
+Line 30, col 12: Conflicting types (got double, expected int)
+Line 34, col 5: Conflicting types (got int(char), expected int(int,double))
+Line 36, col 7: Conflicting types (got short(void), expected int(int,double))
+Line 39, col 9: Conflicting types (got double, expected int)
+Line 40, col 10: Conflicting types (got double, expected char)
+Line 41, col 9: Conflicting types (got double, expected int)
+Line 41, col 9: Symbol d already defined
+Line 44, col 5: Lvalue required
+Line 46, col 10: Operator = cannot be applied to types int(int,double), int
+Line 48, col 9: Operator ! cannot be applied to type int(int,double)
+Line 50, col 11: Lvalue required
+Line 53, col 17: Operator = cannot be applied to types int(int,double), int
+Line 53, col 17: Conflicting types (got undef, expected int)
+Line 57, col 5: Conflicting types (got void, expected int)
+Line 76, col 5: Symbol main already defined
+Line 79, col 5: Conflicting types (got int(int,double,char), expected double(short,int,char))
+Line 80, col 5: Symbol func already defined
+Line 83, col 10: Invalid use of void type in declaration
+Line 84, col 30: Symbol a already defined
+Line 84, col 5: Conflicting types (got int(int,double,char), expected int(int,double))
+Line 86, col 25: Symbol a already defined
+Line 86, col 33: Symbol a already defined
+Line 88, col 25: Symbol a already defined
 Line 90, col 33: Symbol a already defined
-Line 92, col 25: Symbol a already defined
-Line 94, col 33: Symbol a already defined
-Line 96, col 33: Symbol f already defined
+Line 92, col 33: Symbol f already defined
+Line 98, col 7: Operator = cannot be applied to types int(void), int
+Line 100, col 7: Unknown symbol p
+Line 100, col 6: Operator , cannot be applied to types int(int), undef
+Line 100, col 9: Unknown symbol argc
+Line 100, col 8: Operator , cannot be applied to types undef, undef
+Line 111, col 20: Conflicting types (got void, expected double)
+Line 116, col 12: Conflicting types (got double, expected int)
+Line 118, col 5: Conflicting types (got void, expected int)
+Line 119, col 12: Conflicting types (got void(void), expected int)
 ===== Global Symbol Table =====
 putchar	int(int)
 getchar	int(void)
@@ -47,7 +55,6 @@ dd	int
 ll	short(void)
 f7	double(short,double,int)
 r	int
-v	int(void)
 func	double(short,int,char)
 shapovalov	int(void)
 main	int(int,double)
@@ -60,12 +67,19 @@ main1	int(int,double,char)
 main2	int(int,double,char)
 main3	int(int,double,char)
 main4	int(int,double,char)
+f	int(int)
+k	int
+v	int(void)
+g0	void(void)
+A1	int
+B1	short
+C0	char
+f0	int(int,short,char,double)
+main_principal	int(void)
+muitos_returns	int(void)
 
 ===== Function l Symbol Table =====
 return	short
-
-===== Function v Symbol Table =====
-return	int
 
 ===== Function func Symbol Table =====
 return	double
@@ -122,6 +136,19 @@ f	double	param
 return	int
 a	int	param
 f	double	param
+
+===== Function f Symbol Table =====
+return	int
+z	int	param
+
+===== Function v Symbol Table =====
+return	int
+
+===== Function main_principal Symbol Table =====
+return	int
+
+===== Function muitos_returns Symbol Table =====
+return	int
 
 Program
 ..Declaration
@@ -184,16 +211,6 @@ Program
 ........Double
 ......ParamDeclaration
 ........Double
-..FuncDefinition
-....Int
-....Id(v)
-....ParamList
-......ParamDeclaration
-........Void
-....FuncBody
-......Store - undef
-........Id(v) - int(void)
-........Id(a) - int
 ..FuncDefinition
 ....Double
 ....Id(func)
@@ -506,3 +523,87 @@ Program
 ........Char
 ........Id(f)
 ....FuncBody
+..FuncDefinition
+....Int
+....Id(f)
+....ParamList
+......ParamDeclaration
+........Int
+........Id(z)
+....FuncBody
+..Declaration
+....Int
+....Id(k)
+..FuncDefinition
+....Int
+....Id(v)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Store - undef
+........Id(v) - int(void)
+........Id(k) - int
+......Comma - undef
+........Comma - undef
+..........Id(f) - int(int)
+..........Id(p) - undef
+........Id(argc) - undef
+..FuncDeclaration
+....Void
+....Id(g0)
+....ParamList
+......ParamDeclaration
+........Void
+..Declaration
+....Int
+....Id(A1)
+..Declaration
+....Short
+....Id(B1)
+..Declaration
+....Char
+....Id(C0)
+..FuncDeclaration
+....Int
+....Id(f0)
+....ParamList
+......ParamDeclaration
+........Int
+......ParamDeclaration
+........Short
+......ParamDeclaration
+........Char
+......ParamDeclaration
+........Double
+..FuncDefinition
+....Int
+....Id(main_principal)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Call - int
+........Id(f0) - int(int,short,char,double)
+........Id(A1) - int
+........Id(B1) - short
+........Id(C0) - char
+........Call - void
+..........Id(g0) - void(void)
+..FuncDefinition
+....Int
+....Id(muitos_returns)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........IntLit(1) - int
+......Return
+........RealLit(1.1) - double
+......Return
+........ChrLit('a') - int
+......Return
+........Null
+......Return
+........Id(g0) - void(void)

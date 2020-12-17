@@ -557,7 +557,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         //verificar se tipo coincide q se espera returnar, coincide
         t_aux=get_statement_type(statement->child,st);
         if(strcmp(statement->child->str,"Call")!=0 && statement->child->param_list!=NULL){
-            printf("Line %d, col %d: Conflicting types (got %s", statement->tk->lineNum, statement->tk->colNum,type_to_str(t_aux)); 
+            printf("Line %d, col %d: Conflicting types (got %s", statement->child->tk->lineNum, statement->child->tk->colNum,type_to_str(t_aux)); 
             print_param_list_node(statement->child);
             printf(", expected %s",type_to_str(st->sym_list->type));
             printf(")\n");
