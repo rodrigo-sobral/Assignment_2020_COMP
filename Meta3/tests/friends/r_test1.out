@@ -1,0 +1,243 @@
+Line 9, col 6: Invalid use of void type in declaration
+Line 12, col 2: Conflicting types (got void, expected int)
+Line 16, col 12: Conflicting types (got int, expected void)
+Line 20, col 5: Operator ! cannot be applied to type double(void)
+Line 21, col 5: Operator ! cannot be applied to type double
+Line 22, col 9: Operator ^ cannot be applied to types double, double
+Line 23, col 9: Operator ^ cannot be applied to types double, double(void)
+Line 24, col 7: Operator ^ cannot be applied to types double(void), double
+Line 25, col 9: Operator && cannot be applied to types double, double
+Line 26, col 7: Operator && cannot be applied to types double(void), double
+Line 27, col 11: Operator = cannot be applied to types int(void), int
+Line 28, col 13: Unknown symbol teste1
+Line 28, col 11: Operator + cannot be applied to types int(void), undef
+Line 30, col 7: Operator = cannot be applied to types int, double
+Line 31, col 8: Unknown symbol cm
+Line 31, col 11: Operator ^ cannot be applied to types undef, double
+Line 31, col 11: Conflicting types (got undef, expected int)
+Line 34, col 15: Conflicting types (got double, expected int)
+Line 36, col 2: Unknown symbol p
+Line 36, col 3: Operator , cannot be applied to types undef, double
+Line 37, col 4: Operator , cannot be applied to types void(double,int), double
+Line 38, col 5: Operator && cannot be applied to types void(double,int), void(double,int)
+Line 40, col 2: Operator ! cannot be applied to type void(void)
+Line 41, col 5: Operator ^ cannot be applied to types void(void), void
+Line 43, col 2: Operator + cannot be applied to type void(void)
+Line 45, col 12: Conflicting types (got double, expected int)
+Line 46, col 8: Conflicting types (got int(void), expected int)
+Line 47, col 21: Conflicting types (got void, expected short)
+Line 48, col 5: Conflicting types (got void, expected int)
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+teste	int(void)
+jorge	int(double)
+vaz	double(short)
+gui	void(void)
+f7	void(double,int)
+f9	void(void)
+a	double(void)
+fabio	void(int,double)
+f3	int(void)
+vb	void(void)
+main	int(void)
+
+===== Function f3 Symbol Table =====
+return	int
+
+===== Function vb Symbol Table =====
+return	void
+
+===== Function main Symbol Table =====
+return	int
+h	int
+k	int
+l	double
+
+Program
+..FuncDeclaration
+....Int
+....Id(teste)
+....ParamList
+......ParamDeclaration
+........Void
+..FuncDeclaration
+....Int
+....Id(jorge)
+....ParamList
+......ParamDeclaration
+........Double
+..FuncDeclaration
+....Double
+....Id(vaz)
+....ParamList
+......ParamDeclaration
+........Short
+..FuncDeclaration
+....Void
+....Id(gui)
+....ParamList
+......ParamDeclaration
+........Void
+..FuncDeclaration
+....Void
+....Id(f7)
+....ParamList
+......ParamDeclaration
+........Double
+......ParamDeclaration
+........Int
+..FuncDeclaration
+....Void
+....Id(f9)
+....ParamList
+......ParamDeclaration
+........Void
+..FuncDeclaration
+....Double
+....Id(a)
+....ParamList
+......ParamDeclaration
+........Void
+..FuncDeclaration
+....Void
+....Id(fabio)
+....ParamList
+......ParamDeclaration
+........Int
+......ParamDeclaration
+........Double
+..Declaration
+....Void
+....Id(a)
+..FuncDefinition
+....Int
+....Id(f3)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Call - void
+..........Id(f9) - void(void)
+..FuncDefinition
+....Void
+....Id(vb)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........IntLit(1) - int
+..FuncDefinition
+....Int
+....Id(main)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Not - int
+........Id(a) - double(void)
+......Not - int
+........RealLit(1.1) - double
+......BitWiseXor - int
+........RealLit(1.1) - double
+........RealLit(1.1) - double
+......BitWiseXor - int
+........RealLit(1.1) - double
+........Id(a) - double(void)
+......BitWiseXor - int
+........Id(a) - double(void)
+........RealLit(1.1) - double
+......And - int
+........RealLit(1.1) - double
+........RealLit(1.1) - double
+......And - int
+........Id(a) - double(void)
+........RealLit(1.1) - double
+......Store - undef
+........Id(teste) - int(void)
+........IntLit(1) - int
+......Add - undef
+........Id(teste) - int(void)
+........Id(teste1) - undef
+......Declaration
+........Int
+........Id(h)
+......Store - int
+........Id(h) - int
+........RealLit(2.1) - double
+......If
+........BitWiseXor - undef
+..........Id(cm) - undef
+..........RealLit(1.1) - double
+........Null
+........Null
+......Declaration
+........Int
+........Id(k)
+......Declaration
+........Double
+........Id(l)
+......Store - int
+........Id(k) - int
+........Call - void
+..........Id(f7) - void(double,int)
+..........Id(l) - double
+..........Call - double
+............Id(a) - double(void)
+......Comma - double
+........IntLit(1) - int
+........RealLit(1.1) - double
+......Comma - undef
+........Id(p) - undef
+........RealLit(1.1) - double
+......Comma - undef
+........Id(f7) - void(double,int)
+........RealLit(1.1) - double
+......And - int
+........Id(f7) - void(double,int)
+........Id(f7) - void(double,int)
+......Not - int
+........Call - void
+..........Id(f9) - void(void)
+......Not - int
+........Id(f9) - void(void)
+......BitWiseXor - int
+........Id(f9) - void(void)
+........Call - void
+..........Id(f9) - void(void)
+......BitWiseOr - int
+........Call - void
+..........Id(f9) - void(void)
+........Call - void
+..........Id(f9) - void(void)
+......Plus - undef
+........Id(f9) - void(void)
+......Minus - void
+........Call - void
+..........Id(f9) - void(void)
+......If
+........Add - double
+..........Call - double
+............Id(a) - double(void)
+..........Call - int
+............Id(teste) - int(void)
+........Null
+........Null
+......If
+........Id(main) - int(void)
+........Null
+........Null
+......Call - void
+........Id(fabio) - void(int,double)
+........Call - int
+..........Id(jorge) - int(double)
+..........Call - double
+............Id(vaz) - double(short)
+............Call - void
+..............Id(gui) - void(void)
+........Call - double
+..........Id(a) - double(void)
+......Return
+........Null
