@@ -148,7 +148,6 @@ void print_funcBody_code(node* funcBody, int printFlag){
 }
 
 void handle_statement(node* statement, int printFlag){
-    int loopi;
     //node* aux=statement;
     if(statement!=NULL){
         //PLUS
