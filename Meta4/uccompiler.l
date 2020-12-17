@@ -6,6 +6,7 @@
     #include "y.tab.h"
     #include "ast.h"
     #include "semantics.h"
+    #include "code_generator.h"
 
     int printTokenFlag=0; //if 0(default) print error_messages from lexical_analysis only; else print all tokens and error_messages from lexical_analysis
     int parseFlag=1; //if 1(default) execute parser
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]){
             //do lexical and sintax analysis
             yyparse();   
             if(!sintaxErrorFlag) { //print tree if no sintax error occurred 
-                printTree();
+                printTree(0);
             }
             freeTree();//dont forget to free up memory!            
         } else if(strcmp(argv[1],"-e2")==0) {
@@ -137,10 +138,10 @@ int main(int argc, char *argv[]){
         yyparse(); //stdout lexical and sintax errors 
         if(!sintaxErrorFlag&&!lexicalErrorFlag) { //if no syntax error occurred 
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
-            if(/*se n houver nenhum erro semantico*/){
-
+            if(1){
+                /*se n houver nenhum erro semantico*/
                 /*GERAR CÓDIGO LLVM*/
-
+                generate_llvm_code(root);
             }
         }
 

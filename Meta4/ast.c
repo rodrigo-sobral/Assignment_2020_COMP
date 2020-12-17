@@ -34,6 +34,7 @@ node *createNode(char *str, token *tk)
     n->child = NULL;
     n->str = strdup(str);
     n->tk=tk; 
+    n->llvm_name=NULL;
     n->type=none;//for tree notation
     n-> param_list=NULL; //for tree notation
     return n;
@@ -181,4 +182,11 @@ void print_param_list_node(node *n){
         }
         printf(")");
     }
+}
+
+void assign_llvm_name(node *n, char* s){
+    if(n->llvm_name!=NULL){
+        free(n->llvm_name);
+    }
+    n->llvm_name=strdup(s);
 }

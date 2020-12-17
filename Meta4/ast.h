@@ -12,9 +12,12 @@ typedef struct node{
     /*for tree notation*/
     _type type;
     struct param* param_list; //list head
+    /*for llvm*/
+    char *llvm_name;
     /**/
     struct node *next;
     struct node *child; 
+
 } node;
 
 /*token structure*/
@@ -41,4 +44,5 @@ token* createToken(char* str, int lineNum, int colNum);
 token* getCopyToken(token *tk);
 void freeToken(token *tk);
 void print_param_list_node(node *n);
+void assign_llvm_name(node *n, char* s);
 #endif
