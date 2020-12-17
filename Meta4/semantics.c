@@ -572,7 +572,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         }
         return st->sym_list->type; //doesnt matter here..
     }
-        else if(strcmp(statement->str,"Null")==0){
+    else if(strcmp(statement->str,"Null")==0){
         return voidlit;
     }
     else if(isTerminal(statement)){
