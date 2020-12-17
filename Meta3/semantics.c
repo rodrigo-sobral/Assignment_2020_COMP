@@ -100,7 +100,8 @@ void handle_funcDecs(node* n) {
         paramDec=aux->child; //paramDec
         if(paramDec!=NULL){
             if(str_to_type(paramDec->child->str)==voidlit){
-                if(paramDec->child->next!=NULL){flag= 1; printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
+                flag= 1;
+                if(paramDec->child->next!=NULL){printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
             }
             add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
             paramDec=paramDec->next; //next paramdeclaration node
@@ -144,7 +145,8 @@ void handle_funcDecs(node* n) {
         paramDec=aux->child; //paramDec
         if(paramDec!=NULL){
             if(str_to_type(paramDec->child->str)==voidlit){
-                if(paramDec->child->next!=NULL){flag=1; printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
+                flag=1;
+                if(paramDec->child->next!=NULL){printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
             }
             add_param(funcDec,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
             paramDec=paramDec->next; //next paramdeclaration node
@@ -241,7 +243,8 @@ void handle_funcDefs(node* n) {
     paramDec=aux->child; //paramDec
     if(paramDec!=NULL){
         if(str_to_type(paramDec->child->str)==voidlit){
-            if(paramDec->child->next!=NULL){flag=1; printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
+            flag=1;
+            if(paramDec->child->next!=NULL){ printf("Line %d, col %d: Invalid use of void type in declaration\n", paramDec->child->tk->lineNum, paramDec->child->tk->colNum);}
         }
         add_param(funcDef,str_to_type(paramDec->child->str)); //add paramtype to param list of funcDec symbol            
         paramDec=paramDec->next; //next paramdeclaration node
