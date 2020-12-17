@@ -41,6 +41,7 @@ param* create_param(_type type);
 sym_table *get_sym_table(char* name);
 sym* get_sym(sym* s,sym_table* st);
 
+
 //  ADDERS
 void add_sym_table(sym_table *st);
 void add_sym(sym_table* st, sym* s);

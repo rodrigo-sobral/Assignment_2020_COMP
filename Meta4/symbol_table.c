@@ -64,6 +64,7 @@ sym_table *get_sym_table(char* name) {
         }
     } return NULL;
 }
+
 /********************************************************/
 sym *create_sym(char *name,_type type, int isfunc, int isparam) {
     sym *s;

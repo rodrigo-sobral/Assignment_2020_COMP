@@ -16,10 +16,12 @@ void get_funcDecs_code(node *n);
 void get_varDecs_code(node *n);
 /******************************************************************************************/
 void print_funcBody_code(node* funcBody);
-void handle_statements(node* statement);
+void handle_statement(node* statement);
 void print_params_types(node *paramList);
 void print_params(node *paramList);
 void alloca_params(node *paramList);
 char* type_to_llvm(_type t);
 void cast_llvm_type(char* got, char *expected, node *n);
+void handle_funcCall(node * callNode);
+void print_if(node* ifNode);
 #endif
