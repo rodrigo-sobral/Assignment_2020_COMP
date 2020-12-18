@@ -1,6 +1,7 @@
 //PL5_COMPILADORES@2020
 //Eduardo Filipe Ferreira Cruz          2018285164
 //Rodrigo Fernando Henriques Sobral     2018298209
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -116,7 +117,7 @@ void print_funcBody_code(node* funcBody, int printFlag){
             }
             sprintf(buffer,"%%%s",aux->tk->value);
             assign_llvm_name(aux, buffer);
-            count++;
+            //count++;
             if(aux->next!=NULL){
                 //atribuicao de valor à variavel declarada
                 //TODO:
@@ -390,7 +391,7 @@ void handle_statement(node* statement, int printFlag){
         }
         //
         else if(strcmp(statement->str,"While")==0){
-
+            print_while(statement,printFlag);
         }
         //
         else if(strcmp(statement->str,"If")==0){        
@@ -429,10 +430,20 @@ void handle_statement(node* statement, int printFlag){
             else{
                 if(strncmp(statement->str,"ChrLit",6)==0){
                     //ChrLit('a')
-                    sprintf(buffer,"%d",(int)statement->str[8]);
+                    //TODO:
+                    sprintf(buffer,"%d",get_chrlit_ascii_value(statement->tk->value));
                     assign_llvm_name(statement, buffer);
                 }
-                else{ //intlit
+                else if(strncmp(statement->str,"IntLit",6)==0){
+                    if(statement->tk->value[0]=='0'&&strlen(statement->tk->value)>1){
+                        sprintf(buffer,"%d",octal_to_int(statement->tk->value+1));
+                        assign_llvm_name(statement,buffer); 
+                    }
+                    else{
+                        assign_llvm_name(statement, statement->tk->value); 
+                    }
+                }
+                else{ //reallit
                    assign_llvm_name(statement, statement->tk->value); 
                 }
             }
@@ -511,6 +522,26 @@ void handle_funcCall(node *callNode, int printFlag){
     
 }
 
+void print_while(node *whileNode,int printFlag){
+    //whileNode has 2 child nodes
+    node *aux=whileNode->child; //condition node
+    int savedCount;
+    int statCount, initCount;
+
+    printf("\tbr label %%%d\n\n",count);
+    initCount=count;
+    count++;
+    handle_statement(aux,printFlag); //handle while condition
+    savedCount=count;
+    handle_statement(aux->next,0); //counting
+    statCount=count;
+    count=savedCount;
+    printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,statCount+1);
+    count++;
+    handle_statement(aux->next,printFlag);
+    printf("\tbr label %%%d\n\n",initCount);
+}
+
 void print_if(node* ifNode,int printFlag){
     node *aux=ifNode->child; //condition node
     int savedCount;
@@ -527,18 +558,19 @@ void print_if(node* ifNode,int printFlag){
     handle_statement(aux,0);//if
     ifCount=count;
     handle_statement(aux->next,0);//else
-    elseCount=count;
+    elseCount=count+1;
     count=savedCount;
 
 
     printf("\tbr i1 %s, label %%%d, label %%%d\n\n",ifNode->child->llvm_name, count,ifCount+1);
+    count++;
     handle_statement(aux,printFlag); //IF
-    printf("\tbr label %%%d\n",elseCount+1);
+    printf("\tbr label %%%d\n\n",elseCount+1);
     aux=aux->next; //else statement 3rd node
+    count++;
     handle_statement(aux,printFlag); //ELSE
-    printf("\tbr label %%%d\n",elseCount+1);
+    printf("\tbr label %%%d\n\n",elseCount+1);
 }
-
 
 void print_params_types(node *paramList){ //types only..for func declarations
     node *paramDec=paramList->child;
@@ -589,15 +621,67 @@ void alloca_params(node *paramList){
             printf("\t%%%s = alloca %s\n",paramDec->child->next->tk->value,type_to_llvm(t));
             sprintf(buffer,"%%%s",paramDec->child->next->tk->value);
             assign_llvm_name(paramDec->child->next, buffer);
-            count++;
+            //count++;
         }
         paramDec=paramDec->next; //next paramDec
     }
 }
 
+int get_chrlit_ascii_value(char* value){
+    char aux[4];
+    int len=strlen(value);
+    if(len==4){ //escape char
+        switch(value[2]){
+            case 'n': return (int)'\n';
+            case 't': return (int)'\t';
+            case '\\': return (int)'\\';
+            case '\'': return (int)'\'';
+            case '\"': return (int)'\"';
+            default: 
+            strncpy(aux,value+2,1);
+            return octal_to_int(aux);
+        }
+    }
+    else if(len==5){
+        strncpy(aux,value+2,2);
+        return octal_to_int(aux);
+    }
+    else if(len==6){
+        strncpy(aux,value+2,3);
+        return octal_to_int(aux);
+    }
+    else{
+        return (int)value[1];
+    }
+}
+
+int octal_to_int(char *str){
+    //verificar se é um octal válido primeiro? TODO:
+    int octal=atoi(str);
+    int decimal=0, i=0,j=0;
+    char ch;
+    //check if its a valid octal
+    while((ch=str[j++])!='\0'){
+        if(ch-'0'>=8){return octal;}
+    }
+
+    while(octal!=0){
+        decimal+=(octal%10)*power(8,i); ++i; octal/=10;
+    }
+    return decimal;
+}
+
+int power(int b, int exp){
+    int i,res=1;
+    for(i=exp;i>0;i--){
+        res*=b;
+    }
+    return res;
+}
+
 char* type_to_llvm(_type t){
     switch(t){
-        case charlit: return "i32";
+        case charlit: return "i32"; 
         case intlit: return "i32";
         case reallit: return "double";
         case voidlit: return "void";
