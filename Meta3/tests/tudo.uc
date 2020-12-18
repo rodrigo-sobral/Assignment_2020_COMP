@@ -1,4 +1,10 @@
-void v(void b);
+int f5(char, int, int);
+
+int f5(char r, double t, int b) {}
+
+void v(void, char);
+void ad;
+
 void g(void) {
     void l;
     return v();

@@ -7,7 +7,7 @@ Line 13, col 6: Symbol f already defined
 Line 15, col 12: Unknown symbol y
 Line 18, col 5: Wrong number of arguments to function s (got 2, required 1)
 Line 19, col 9: Conflicting types (got void, expected int)
-Line 19, col 5: Wrong number of arguments to function dbl (got 1, required 2)
+Line 19, col 19: Wrong number of arguments to function dbl (got 1, required 2)
 Line 20, col 10: Unknown symbol und3f
 Line 20, col 7: Operator >= cannot be applied to types double, undef
 Line 20, col 18: Unknown symbol und3f
@@ -118,6 +118,10 @@ Program
 ........Call - void
 ..........Id(s) - void(int)
 ..........Id(i) - int
+........Id(d) - double
+......Call - double
+........Id(dbl) - double(int,double)
+........Id(i) - int
 ......And - int
 ........BitWiseOr - int
 ..........Ge - int

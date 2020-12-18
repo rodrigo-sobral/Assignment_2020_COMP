@@ -16,7 +16,7 @@ double x = y;
 
 double dbl(int i, double d) {
     s(i, d);
-    dbl(s(i));
+    dbl(s(i), d); dbl(i);
     d >= und3f | und3f && und3f % und3f;
     und3f + und3f;
     x = s(i) + 1;
