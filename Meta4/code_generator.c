@@ -411,7 +411,8 @@ void handle_statement(node* statement, int printFlag){
                 if(printFlag){
                     printf("\tret %s %s\n", type_to_llvm(funcRetType),statement->child->llvm_name);
                 }
-            }            
+            }  
+            count++;          
         }
         else if(strcmp(statement->str,"Null")==0){
             //nada
@@ -551,6 +552,7 @@ void print_while(node *whileNode,int printFlag){
     count++;
     handle_statement(aux->next,printFlag);
     printf("\tbr label %%%d\n\n",initCount);
+    count++;
 }
 
 void print_if(node* ifNode,int printFlag){
@@ -594,6 +596,7 @@ void print_if(node* ifNode,int printFlag){
     count++;
     handle_statement(aux,printFlag); //ELSE
     printf("\tbr label %%%d\n\n",elseCount+1);
+    count++;
 }
 
 void print_params_types(node *paramList){ //types only..for func declarations

@@ -6,14 +6,14 @@ call void @_GLOBAL_DECLARATIONS()
 store i32 3, i32* %1
 %2 = alloca i32
 store i32 3, i32* %2
-br label %3
+br label %3 ********
 
 %4= load i32, i32* %1
 %5 = icmp ne i32 %4, 0 
-br i1 %5, label %6, label %8
+br i1 %5, label %6, label %8 ****
 
 ret i32 -1
-br label %3
+br label %3 ********
 
 %9= load i32, i32* %1
 %10 = icmp eq i32 %9, 2
