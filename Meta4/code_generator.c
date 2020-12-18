@@ -138,6 +138,55 @@ void print_funcBody_code(node* funcBody, int printFlag){
         }
         else{
             //pode ser:
+            //while, if else, statlist, return
+            if(strcmp(funcDecAndStats->str,"Return")==0){
+                retFlag=1; //set retFlag
+            } 
+            //STATEMENTS
+            handle_statement(funcDecAndStats,printFlag);
+        }
+
+        funcDecAndStats=funcDecAndStats->next;
+    }
+
+}
+
+void print_statList(node* statList, int printFlag){
+    //count==1 se funcao n devolver nada, count==2 se a função tiver um tipo de retorno diferente de void 
+    node *funcDecAndStats=statList->child,*aux; 
+    // ^^lista ligada de declarations and statements do func body
+    _type t;
+    while(funcDecAndStats){
+        if(strcmp(funcDecAndStats->str,"Declaration")==0){
+            aux=funcDecAndStats->child; //typedef 
+            t=str_to_type(aux->str); //typedef of declared var
+            aux=aux->next;//id (var name)
+            if(printFlag){
+                printf("\t%%%s = alloca %s\n", aux->tk->value, type_to_llvm(t));
+            }
+            sprintf(buffer,"%%%s",aux->tk->value);
+            assign_llvm_name(aux, buffer);
+            //count++;
+            if(aux->next!=NULL){
+                //atribuicao de valor à variavel declarada
+                //TODO:
+                //expressões...func calls...
+                //traduzir as expressões todas e no final fazer o store com o valor resultante
+                //...
+                handle_statement(aux->next,printFlag);
+                //FAZER CASTING!!!!!!!!!!!
+                cast_llvm_type(type_to_llvm(aux->next->type), type_to_llvm(t),aux->next,printFlag);
+                if(printFlag){
+                    printf("\tstore %s ",type_to_llvm(t));
+                    printf("%s, ",aux->next->llvm_name);
+                    printf("%s* %%%s\n",type_to_llvm(t),aux->tk->value);
+                }
+                //...
+                
+            }
+        }
+        else{
+            //pode ser:
             //while, if else, statlist, return 
             //STATEMENTS
             handle_statement(funcDecAndStats,printFlag);
@@ -387,7 +436,7 @@ void handle_statement(node* statement, int printFlag){
         }
         //
         else if(strcmp(statement->str,"StatList")==0){
-            print_funcBody_code(statement,printFlag);
+            print_statList(statement,printFlag);
         }
         //
         else if(strcmp(statement->str,"While")==0){
@@ -399,7 +448,6 @@ void handle_statement(node* statement, int printFlag){
         }
         //RETURN
         else if(strcmp(statement->str,"Return")==0){
-            retFlag=1; //set retFlag
             if(strcmp(statement->child->str,"Null")==0){
                 if(printFlag){
                     printf("\tret void\n");
@@ -526,8 +574,9 @@ void print_while(node *whileNode,int printFlag){
     node *aux=whileNode->child; //condition node
     int savedCount;
     int statCount, initCount;
-
-    printf("\tbr label %%%d\n\n",count);
+    if(printFlag){
+        printf("\tbr label %%%d\n\n",count);
+    }
     initCount=count;
     count++;
     handle_statement(aux,printFlag); //handle while condition
@@ -548,10 +597,14 @@ void print_while(node *whileNode,int printFlag){
     handle_statement(aux->next,0); //counting
     statCount=count;
     count=savedCount;
-    printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,statCount+1);
+    if(printFlag){
+        printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",savedCount-1,savedCount,statCount+1);
+    }
     count++;
     handle_statement(aux->next,printFlag);
-    printf("\tbr label %%%d\n\n",initCount);
+    if(printFlag){
+        printf("\tbr label %%%d\n\n",initCount);
+    }
     count++;
 }
 
@@ -587,15 +640,20 @@ void print_if(node* ifNode,int printFlag){
     elseCount=count+1;
     count=savedCount;
 
-
-    printf("\tbr i1 %s, label %%%d, label %%%d\n\n",ifNode->child->llvm_name, count,ifCount+1);
+    if(printFlag){
+        printf("\tbr i1 %s, label %%%d, label %%%d\n\n",ifNode->child->llvm_name, savedCount,ifCount+1);
+    }
     count++;
     handle_statement(aux,printFlag); //IF
-    printf("\tbr label %%%d\n\n",elseCount+1);
+    if(printFlag){
+        printf("\tbr label %%%d\n\n",elseCount+1);
+    }
     aux=aux->next; //else statement 3rd node
     count++;
     handle_statement(aux,printFlag); //ELSE
-    printf("\tbr label %%%d\n\n",elseCount+1);
+    if(printFlag){
+        printf("\tbr label %%%d\n\n",elseCount+1);
+    }
     count++;
 }
 

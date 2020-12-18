@@ -17,6 +17,7 @@ void get_funcDecs_code(node *n);
 void get_varDecs_code(node *n);
 /******************************************************************************************/
 void print_funcBody_code(node* funcBody,int);
+void print_statList(node* statList, int);
 void handle_statement(node* statement,int);
 void print_params_types(node *paramList);
 void print_params(node *paramList);
