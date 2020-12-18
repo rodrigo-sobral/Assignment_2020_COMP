@@ -13,8 +13,8 @@ _type funcRetType;
 
 void generate_llvm_code(node* ast_root){
     //incluir funções standard do C
-    printf("declare i32 @putchar(i32 nocapture) nounwind\n");  //nocapture e nounwind para dizer q a funcao esta na biblioteca standard do c
-    //printf("declare i32 @getchar(void no capture) nounwind\n");  //para dizer q a funcao esta na biblioteca standard do c
+    printf("declare i32 @putchar(i32)\n");  //nocapture e nounwind para dizer q a funcao esta na biblioteca standard do c
+    printf("declare i32 @getchar()\n");  //para dizer q a funcao esta na biblioteca standard do c
     //TODO: 
     printf("\n");
 
@@ -485,8 +485,11 @@ void handle_funcCall(node *callNode, int printFlag){
     }
     aux=callNode->child->next;//back to first argument node
     if(printFlag){
-        printf("\tcall %s @%s(",type_to_llvm(callNode->type),callNode->child->tk->value);   
+        printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);   
     }
+    sprintf(buffer,"%%%d", count);
+    assign_llvm_name(callNode->child, buffer); //func ID
+    count++;
     //print arguments
     if(aux!=NULL){
         if(printFlag){
@@ -517,6 +520,7 @@ void print_if(node* ifNode,int printFlag){
     //2nd node=if stat body dec/stat ou statlist
     //3rd node=else condition (if Null..there's no else stat)
     handle_statement(aux,printFlag); //handle conditions
+
     //IF
     aux=aux->next; //if statement 2nd node
     savedCount=count;
@@ -527,12 +531,12 @@ void print_if(node* ifNode,int printFlag){
     count=savedCount;
 
 
-    printf("\tbr i1 %s, label %%%d, label %%%d\n\n",aux->llvm_name, count,ifCount);
+    printf("\tbr i1 %s, label %%%d, label %%%d\n\n",ifNode->child->llvm_name, count,ifCount+1);
     handle_statement(aux,printFlag); //IF
-    printf("\tbr label %%%d\n",elseCount);
+    printf("\tbr label %%%d\n",elseCount+1);
     aux=aux->next; //else statement 3rd node
     handle_statement(aux,printFlag); //ELSE
-    printf("\tbr label %%%d\n",elseCount);
+    printf("\tbr label %%%d\n",elseCount+1);
 }
 
 

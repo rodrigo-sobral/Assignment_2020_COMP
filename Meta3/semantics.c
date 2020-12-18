@@ -115,7 +115,7 @@ void handle_funcDecs(node* n) {
             }
             if(paramDec->child->next!=NULL){
                 if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                    printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                    //printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
                 }
                 else{
                     add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
@@ -202,7 +202,7 @@ void handle_funcDecs(node* n) {
             if(str_to_type(paramDec->child->str)!=voidlit) { //param type
                 if(paramDec->child->next!=NULL){
                     if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                        //printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
                     }
                     else{
                         add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
@@ -271,13 +271,16 @@ void handle_funcDefs(node* n) {
         if(!funcDefTable->isDef){ //se a função so tiver sido declarada
             sym_aux=get_sym(funcDef,st_root); 
             //if params types are not equal
-            if(!flag&&(!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
-                printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
-                print_param_list(funcDef);
-                printf(", expected %s",type_to_str(sym_aux->type));
-                print_param_list(sym_aux);
-                printf(")\n");
-                flag=1;
+            if(!flag){
+                if((!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
+                    printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
+                    print_param_list(funcDef);
+                    printf(", expected %s",type_to_str(sym_aux->type));
+                    print_param_list(sym_aux);
+                    printf(")\n");
+                    flag=1;
+                    return;
+                }
             }
         }
         
@@ -287,6 +290,7 @@ void handle_funcDefs(node* n) {
             /********NOTE: NÃO É ADICIONADA NENHUMA TABELA À LISTA DE TABELAS****************/
             funcDefTable=create_sym_table(funcName);
             add_sym(funcDefTable, create_sym("return", retType, 0, 0)); //return sym
+            return;
         }
         /*ADD PARAMETER VARIABLES SYMS TO FUNCDEF SYM_TABLE*/
         if(!flag) funcDefTable->isDef=1;//set as defined
@@ -577,7 +581,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         }
         return st->sym_list->type; //doesnt matter here..
     }
-        else if(strcmp(statement->str,"Null")==0){
+    else if(strcmp(statement->str,"Null")==0){
         return voidlit;
     }
     else if(isTerminal(statement)){
@@ -695,7 +699,7 @@ _type get_bitwise_type(node *operation, sym_table *st){
         print_param_list_node(n_aux->next);
         printf("\n");
     }
-    if(type0==reallit||type1==reallit||type0==voidlit||type1==voidlit||type0==undef||type1==undef){
+    else if(type0==reallit||type1==reallit||type0==voidlit||type1==voidlit||type0==undef||type1==undef){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
     }
     operation->type=intlit;
@@ -715,7 +719,7 @@ _type get_comparisons_type(node *operation, sym_table *st){
         print_param_list_node(n_aux->next);
         printf("\n");
     }
-    if(type0==voidlit||type1==voidlit||(type0==undef&&type1!=undef)||(type0!=undef&&type1==undef)){
+    else if(type0==voidlit||type1==voidlit||(type0==undef&&type1!=undef)||(type0!=undef&&type1==undef)){
         printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",operation->tk->lineNum,operation->tk->colNum,operation->tk->value,type_to_str(type0),type_to_str(type1));
     }
     operation->type=intlit;
