@@ -282,7 +282,7 @@ void handle_funcDefs(node* n) {
             }
         }
         
-        if(!flag&&funcDefTable->sym_list->next!=NULL){ //se a função já tiver sido definida
+        if(!flag&&funcDefTable->isDef){ //se a função já tiver sido definida
             printf("Line %d, col %d: Symbol %s already defined\n", n->next->tk->lineNum, n->next->tk->colNum, funcName);
             /*******************SÓ PARA FAZER A ANOTAÇÃO DA ÁRVORE E ANÁLISE SEMÂNTICA DO CÓDIGO DA FUNÇÃO******************/
             /********NOTE: NÃO É ADICIONADA NENHUMA TABELA À LISTA DE TABELAS****************/

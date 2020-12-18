@@ -322,12 +322,7 @@ void handle_statement(node* statement, int printFlag){
                     printf("\t%%%d = icmp eq %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
-            assign_llvm_name(statement, buffer);
-            count+=2;
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Ne")==0){
             handle_statement(statement->child,printFlag);
@@ -344,12 +339,7 @@ void handle_statement(node* statement, int printFlag){
                     printf("\t%%%d = icmp ne %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
-            assign_llvm_name(statement, buffer);
-            count+=2;
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Le")==0){
             handle_statement(statement->child,printFlag);
@@ -366,12 +356,7 @@ void handle_statement(node* statement, int printFlag){
                     printf("\t%%%d = icmp sle %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
-            assign_llvm_name(statement, buffer);
-            count+=2;
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Ge")==0){
             handle_statement(statement->child,printFlag);
@@ -388,12 +373,7 @@ void handle_statement(node* statement, int printFlag){
                     printf("\t%%%d = icmp sge %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
-            assign_llvm_name(statement, buffer);
-            count+=2;
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Lt")==0){
             handle_statement(statement->child,printFlag);
@@ -412,12 +392,7 @@ void handle_statement(node* statement, int printFlag){
                 }
                 
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
-            assign_llvm_name(statement, buffer);
-            count+=2;
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Gt")==0){
             handle_statement(statement->child,printFlag);
@@ -435,12 +410,9 @@ void handle_statement(node* statement, int printFlag){
                     printf("\t%%%d = icmp sgt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
-            if(printFlag){
-                printf("\t%%%d = zext i1 %%%d to i32\n", count+1, count);
-            }
-            sprintf(buffer,"%%%d", count+1);
+            sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
-            count+=2;
+            count++;
         }
         //BITWISE OPERATORS
         else if(strcmp(statement->str,"BitWiseAnd")==0){
@@ -705,18 +677,72 @@ void print_if(node* ifNode,int printFlag){
 void print_and_or_condition(node *and_or, int printFlag){
     node *aux=and_or; //AND or OR
     int savedCount, labelCount;
-    handle_statement(aux->child,printFlag); //1st condition
+    handle_statement(aux->child,printFlag); //1st condition`
+
+
+    if(isTerminal(aux->child)){
+        if(aux->type==reallit){
+            if(printFlag){
+                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        else{
+            if(printFlag){
+                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        count++;
+    }
+
+
+    
+    printf("%%%d = zext i1 %");
+
+
+
+
+
+
     if(aux->child->type==reallit){
         if(printFlag){
-           printf("%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name); 
+           printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name); 
         }
     }
     else{
         if(printFlag){
-            printf("%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+            printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
         }
     }
     count++;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     savedCount=count;
     handle_statement(aux->child->next,0); //2nd condition count
