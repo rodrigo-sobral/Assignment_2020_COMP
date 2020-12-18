@@ -555,7 +555,10 @@ _type get_statement_type(node* statement, sym_table *st) {
     else if(strcmp(statement->str,"If")==0){        
         t_aux=get_statement_type(statement->child,st);
         if(checkConflitingTypes(intlit,t_aux)){
-            printf("Line %d, col %d: Conflicting types (got %s, expected %s)\n", statement->child->tk->lineNum, statement->child->tk->colNum,type_to_str(t_aux),type_to_str(intlit));
+            printf("Line %d, col %d: Conflicting types (got %s", statement->child->tk->lineNum, statement->child->tk->colNum,type_to_str(t_aux)); 
+            print_param_list_node(statement->child);
+            printf(", expected %s",type_to_str(intlit));
+            printf(")\n");
         }
         add_stat_decs_syms_to_table(st, statement->child->next); 
         return voidlit; //doesnt matter here..
