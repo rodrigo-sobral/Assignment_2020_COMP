@@ -27,6 +27,7 @@ void cast_llvm_type(char* got, char *expected, node *n,int);
 void handle_funcCall(node * callNode,int);
 void print_if(node* ifNode,int);
 void print_while(node *whileNode,int printFlag);
+void print_and_or_condition(node *and_or, int printFlag);
 int get_chrlit_ascii_value(char* value);
 int octal_to_int(char* str);
 int power(int x, int y);
