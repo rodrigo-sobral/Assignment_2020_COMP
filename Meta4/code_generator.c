@@ -406,7 +406,6 @@ void handle_statement(node* statement, int printFlag){
                 }
             }
             else{
-                //TODO: Vou ter de fazer CAST aqui tb!
                 handle_statement(statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(funcRetType),statement->child,printFlag);
                 if(printFlag){
@@ -430,7 +429,6 @@ void handle_statement(node* statement, int printFlag){
             else{
                 if(strncmp(statement->str,"ChrLit",6)==0){
                     //ChrLit('a')
-                    //TODO:
                     sprintf(buffer,"%d",get_chrlit_ascii_value(statement->tk->value));
                     assign_llvm_name(statement, buffer);
                 }
@@ -532,6 +530,19 @@ void print_while(node *whileNode,int printFlag){
     initCount=count;
     count++;
     handle_statement(aux,printFlag); //handle while condition
+    if(isTerminal(aux)){
+        if(aux->type==reallit){
+            if(printFlag){
+                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        else{
+            if(printFlag){
+                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        count++;
+    }
     savedCount=count;
     handle_statement(aux->next,0); //counting
     statCount=count;
@@ -550,8 +561,21 @@ void print_if(node* ifNode,int printFlag){
     //1st node=if condition
     //2nd node=if stat body dec/stat ou statlist
     //3rd node=else condition (if Null..there's no else stat)
-    handle_statement(aux,printFlag); //handle conditions
 
+    handle_statement(aux,printFlag); //handle conditions
+    if(isTerminal(aux)){
+        if(aux->type==reallit){
+            if(printFlag){
+                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        else{
+            if(printFlag){
+                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+            }
+        }
+        count++;
+    }
     //IF
     aux=aux->next; //if statement 2nd node
     savedCount=count;

@@ -919,8 +919,23 @@ _type getTerminalType(node *n,sym_table *st) {
 }
 
 int isTerminal(node *n) {
-    if(n->tk->value) return 1;    
-    else return 0;
+
+    if(strncmp(n->str,"Id",2)==0){
+        return 1;
+    } 
+    else if(strncmp(n->str,"ChrLit",6)==0){
+        return 1;
+    } 
+    else if(strncmp(n->str,"IntLit",6)==0){
+        return 1;
+    } 
+    else if(strncmp(n->str,"RealLit",7)==0){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+
 }
 
 int isBeforeMainFunc(sym *s){
