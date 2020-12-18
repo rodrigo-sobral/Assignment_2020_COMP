@@ -115,7 +115,7 @@ void handle_funcDecs(node* n) {
             }
             if(paramDec->child->next!=NULL){
                 if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                    //printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                    printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
                 }
                 else{
                     add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
@@ -202,7 +202,7 @@ void handle_funcDecs(node* n) {
             if(str_to_type(paramDec->child->str)!=voidlit) { //param type
                 if(paramDec->child->next!=NULL){
                     if(isVarNameInSymList(paramDec->child->next->tk->value,funcDefTable)){
-                        //printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
+                        printf("Line %d, col %d: Symbol %s already defined\n", paramDec->child->next->tk->lineNum, paramDec->child->next->tk->colNum, paramDec->child->next->tk->value);
                     }
                     else{
                         add_sym(funcDefTable,create_sym(paramDec->child->next->tk->value,str_to_type(paramDec->child->str),0,1));
@@ -271,16 +271,14 @@ void handle_funcDefs(node* n) {
         if(!funcDefTable->isDef){ //se a função so tiver sido declarada
             sym_aux=get_sym(funcDef,st_root); 
             //if params types are not equal
-            if(!flag){
-                if((!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
-                    printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
-                    print_param_list(funcDef);
-                    printf(", expected %s",type_to_str(sym_aux->type));
-                    print_param_list(sym_aux);
-                    printf(")\n");
-                    flag=1;
-                    return;
-                }
+            if(!flag&&(!check_params_list_types(funcDef,sym_aux)||sym_aux->type!=funcDef->type)){
+                printf("Line %d, col %d: Conflicting types (got %s", n->next->tk->lineNum,  n->next->tk->colNum,type_to_str(funcDef->type)); 
+                print_param_list(funcDef);
+                printf(", expected %s",type_to_str(sym_aux->type));
+                print_param_list(sym_aux);
+                printf(")\n");
+                flag=1;
+                return;
             }
         }
         
@@ -581,7 +579,7 @@ _type get_statement_type(node* statement, sym_table *st) {
         }
         return st->sym_list->type; //doesnt matter here..
     }
-    else if(strcmp(statement->str,"Null")==0){
+        else if(strcmp(statement->str,"Null")==0){
         return voidlit;
     }
     else if(isTerminal(statement)){
