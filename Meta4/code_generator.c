@@ -64,7 +64,9 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     aux=aux->next; //funcBody node
     //funcBody
     printf("{\n");
-
+    if(strcmp(n->next->tk->value,"main")==0){
+        printf("call void @_INIT_GLOBAL_VARS()\n");
+    }
     //alocar parametros
     alloca_params(n->next->next);
     print_funcBody_code(aux,1);
@@ -108,7 +110,12 @@ void get_varDecs_code(node *n){ //VAR DECS
         handle_Global_varDef(aux->next);
         global_vars_count=count;
         printf("@%s = global %s ", aux->tk->value,type_to_llvm(t));
-        printf("%s\n",aux->next->llvm_name);
+        if(t==reallit){
+            printf("0.0\n");
+        }
+        else{
+            printf("0\n");
+        }
         sprintf(buffer,"@%s",aux->tk->value);
         assign_llvm_name(aux, buffer);
         count=1;

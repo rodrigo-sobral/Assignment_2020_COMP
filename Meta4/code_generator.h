@@ -34,4 +34,5 @@ int isComparison(node *n);
 int get_chrlit_ascii_value(char* value);
 int octal_to_int(char* str);
 int power(int x, int y);
+void handle_Global_varDef(node* statement);
 #endif
