@@ -11,6 +11,7 @@ int count=1, savedLabel=0; //para variáveis intermédias
 char buffer[1000]; //aux
 int retFlag=0;
 _type funcRetType;
+char *currFuncName;
 //int funcCountParams;
 
 void generate_llvm_code(node* ast_root){
@@ -47,6 +48,7 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     _type t=str_to_type(aux->str);
     funcRetType=t;
     printf("define %s @%s(",type_to_llvm(t),aux->next->tk->value);
+    currFuncName=aux->next->tk->value;
     aux=aux->next; //id node
     print_params_types(aux->next); //paramList node
     printf(") ");
@@ -256,9 +258,17 @@ void handle_statement(node* statement, int printFlag){
             //cast if necessary
             cast_llvm_type(type_to_llvm(statement->child->next->type), type_to_llvm(statement->child->type),statement->child->next,printFlag);
             if(printFlag){
-                printf("\tstore %s ",type_to_llvm(statement->child->type));
-                printf("%s, ",statement->child->next->llvm_name);
-                printf("%s* %%%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
+                if(isLocalVar(statement->child->tk->value,currFuncName)){
+                    printf("\tstore %s ",type_to_llvm(statement->child->type));
+                    printf("%s, ",statement->child->next->llvm_name);
+                    printf("%s* %%%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);   
+                }
+                else{
+                    printf("\tstore %s ",type_to_llvm(statement->child->type));
+                    printf("%s, ",statement->child->next->llvm_name);
+                    printf("%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
+                }
+                
             }
         }
         //COMMA
@@ -563,7 +573,12 @@ void handle_statement(node* statement, int printFlag){
             if(strncmp(statement->str,"Id",2)==0){
                 //se for ID
                 if(printFlag){
-                    printf("\t%%%d = load %s, %s* %%%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
+                    if(isLocalVar(statement->tk->value,currFuncName)){
+                        printf("\t%%%d = load %s, %s* %%%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
+                    }
+                    else{
+                        printf("\t%%%d = load %s, %s* @%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
+                    }
                 }
                 sprintf(buffer,"%%%d",count);
                 assign_llvm_name(statement, buffer);

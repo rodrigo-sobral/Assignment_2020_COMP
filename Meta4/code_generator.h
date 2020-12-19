@@ -8,6 +8,7 @@
 #include "ast.h"
 #include "symbol_table.h"
 #include "semantics.h"
+#include "symbol_table.h"
 
 void generate_llvm_code(node* ast_root);
 void start_gen(node* ast_root);

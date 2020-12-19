@@ -236,6 +236,10 @@ void print_param_list(sym *s){
     }
 }
 
+int isLocalVar(char *id,char *funcName){
+    return isVarNameInSymList(id,get_sym_table(funcName));
+}
+
 /*********************************************************************/
 
 void delete_sym_from_table(char *name,sym_table *st){
@@ -257,3 +261,4 @@ void delete_sym_from_table(char *name,sym_table *st){
         }
     }
 }
+
