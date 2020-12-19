@@ -90,6 +90,9 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
 void get_funcDecs_code(node *n){ //FUNC DECS
     //receives typedef node as n
     node *aux=n; //typedef
+    if(get_sym_table(aux->next->tk->value)->isDef){
+        return ;
+    }
     printf("declare %s @%s(",type_to_llvm(str_to_type(aux->str)),aux->next->tk->value);
     aux=aux->next; //id
     print_params_types(aux->next); //paramList node
