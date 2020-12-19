@@ -135,7 +135,24 @@ int main(int argc, char *argv[]){
             }
             freeTree();
             freeTables();
-        } 
+        } else{
+            yyparse(); //stdout lexical and sintax errors 
+            if(!sintaxErrorFlag&&!lexicalErrorFlag) { //if no syntax error occurred 
+                startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
+                if(!semanticErrorFlag){
+                    /*se n houver nenhum erro semantico*/
+                    /*GERAR CÓDIGO LLVM*/
+                    generate_llvm_code(root);
+                }
+            }
+            /*
+            SÓ DEVE SER GERADO CÓDIGO LLVM
+            CASO NÃO HAJA NENHUM ERRO,
+            NEM SEMANTICO NEM LEXICAL NEM SINTATICO
+            */
+            freeTree();
+            freeTables();
+        }
     } else{
         yyparse(); //stdout lexical and sintax errors 
         if(!sintaxErrorFlag&&!lexicalErrorFlag) { //if no syntax error occurred 

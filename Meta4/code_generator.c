@@ -217,9 +217,17 @@ void handle_statement(node* statement, int printFlag){
         else if(strcmp(statement->str,"Minus")==0){
             //1 nó filho
             handle_statement(statement->child,printFlag);
-            if(printFlag){
-                printf("\t%%%d = sub i32 0, %s\n", count, statement->child->llvm_name);
+            if(statement->type==reallit){
+                if(printFlag){
+                    printf("\t%%%d = fsub double -0.0, %s\n", count, statement->child->llvm_name);
+                }
             }
+            else{
+                if(printFlag){
+                    printf("\t%%%d = sub i32 0, %s\n", count, statement->child->llvm_name);
+                }
+            }
+            
             sprintf(buffer,"%%%d",count);
             assign_llvm_name(statement, buffer);
             count++;
@@ -785,7 +793,7 @@ void print_and_or_condition(node *and_or, int printFlag){
             }
         }
         count++;
-        
+
     if(printFlag){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
     }
