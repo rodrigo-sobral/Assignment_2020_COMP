@@ -411,7 +411,7 @@ void add_funcBody_syms_to_table(sym_table* st, node* funcBodyNode) {
             else{
                 printf("Line %d, col %d: Symbol %s already defined\n", funcDecAndStats->child->next->tk->lineNum, funcDecAndStats->child->next->tk->colNum, funcDecAndStats->child->next->tk->value);
             }
-            if(flag){printf("Line %d, col %d: Invalid use of void type in declaration\n",funcDecAndStats->child->next->tk->lineNum,funcDecAndStats->child->next->tk->colNum); free_sym(s);}
+            if(flag){printf("Line %d, col %d: Invalid use of void type in declaration\n",funcDecAndStats->child->next->tk->lineNum,funcDecAndStats->child->next->tk->colNum); flag=0; free_sym(s);}
               
         }
         else{
@@ -629,7 +629,7 @@ void add_stat_decs_syms_to_table(sym_table* st, node* stats_decs) {
             else{
                 printf("Line %d, col %d: Symbol %s already defined\n", stat_dec->child->next->tk->lineNum, stat_dec->child->next->tk->colNum, stat_dec->child->next->tk->value);
             }
-            if(flag){ printf("Line %d, col %d: Invalid use of void type in declaration\n",stat_dec->child->next->tk->lineNum,stat_dec->child->next->tk->colNum); free_sym(s);}            
+            if(flag){ printf("Line %d, col %d: Invalid use of void type in declaration\n",stat_dec->child->next->tk->lineNum,stat_dec->child->next->tk->colNum); flag=0; free_sym(s);}            
         }
         else{
             expr_type=get_statement_type(stat_dec, st);

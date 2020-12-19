@@ -730,7 +730,8 @@ void print_and_or_condition(node *and_or, int printFlag){
     }
     count++;
 
-    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1,count-1);
+    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    count++;
 
 }
 
