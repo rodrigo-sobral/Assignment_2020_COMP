@@ -279,7 +279,7 @@ void handle_statement(node* statement, int printFlag){
             handle_statement(statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
             if(printFlag){
-                printf("\t%%%d = div %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                printf("\t%%%d = sdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
@@ -403,7 +403,6 @@ void handle_statement(node* statement, int printFlag){
                 if(printFlag){
                     printf("\t%%%d = fcmp sgt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
                 }
-                
             }
             else{
                 if(printFlag){
@@ -425,7 +424,6 @@ void handle_statement(node* statement, int printFlag){
             assign_llvm_name(statement, buffer);
             count++;
         }
-            
         else if(strcmp(statement->str,"BitWiseOr")==0){
             handle_statement(statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
@@ -692,7 +690,9 @@ void print_and_or_condition(node *and_or, int printFlag){
         }
         count++;
     }
-    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    if(printFlag){
+        printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
     op1=count;
     count++;
 
@@ -711,28 +711,39 @@ void print_and_or_condition(node *and_or, int printFlag){
         }
         count++;
     }
-    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    if(printFlag){
+        printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
     op2=count;
     count++;
-
     //________________Compare_with_zero_________________//
     if(printFlag){
         printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
         printf("\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
     }
     count+=2;
-
     if(strcmp(and_or->str,"And")==0){ //AND
-        printf("\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+        if(printFlag){
+            printf("\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+        }
     }
     else{ //OR
-        printf("\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+        if(printFlag){
+            printf("\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+        }
     }
     count++;
-
-    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    if(printFlag){
+        printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
     count++;
-
+    if(printFlag){
+        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
+    }
+    sprintf(buffer,"%%%d", count);
+    assign_llvm_name(and_or, buffer);
+    count++;
+    
 }
 
 void print_params_types(node *paramList){ //types only..for func declarations
