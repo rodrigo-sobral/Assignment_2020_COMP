@@ -561,7 +561,7 @@ void handle_funcCall(node *callNode, int printFlag){
         printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);   
     }
     sprintf(buffer,"%%%d", count);
-    assign_llvm_name(callNode->child, buffer); //func ID
+    assign_llvm_name(callNode, buffer); //func ID
     count++;
     //print arguments
     if(aux!=NULL){
@@ -695,7 +695,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         sprintf(buffer,"%%%d", count); 
         assign_llvm_name(and_or->child, buffer);
         count++;
-        
+
     }
     if(printFlag){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
