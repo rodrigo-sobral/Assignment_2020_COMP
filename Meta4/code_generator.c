@@ -45,7 +45,7 @@ void start_gen(node* ast_root){
 
     /*CREATE FUNCTION NO INITIALIZE GLOBAL VARIABLES IF NECESSARY*/
     printf("define void @_INIT_GLOBAL_VARS(){\n");
-    printf("%s\n",global_vars_code);
+    printf("%s",global_vars_code);
     printf("\tret void\n}");
 }
 /***************************************************************************************************************/
