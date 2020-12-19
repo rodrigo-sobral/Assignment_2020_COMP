@@ -15,8 +15,10 @@
     int auxL,auxC;    //to save aux values 
     
     extern struct node *root;
-    extern int sintaxErrorFlag;
     int lexicalErrorFlag=0;
+    extern int sintaxErrorFlag;
+    extern int semanticErrorFlag;
+    
 %}
 
 
@@ -138,27 +140,17 @@ int main(int argc, char *argv[]){
         yyparse(); //stdout lexical and sintax errors 
         if(!sintaxErrorFlag&&!lexicalErrorFlag) { //if no syntax error occurred 
             startSemanticAnalysis(root); /*FAZER ANÁLISE SEMÂNTICA*/
-            if(1){
+            if(!semanticErrorFlag){
                 /*se n houver nenhum erro semantico*/
                 /*GERAR CÓDIGO LLVM*/
                 generate_llvm_code(root);
             }
         }
-
         /*
         SÓ DEVE SER GERADO CÓDIGO LLVM
         CASO NÃO HAJA NENHUM ERRO,
         NEM SEMANTICO NEM LEXICAL NEM SINTATICO
         */
-
-        /*
-        TODO:
-        implementar deteção de ocorrência de erros semânticos,
-        utilizando uma flag, 
-        APÓS TERMINADAS A META 3!
-        */
-
-
         freeTree();
         freeTables();
     }
