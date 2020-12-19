@@ -1,8 +1,26 @@
-void A(void);
-
-void A(void a){
-	int x;
+//Neste código: 
+void f20(char x, char y, int z){
+	void p;
+	int p;
 }
+//devem encontrar apenas o erro Invalid use of void type in declaration
+
+void f1(void){}
+
+char f1(void) {}
+
+
+void d(void);
+int main(void) {
+    int a, b, c;
+    if(main) {b=1; c=2;} else {c=1;}
+    if (d){}
+}
+//Deve dar estes erros:
+//Line 12, col 8: Conflicting types (got int(void), expected int)
+//4c3
+//Line 16, col 9: Conflicting types (got void(void), expected int)
+
 
 int B(int a){
 	int x;
