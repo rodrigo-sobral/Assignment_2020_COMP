@@ -264,40 +264,78 @@ void handle_statement(node* statement, int printFlag){
         //OPERATIONS
         else if(strcmp(statement->str,"Add")==0){
             handle_statement(statement->child,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
-            if(printFlag){
-                printf("\t%%%d = add %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
+            if(statement->type==reallit){
+                if(printFlag){
+                    printf("\t%%%d = fadd %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
             }
+            else{
+                if(printFlag){
+                    printf("\t%%%d = add %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
+            }
+            
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
             count++;
         }
         else if(strcmp(statement->str,"Mul")==0){
             handle_statement(statement->child,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
-            if(printFlag){
-                printf("\t%%%d = mul %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
+            
+            if(statement->type==reallit){
+                if(printFlag){
+                    printf("\t%%%d = fmul %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
             }
+            else{
+                if(printFlag){
+                    printf("\t%%%d = mul %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
+            } 
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
             count++;
         }
         else if(strcmp(statement->str,"Div")==0){
             handle_statement(statement->child,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
-            if(printFlag){
-                printf("\t%%%d = sdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
+            if(statement->type==reallit){
+                if(printFlag){
+                    printf("\t%%%d = fdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
             }
+            else{
+                if(printFlag){
+                    printf("\t%%%d = sdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
+            } 
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
             count++;
         }
         else if(strcmp(statement->str,"Sub")==0){
             handle_statement(statement->child,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
-            if(printFlag){
-                printf("\t%%%d = sub %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
+            if(statement->type==reallit){
+                if(printFlag){
+                printf("\t%%%d = fsub %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
+            }
+            else{
+                if(printFlag){
+                    printf("\t%%%d = sub %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                }
+            } 
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
             count++;
@@ -305,7 +343,9 @@ void handle_statement(node* statement, int printFlag){
         else if(strcmp(statement->str,"Mod")==0){
             //urem ou srem ?
             handle_statement(statement->child,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
             handle_statement(statement->child->next,printFlag);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             if(printFlag){
                 printf("\t%%%d = srem %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
@@ -321,7 +361,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp eq %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp oeq double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
             else{
@@ -338,7 +378,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp ne %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp une double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }   
             }
             else{
@@ -355,7 +395,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp sle %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp ole double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
             else{
@@ -372,7 +412,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp sge %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp oge double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
             else{
@@ -389,7 +429,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp slt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp olt double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }
                 
             }
@@ -408,7 +448,7 @@ void handle_statement(node* statement, int printFlag){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
                 if(printFlag){
-                    printf("\t%%%d = fcmp sgt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                    printf("\t%%%d = fcmp ogt double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
                 }
             }
             else{
@@ -605,7 +645,7 @@ void print_while(node *whileNode,int printFlag){
     if(!isComparison(aux)){
         if(aux->type==reallit){
             if(printFlag){
-                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
             }
         }
         else{
@@ -645,7 +685,7 @@ void print_if(node* ifNode,int printFlag){
     if(!isComparison(aux)){
         if(aux->type==reallit){
             if(printFlag){
-                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
             }
         }
         else{
@@ -691,7 +731,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     if(!isComparison(aux->child)){
         if(aux->child->type==reallit){
             if(printFlag){
-                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
         }
         else{
@@ -715,7 +755,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     if(isTerminal(aux->child->next)){
         if(aux->child->next->type==reallit){
             if(printFlag){
-                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
             }
         }
         else{
@@ -750,10 +790,10 @@ void print_and_or_condition(node *and_or, int printFlag){
     if(printFlag){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
     }
-    count++;
+    /*
     if(printFlag){
         printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-    }
+    }*/
     sprintf(buffer,"%%%d", count);
     assign_llvm_name(and_or, buffer);
     count++;
