@@ -692,9 +692,10 @@ void print_and_or_condition(node *and_or, int printFlag){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
         }
-        sprintf(buffer,"%%%d", count);
+        sprintf(buffer,"%%%d", count); 
         assign_llvm_name(and_or->child, buffer);
         count++;
+        
     }
     if(printFlag){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
