@@ -11,6 +11,7 @@ int count=1, savedLabel=0; //para variáveis intermédias
 char buffer[1000]; //aux
 int retFlag=0;
 _type funcRetType;
+//int funcCountParams;
 
 void generate_llvm_code(node* ast_root){
     //incluir funções standard do C
@@ -47,7 +48,7 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     funcRetType=t;
     printf("define %s @%s(",type_to_llvm(t),aux->next->tk->value);
     aux=aux->next; //id node
-    print_params(aux->next); //paramList node
+    print_params_types(aux->next); //paramList node
     printf(") ");
     aux=aux->next; //paramList node
     aux=aux->next; //funcBody node
@@ -58,8 +59,14 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     alloca_params(n->next->next);
     print_funcBody_code(aux,1);
     if(!retFlag){
-        if(t!=voidlit)
+        if(t!=voidlit){
             printf("\tret %s 0\n", type_to_llvm(t));
+
+            /*printf("\tstore %s 0, %s* %%%d\n",type_to_llvm(t),type_to_llvm(t),funcCountParams);
+            printf("\t%%%d = load %s, %s* %%%d\n",count,type_to_llvm(t),type_to_llvm(t),funcCountParams);
+            printf("\tret %s %%%d\n", type_to_llvm(t),count);
+            count++;*/
+        } 
         else
             printf("\tret void\n");
         
@@ -795,16 +802,43 @@ void print_params(node *paramList){ //types and var names...for func definitions
 void alloca_params(node *paramList){
     _type t;
     node *paramDec=paramList->child;
+    int i=0;
+    /*
+    funcCountParams=count_params(paramList);
+    count+=funcCountParams;
+    if(funcCountParams!=0){
+        printf("\t%%%d = alloca %s\n",count,type_to_llvm(funcRetType)); //alocca return pointer
+        count++;
+    }
+    */
     while(paramDec!=NULL){
         t=str_to_type(paramDec->child->str);
         if(t!=voidlit&&paramDec->child->next!=NULL){
             printf("\t%%%s = alloca %s\n",paramDec->child->next->tk->value,type_to_llvm(t));
             sprintf(buffer,"%%%s",paramDec->child->next->tk->value);
             assign_llvm_name(paramDec->child->next, buffer);
-            //count++;
+            count++;
+            //store argument value
+            printf("\tstore %s ",type_to_llvm(t));
+            printf("%%%d, ",i);
+            printf("%s* %%%s\n",type_to_llvm(t),paramDec->child->next->tk->value);
         }
         paramDec=paramDec->next; //next paramDec
     }
+}
+
+int count_params(node *paramList){
+    int i=0;
+    _type t;
+    node *paramDec=paramList->child;
+    while(paramDec!=NULL){
+        t=str_to_type(paramDec->child->str);
+        if(t!=voidlit){
+            i++;
+        }
+        paramDec=paramDec->next; //next paramDec
+    }
+    return i;
 }
 
 int isComparison(node *n){ 
