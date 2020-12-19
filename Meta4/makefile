@@ -1,4 +1,4 @@
-m
+
 TESTS_PATH= ./tests/
 RUNNING_PROG= uccompiler
 
