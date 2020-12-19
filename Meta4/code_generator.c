@@ -686,26 +686,29 @@ void handle_funcCall(node *callNode, int printFlag){
         p_aux=p_aux->next;
     }
     aux=callNode->child->next;//back to first argument node
-    if(printFlag==1){
-        if(callNode->type==voidlit){
-            printf("\tcall %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+
+    if(callNode->type==voidlit){
+        if(printFlag==1){
+            printf("\tcall %s @%s(",type_to_llvm(callNode->type),callNode->child->tk->value);
         }
-        else{
+        else if(printFlag==2){
+            sprintf(buffer,"\tcall %s @%s(",type_to_llvm(callNode->type),callNode->child->tk->value);
+            strcat(global_vars_code,buffer);
+        }    
+    }
+    else{
+        if(printFlag==1){
             printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
-        }   
-    }
-    else if(printFlag==2){
-        if(callNode->type==voidlit){
-            sprintf(buffer,"\tcall %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
         }
-        else{
+        else if(printFlag==2){
             sprintf(buffer,"\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+            strcat(global_vars_code,buffer);
         }
-        strcat(global_vars_code,buffer);
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(callNode, buffer); //func ID
+        count++;
     }
-    sprintf(buffer,"%%%d", count);
-    assign_llvm_name(callNode, buffer); //func ID
-    count++;
+    
     //print arguments
     if(aux!=NULL){
         if(printFlag==1){
@@ -1191,7 +1194,6 @@ void handle_Global_varDef(node* statement){
                     sprintf(buffer,"\t%%%d = add %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
                     strcat(global_vars_code,buffer);
             }
-            
             sprintf(buffer,"%%%d", count);
             assign_llvm_name(statement, buffer);
             count++;
