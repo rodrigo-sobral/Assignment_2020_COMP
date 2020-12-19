@@ -595,7 +595,7 @@ void print_while(node *whileNode,int printFlag){
     initCount=count;
     count++;
     handle_statement(aux,printFlag); //handle while condition
-    if(isTerminal(aux)){
+    if(!isComparison(aux)){
         if(aux->type==reallit){
             if(printFlag){
                 printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
@@ -606,6 +606,8 @@ void print_while(node *whileNode,int printFlag){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
             }
         }
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(whileNode->child, buffer);
         count++;
     }
     savedCount=count;
@@ -633,7 +635,7 @@ void print_if(node* ifNode,int printFlag){
     //3rd node=else condition (if Null..there's no else stat)
 
     handle_statement(aux,printFlag); //handle conditions
-    if(isTerminal(aux)){
+    if(!isComparison(aux)){
         if(aux->type==reallit){
             if(printFlag){
                 printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
@@ -644,6 +646,8 @@ void print_if(node* ifNode,int printFlag){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
             }
         }
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(ifNode->child, buffer);
         count++;
     }
     //IF
@@ -677,7 +681,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     int op1, op2;
     /*************************_1ST_OP_********************************/
     handle_statement(aux->child,printFlag); //1st condition`
-    if(isTerminal(aux->child)){
+    if(!isComparison(aux->child)){
         if(aux->child->type==reallit){
             if(printFlag){
                 printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
@@ -688,6 +692,8 @@ void print_and_or_condition(node *and_or, int printFlag){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
         }
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(and_or->child, buffer);
         count++;
     }
     if(printFlag){
@@ -797,6 +803,15 @@ void alloca_params(node *paramList){
             //count++;
         }
         paramDec=paramDec->next; //next paramDec
+    }
+}
+
+int isComparison(node *n){ 
+    if(strcmp(n->str,"Eq")==0||strcmp(n->str,"Ne")==0||strcmp(n->str,"Le")==0||strcmp(n->str,"Gt")==0||strcmp(n->str,"Lt")==0||strcmp(n->str,"Ge")==0){
+        return 1;
+    }
+    else{
+        return 0;
     }
 }
 
