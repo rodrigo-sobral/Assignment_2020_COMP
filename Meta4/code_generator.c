@@ -122,7 +122,13 @@ void get_varDecs_code(node *n){ //VAR DECS
     }
     else{
         //VAR DECLARATION
-        printf("@%s = common global %s 0\n", aux->tk->value,type_to_llvm(t));
+        printf("@%s = common global %s ", aux->tk->value,type_to_llvm(t));
+        if(t==reallit){
+            printf("0.0\n");
+        }
+        else{
+            printf("0\n");
+        }
         sprintf(buffer,"@%s",aux->tk->value);
         assign_llvm_name(aux, buffer);
     }
@@ -992,6 +998,7 @@ void alloca_params(node *paramList){
             printf("\tstore %s ",type_to_llvm(t));
             printf("%%%d, ",i);
             printf("%s* %%%s\n",type_to_llvm(t),paramDec->child->next->tk->value);
+            i++;
         }
         paramDec=paramDec->next; //next paramDec
     }
