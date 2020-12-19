@@ -219,7 +219,7 @@ void handle_statement(node* statement, int printFlag){
             handle_statement(statement->child,printFlag);
             if(statement->type==reallit){
                 if(printFlag){
-                    printf("\t%%%d = fsub double -0.0, %s\n", count, statement->child->llvm_name);
+                    printf("\t%%%d = fsub double 0.0, %s\n", count, statement->child->llvm_name);
                 }
             }
             else{
