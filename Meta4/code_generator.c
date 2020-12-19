@@ -687,10 +687,20 @@ void handle_funcCall(node *callNode, int printFlag){
     }
     aux=callNode->child->next;//back to first argument node
     if(printFlag==1){
-        printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);   
+        if(callNode->type==voidlit){
+            printf("\tcall %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        }
+        else{
+            printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        }   
     }
     else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        if(callNode->type==voidlit){
+            sprintf(buffer,"\tcall %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        }
+        else{
+            sprintf(buffer,"\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        }
         strcat(global_vars_code,buffer);
     }
     sprintf(buffer,"%%%d", count);
