@@ -2,7 +2,7 @@
 TESTS_PATH= ./tests/
 RUNNING_PROG= uccompiler
 
-RUNNING_FILE_NAME= fibonacci
+RUNNING_FILE_NAME= random_stuff
 RUNNING_FILE= ${TESTS_PATH}${RUNNING_FILE_NAME}.c
 
 OUTPUTS_PATH= ${TESTS_PATH}outputs/

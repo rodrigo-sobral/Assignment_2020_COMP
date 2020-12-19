@@ -17,13 +17,15 @@ int fibbonacci(int n) {
    }
 }
 
-int main() {
+int main(void) {
    int n = 5;
-   int i;
-	
-   putchar(fibbonacci(n));
-	
-   for(i = 0;i<n;i++) {
-      putchar(fibbonacci(n));
+   int i=0;
+   putchar('\n');
+   putchar('0'+fibbonacci(i));
+    
+   while(i<n) {
+      i=i+1;
+      putchar('-');
+      putchar(fibbonacci(i)+'0');
    }
 }
