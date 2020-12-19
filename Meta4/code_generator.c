@@ -7,8 +7,11 @@
 #include <string.h>
 #include "code_generator.h"
 
-int count=1, savedLabel=0; //para variáveis intermédias
-char buffer[1000]; //aux
+#define MAX_SIZE 4086
+
+int count=1, savedLabel=0, global_vars_count=1; //para variáveis intermédias
+char buffer[1024]; //aux
+char global_vars_code[MAX_SIZE]="";
 int retFlag=0;
 _type funcRetType;
 char *currFuncName;
@@ -39,6 +42,11 @@ void start_gen(node* ast_root){
         }    
         ast_node=ast_node->next;
     }
+
+    /*CREATE FUNCTION NO INITIALIZE GLOBAL VARIABLES IF NECESSARY*/
+    printf("define void @_INIT_GLOBAL_VARS(){\n");
+    printf("%s\n",global_vars_code);
+    printf("\tret void\n}");
 }
 /***************************************************************************************************************/
 void get_funcDefs_code(node *n){ //FUNC DEFS
@@ -96,7 +104,9 @@ void get_varDecs_code(node *n){ //VAR DECS
     aux=aux->next;//id
     if(aux->next!=NULL){
         //VAR DEFINITION
-        handle_statement(aux->next,1);
+        count=global_vars_count;
+        handle_Global_varDef(aux->next);
+        global_vars_count=count;
         printf("@%s = global %s ", aux->tk->value,type_to_llvm(t));
         printf("%s\n",aux->next->llvm_name);
         sprintf(buffer,"@%s",aux->tk->value);
@@ -616,8 +626,12 @@ void cast_llvm_type(char* got, char *expected, node* n,int printFlag){
     }
     //got double expected int
     else if(strcmp(got,"double")==0&&strcmp(expected,"i32")==0){
-        if(printFlag){
+        if(printFlag==1){
            printf("\t%%%d = fptosi double %s to i32\n",count,n->llvm_name); 
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = fptosi double %s to i32\n",count,n->llvm_name); 
+            strcat(global_vars_code,buffer);
         }
         sprintf(buffer,"%%%d", count);
         assign_llvm_name(n, buffer);
@@ -626,10 +640,13 @@ void cast_llvm_type(char* got, char *expected, node* n,int printFlag){
     }
     //got int expected double
     else if(strcmp(expected,"double")==0&&strcmp(got,"i32")==0){
-        if(printFlag){
+        if(printFlag==1){
             printf("\t%%%d = sitofp i32 %s to double\n",count,n->llvm_name);   
         }
-        
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = sitofp i32 %s to double\n",count,n->llvm_name); 
+            strcat(global_vars_code,buffer);
+        }
         sprintf(buffer,"%%%d", count);
         assign_llvm_name(n, buffer);
         count++;
@@ -645,35 +662,55 @@ void handle_funcCall(node *callNode, int printFlag){
     aux=aux->child->next; //first argument node
     p_aux=callNode->child->param_list;
     while(aux!=NULL){
-        handle_statement(aux,printFlag);
+        if(printFlag==2){
+            handle_Global_varDef(aux);
+        }
+        else{
+            handle_statement(aux,printFlag);
+        }
         cast_llvm_type(type_to_llvm(aux->type),type_to_llvm(p_aux->type),aux,printFlag); //CAST if necessary
         aux=aux->next;
         p_aux=p_aux->next;
     }
     aux=callNode->child->next;//back to first argument node
-    if(printFlag){
+    if(printFlag==1){
         printf("\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);   
+    }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = call %s @%s(",count,type_to_llvm(callNode->type),callNode->child->tk->value);
+        strcat(global_vars_code,buffer);
     }
     sprintf(buffer,"%%%d", count);
     assign_llvm_name(callNode, buffer); //func ID
     count++;
     //print arguments
     if(aux!=NULL){
-        if(printFlag){
+        if(printFlag==1){
            printf("%s %s",type_to_llvm(aux->type),aux->llvm_name); 
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"%s %s",type_to_llvm(aux->type),aux->llvm_name); 
+            strcat(global_vars_code,buffer);
         }
         
         aux=aux->next;
     }
     while(aux!=NULL){
-        if(printFlag){
+        if(printFlag==1){
             printf(", %s %s",type_to_llvm(aux->type),aux->llvm_name);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,", %s %s",type_to_llvm(aux->type),aux->llvm_name);
+            strcat(global_vars_code,buffer);
         }
         
         aux=aux->next;
     }
-    if(printFlag){
+    if(printFlag==1){
         printf(")\n");   
+    }
+    else if(printFlag==2){
+        strcat(global_vars_code,")\n");
     }
     
 }
@@ -775,13 +812,21 @@ void print_and_or_condition(node *and_or, int printFlag){
     handle_statement(aux->child,printFlag); //1st condition`
 
         if(aux->child->type==reallit){
-            if(printFlag){
+            if(printFlag==1){
                 printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+            }
+            else if(printFlag==2){
+                sprintf(buffer,"\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+                strcat(global_vars_code,buffer);
             }
         }
         else{
-            if(printFlag){
+            if(printFlag==1){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+            }
+            else if(printFlag==2){
+                sprintf(buffer,"\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+                strcat(global_vars_code,buffer);
             }
         }
         sprintf(buffer,"%%%d", count); 
@@ -789,50 +834,84 @@ void print_and_or_condition(node *and_or, int printFlag){
         count++;
 
     
-    if(printFlag){
+    if(printFlag==1){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+        strcat(global_vars_code,buffer);
     }
     op1=count;
     count++;
 
     /*************************_2ND_OP_********************************/
-    handle_statement(aux->child->next,printFlag); //1st condition`
+    handle_statement(aux->child->next,printFlag==1); //1st condition`
         if(aux->child->next->type==reallit){
-            if(printFlag){
+            if(printFlag==1){
                 printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+            }
+            else if(printFlag==2){
+                sprintf(buffer,"\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
             }
         }
         else{
-            if(printFlag){
+            if(printFlag==1){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+            }
+            else if(printFlag==2){
+                sprintf(buffer,"\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
             }
         }
         count++;
 
-    if(printFlag){
+    if(printFlag==1){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+        strcat(global_vars_code,buffer);
     }
     op2=count;
     count++;
     //________________Compare_with_zero_________________//
-    if(printFlag){
+    if(printFlag==1){
         printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
         printf("\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
     }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
+        strcat(global_vars_code,buffer);
+        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
+        strcat(global_vars_code,buffer);
+    }
     count+=2;
     if(strcmp(and_or->str,"And")==0){ //AND
-        if(printFlag){
+        if(printFlag==1){
             printf("\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+            strcat(global_vars_code,buffer);
         }
     }
     else{ //OR
-        if(printFlag){
+        if(printFlag==1){
             printf("\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+        }
+        else if(printFlag==2){
+            printf(buffer,"\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+            strcat(global_vars_code,buffer);
         }
     }
     count++;
-    if(printFlag){
+    if(printFlag==1){
         printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+        strcat(global_vars_code,buffer);
     }
     /*
     if(printFlag){
@@ -997,6 +1076,350 @@ char* type_to_llvm(_type t){
     }
 }
 
+void handle_Global_varDef(node* statement){
+    //node* aux=statement;
+    if(statement!=NULL){
+        //PLUS
+        if(strcmp(statement->str,"Plus")==0){
+            //1 nó filho
+            handle_Global_varDef(statement->child);
+            assign_llvm_name(statement, statement->child->llvm_name);
+        }
+        //MINUS
+        else if(strcmp(statement->str,"Minus")==0){
+            //1 nó filho
+            handle_Global_varDef(statement->child);
+            if(statement->type==reallit){
+                    sprintf(buffer,"\t%%%d = fsub double 0.0, %s\n", count, statement->child->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            else{
+                    sprintf(buffer,"\t%%%d = sub i32 0, %s\n", count, statement->child->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            sprintf(buffer,"%%%d",count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        //NOT
+        else if(strcmp(statement->str,"Not")==0){
+            //1 nó filho
+            handle_Global_varDef(statement->child);
+            //statement->type sempre igual a int
+                sprintf(buffer,"\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(statement->type),statement->child->llvm_name);
+                strcat(global_vars_code,buffer);
+                sprintf(buffer,"\t%%%d = xor i1 %%%d, true\n", count+1, count);
+                strcat(global_vars_code,buffer);
+                sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count+2, count+1);
+                strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count+2);
+            assign_llvm_name(statement, buffer);
+            count+=3;
+        }
+        //CALL
+        else if(strcmp(statement->str,"Call")==0){
+            handle_funcCall(statement,2);
+        }
+        //STORE
+        else if(strcmp(statement->str,"Store")==0){
+            handle_Global_varDef(statement->child->next);
+            //cast if necessary
+            cast_llvm_type(type_to_llvm(statement->child->next->type), type_to_llvm(statement->child->type),statement->child->next,2);
 
+                if(isLocalVar(statement->child->tk->value,currFuncName)){
+                    sprintf(buffer,"\tstore %s ",type_to_llvm(statement->child->type));
+                    strcat(global_vars_code,buffer);
+                    sprintf(buffer,"%s, ",statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+                    sprintf(buffer,"%s* %%%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
+                    strcat(global_vars_code,buffer);   
+                }
+                else{
+                    sprintf(buffer,"\tstore %s ",type_to_llvm(statement->child->type));
+                    strcat(global_vars_code,buffer);
+                    sprintf(buffer,"%s, ",statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+                    sprintf(buffer,"%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
+                    strcat(global_vars_code,buffer);
+                }
+                
+            
+        }
+        //COMMA
+        else if(strcmp(statement->str,"Comma")==0){
+            //evaluates first expr and discard result, evaluates second expr and returns result
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            assign_llvm_name(statement, statement->child->next->llvm_name);
+            //TODO:?
+        }
+        //OPERATIONS
+        else if(strcmp(statement->str,"Add")==0){
+            handle_Global_varDef(statement->child);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,2);
+            handle_Global_varDef(statement->child->next);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,2);
+            if(statement->type==reallit){
+                    sprintf(buffer,"\t%%%d = fadd %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            else{
+                    sprintf(buffer,"\t%%%d = add %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"Mul")==0){
+            handle_Global_varDef(statement->child);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,2);
+            handle_Global_varDef(statement->child->next);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,2);
+            
+            if(statement->type==reallit){
+                    sprintf(buffer,"\t%%%d = fmul %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            else{
+                    sprintf(buffer,"\t%%%d = mul %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            } 
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"Div")==0){
+            handle_Global_varDef(statement->child);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,2);
+            handle_Global_varDef(statement->child->next);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,2);
+            if(statement->type==reallit){
 
+                    sprintf(buffer,"\t%%%d = fdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            }
+            else{
+                    sprintf(buffer,"\t%%%d = sdiv %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                    strcat(global_vars_code,buffer);
+            } 
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"Sub")==0){
+            handle_Global_varDef(statement->child);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,2);
+            handle_Global_varDef(statement->child->next);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,2);
+            if(statement->type==reallit){
+                sprintf(buffer,"\t%%%d = fsub %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = sub %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            } 
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"Mod")==0){
+            //urem ou srem ?
+            handle_Global_varDef(statement->child);
+            cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,2);
+            handle_Global_varDef(statement->child->next);
+            cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,2);
+            sprintf(buffer,"\t%%%d = srem %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        //COMPARISONS
+        else if(strcmp(statement->str,"Eq")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp oeq double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = icmp eq %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);
+            
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
+        }
+        else if(strcmp(statement->str,"Ne")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp une double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = icmp ne %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
+        }
+        else if(strcmp(statement->str,"Le")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp ole double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = icmp sle %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
+        }
+        else if(strcmp(statement->str,"Ge")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp oge double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+
+                sprintf(buffer,"\t%%%d = icmp sge %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);    
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
+        }
+        else if(strcmp(statement->str,"Lt")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp olt double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = icmp slt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
+        }
+        else if(strcmp(statement->str,"Gt")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            if(statement->child->type==reallit||statement->child->next->type==reallit){
+                cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,2);
+                cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,2);
+                sprintf(buffer,"\t%%%d = fcmp ogt double %s, %s\n", count,statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            else{
+                sprintf(buffer,"\t%%%d = icmp sgt %s %s, %s\n", count, type_to_llvm(statement->type),statement->child->llvm_name, statement->child->next->llvm_name);
+                strcat(global_vars_code,buffer);
+            }
+            count++;
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n", count, count-1);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        //BITWISE OPERATORS
+        else if(strcmp(statement->str,"BitWiseAnd")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            sprintf(buffer,"\t%%%d = and %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"BitWiseOr")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            sprintf(buffer,"\t%%%d = or %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        else if(strcmp(statement->str,"BitWiseXor")==0){
+            handle_Global_varDef(statement->child);
+            handle_Global_varDef(statement->child->next);
+            sprintf(buffer,"\t%%%d = xor %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
+            strcat(global_vars_code,buffer);
+            sprintf(buffer,"%%%d", count);
+            assign_llvm_name(statement, buffer);
+            count++;
+        }
+        //CONDITIONAL OPERATIONS
+        else if(strcmp(statement->str,"Or")==0 || strcmp(statement->str,"And")==0){
+            print_and_or_condition(statement,2);
+        }
+        //TERMINALS
+        else if(isTerminal(statement)){
+            if(strncmp(statement->str,"Id",2)==0){
+                //se for ID
+                    if(isLocalVar(statement->tk->value,currFuncName)){
+                        sprintf(buffer,"\t%%%d = load %s, %s* %%%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
+                        strcat(global_vars_code,buffer);
+                    }
+                    else{
+                        sprintf(buffer,"\t%%%d = load %s, %s* @%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
+                        strcat(global_vars_code,buffer);
+                    }
+                sprintf(buffer,"%%%d",count);
+                assign_llvm_name(statement, buffer);
+                count++;
+            }
+            else{
+                if(strncmp(statement->str,"ChrLit",6)==0){
+                    //ChrLit('a')
+                    sprintf(buffer,"%d",get_chrlit_ascii_value(statement->tk->value));
+                    assign_llvm_name(statement, buffer);
+                }
+                else if(strncmp(statement->str,"IntLit",6)==0){
+                    if(statement->tk->value[0]=='0'&&strlen(statement->tk->value)>1){
+                        sprintf(buffer,"%d",octal_to_int(statement->tk->value+1));
+                        assign_llvm_name(statement,buffer); 
+                    }
+                    else{
+                        assign_llvm_name(statement, statement->tk->value); 
+                    }
+                }
+                else{ //reallit
+                   assign_llvm_name(statement, statement->tk->value); 
+                }
+            }
+        }
+
+    }
+}
 
