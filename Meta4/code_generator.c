@@ -676,103 +676,61 @@ void print_if(node* ifNode,int printFlag){
 
 void print_and_or_condition(node *and_or, int printFlag){
     node *aux=and_or; //AND or OR
-    int savedCount, labelCount;
+    int op1, op2;
+    /*************************_1ST_OP_********************************/
     handle_statement(aux->child,printFlag); //1st condition`
-
-
     if(isTerminal(aux->child)){
-        if(aux->type==reallit){
+        if(aux->child->type==reallit){
             if(printFlag){
-                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
         }
         else{
             if(printFlag){
-                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
+                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
         }
         count++;
     }
+    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    op1=count;
+    count++;
 
-
-    
-    printf("%%%d = zext i1 %");
-
-
-
-
-
-
-    if(aux->child->type==reallit){
-        if(printFlag){
-           printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name); 
+    /*************************_2ND_OP_********************************/
+    handle_statement(aux->child->next,printFlag); //1st condition`
+    if(isTerminal(aux->child->next)){
+        if(aux->child->next->type==reallit){
+            if(printFlag){
+                printf("\t%%%d = fcmp ne %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+            }
         }
-    }
-    else{
-        if(printFlag){
-            printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
+        else{
+            if(printFlag){
+                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
+            }
         }
+        count++;
     }
+    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
+    op2=count;
     count++;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    savedCount=count;
-    handle_statement(aux->child->next,0); //2nd condition count
-    labelCount=count;
-    labelCount++;
-    count=savedCount;
+    //________________Compare_with_zero_________________//
     if(printFlag){
-        printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",savedCount-1,savedCount,labelCount);
+        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
+        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
+    }
+    count+=2;
+
+    if(strcmp(and_or->str,"And")==0){ //AND
+        printf("\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+    }
+    else{ //OR
+        printf("\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
     }
     count++;
-    handle_statement(aux->child->next,printFlag); //2nd condition
-    if(printFlag){
-        printf("\tbr label %%%d\n\n",labelCount);
-    }
-    count++;
-    if(strcmp(aux->str,"Or")==0){ //OR
-        if(printFlag){
-            printf("\t%%%d = phi i1 [ true, %%%d ], [ %s, %%%d ]\n", count,savedLabel,aux->child->next->llvm_name,savedCount );
-        }
-	} 
-    else { //AND
-        if(printFlag){
-            printf("\t%%%d = phi i1 [ false, %%%d ], [ %s, %%%d ]\n", count, savedLabel,aux->child->next->llvm_name,savedCount );
-        }   
-    }
-    count++;
-    if(printFlag){
-        printf("\t%%%d = zext i1 %%%d to i32\n", count, count-1);
-    }
-    savedLabel=labelCount;
+
+    printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1,count-1);
 
 }
 
