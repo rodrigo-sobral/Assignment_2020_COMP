@@ -873,7 +873,6 @@ void print_if(node* ifNode,int printFlag){
 /********************************************************************************TODO:**/
 void print_and_or_condition(node *and_or, int printFlag){
     node *aux=and_or; //AND or OR
-    int op1;
     int savedCount,labelCount,result;
 
     and_or_Flag=1; //set flag
@@ -915,30 +914,10 @@ void print_and_or_condition(node *and_or, int printFlag){
         assign_llvm_name(and_or->child, buffer);
         count++;
 
-    
-    if(printFlag==1){
-        printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
-    }
-    else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
-        strcat(global_vars_code,buffer);
-    }
-    count++;
-    //________________Compare_1ST_OP_with_zero_________________//
-    if(printFlag==1){
-        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-    }
-    else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-        strcat(global_vars_code,buffer);
-    }
-    op1=count;
-    count++;
-
     //if output da 1ª condicao==0 e AND, valor ==0
-    if(strcmp(and_or->str,"Or")==0){   //OR
+    if(strcmp(and_or->str,"And")==0){   //AND
         savedCount=count;
-        print_2nd_op_AndOr(and_or,op1,0);
+        print_2nd_op_AndOr(and_or,0);
         labelCount=count+1; //count zext command!
         count=savedCount;
         if(printFlag==1){
@@ -951,7 +930,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         
         count++;
         //if
-        print_2nd_op_AndOr(and_or,op1,printFlag);
+        print_2nd_op_AndOr(and_or,printFlag);
         if(printFlag==1){
             printf("\tbr label %%%d\n\n",labelCount+1+1);
         }
@@ -962,12 +941,12 @@ void print_and_or_condition(node *and_or, int printFlag){
         count++;
         //else
         if(printFlag==1){
-            printf("\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            printf("\t%%%d = zext i1 %s to i32\n",count,and_or->child->llvm_name);
             //store argument value in result variable
             printf("\tstore i32 %%%d, i32* %s\n",count,and_or->llvm_name);
         }
         else if(printFlag==2){
-            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            sprintf(buffer,"\t%%%d = zext i1 %s to i32\n",count,and_or->child->llvm_name);
             strcat(global_vars_code,buffer);
             sprintf(buffer,"\tstore i32 %%%d, i32* %s\n",count,and_or->llvm_name);
             strcat(global_vars_code,buffer);
@@ -983,7 +962,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         }
         count++;
     }
-    else{   //AND
+    else{   //OR
         if(printFlag==1){
             printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,count+1+1);
         }
@@ -994,12 +973,12 @@ void print_and_or_condition(node *and_or, int printFlag){
         count++;
         //if
         if(printFlag==1){
-            printf("\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            printf("\t%%%d = zext i1 %s to i32\n",count,and_or->child->llvm_name);
             //store argument value in result variable
             printf("\tstore i32 %%%d, i32* %s\n",count,and_or->llvm_name);
         }
         else if(printFlag==2){
-            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            sprintf(buffer,"\t%%%d = zext i1 %s to i32\n",count,and_or->child->llvm_name);
             strcat(global_vars_code,buffer);
             //store argument value in result variable
             sprintf(buffer,"\tstore i32 %%%d, i32* %s\n",count,and_or->llvm_name);
@@ -1008,7 +987,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         count++;
         /****/
         savedCount=count;
-        print_2nd_op_AndOr(and_or,op1,0);
+        print_2nd_op_AndOr(and_or,0);
         labelCount=count+1;
         count=savedCount;
         /*****/
@@ -1021,7 +1000,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         }
         count++;
         //else
-        print_2nd_op_AndOr(and_or,op1,printFlag);
+        print_2nd_op_AndOr(and_or,printFlag);
         if(printFlag==1){
             printf("\tbr label %%%d\n\n",labelCount);
         }
@@ -1046,7 +1025,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     count++;
 }
 
-void print_2nd_op_AndOr(node *and_or, int op1,int printFlag){
+void print_2nd_op_AndOr(node *and_or, int printFlag){
     node *aux=and_or;
     /*************************_2ND_OP_********************************/
     handle_statement(aux->child->next,printFlag); //2nd condition`
@@ -1068,40 +1047,22 @@ void print_2nd_op_AndOr(node *and_or, int op1,int printFlag){
                 strcat(global_vars_code,buffer);
             }
         }
-        count++;
-
-    if(printFlag==1){
-        printf("\t%%%d = zext i1 %%%d to i32\n",count,count-1);
-    }
-    else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
-        strcat(global_vars_code,buffer);
-    }
-    count++;
-    //________________Compare_with_zero_________________//
-    if(printFlag==1){
-        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-    }
-    else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-        strcat(global_vars_code,buffer);
-    }
     count++;
     if(strcmp(and_or->str,"And")==0){ //AND
         if(printFlag==1){
-            printf("\t%%%d = and i1 %%%d, %%%d\n",count,op1,count-1);
+            printf("\t%%%d = and i1 %s, %%%d\n",count,and_or->child->llvm_name,count-1);
         }
         else if(printFlag==2){
-            sprintf(buffer,"\t%%%d = and i1 %%%d, %%%d\n",count,op1,count-1);
+            sprintf(buffer,"\t%%%d = and i1 %s, %%%d\n",count,and_or->child->llvm_name,count-1);
             strcat(global_vars_code,buffer);
         }
     }
     else{ //OR
         if(printFlag==1){
-            printf("\t%%%d = or i1 %%%d, %%%d\n",count,op1,count-1);
+            printf("\t%%%d = or i1 %s, %%%d\n",count,and_or->child->llvm_name,count-1);
         }
         else if(printFlag==2){
-            printf(buffer,"\t%%%d = or i1 %%%d, %%%d\n",count,op1,count-1);
+            printf(buffer,"\t%%%d = or i1 %s, %%%d\n",count,and_or->child->llvm_name,count-1);
             strcat(global_vars_code,buffer);
         }
     }

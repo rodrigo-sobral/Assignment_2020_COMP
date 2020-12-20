@@ -29,7 +29,7 @@ void handle_funcCall(node * callNode,int);
 void print_if(node* ifNode,int);
 void print_while(node *whileNode,int printFlag);
 void print_and_or_condition(node *and_or, int printFlag);
-void print_2nd_op_AndOr(node *and_or, int op1,int printFlag);
+void print_2nd_op_AndOr(node *and_or,int printFlag);
 int count_params(node *paramList);
 int isComparison(node *n);
 int get_chrlit_ascii_value(char* value);
