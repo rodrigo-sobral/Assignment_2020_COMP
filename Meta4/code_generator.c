@@ -121,6 +121,8 @@ void get_varDecs_code(node *n){ //VAR DECS
         }
         sprintf(buffer,"@%s",aux->tk->value);
         assign_llvm_name(aux, buffer);
+        sprintf(buffer,"\tstore %s %s, %s* %s\n",type_to_llvm(t),aux->next->llvm_name,type_to_llvm(t),aux->llvm_name);
+        strcat(global_vars_code,buffer);
         count=1;
     }
     else{
@@ -294,8 +296,9 @@ void handle_statement(node* statement, int printFlag){
                     printf("%s, ",statement->child->next->llvm_name);
                     printf("%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
                 }
-                
             }
+            handle_statement(statement->child,printFlag);
+            assign_llvm_name(statement,statement->child->llvm_name);
         }
         //COMMA
         else if(strcmp(statement->str,"Comma")==0){
@@ -1162,7 +1165,8 @@ void handle_Global_varDef(node* statement){
                     strcat(global_vars_code,buffer);
                     sprintf(buffer,"%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
                     strcat(global_vars_code,buffer);
-                
+           handle_Global_varDef(statement->child);
+           assign_llvm_name(statement,statement->child->llvm_name); 
                 
             
         }
