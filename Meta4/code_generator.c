@@ -1156,22 +1156,13 @@ void handle_Global_varDef(node* statement){
             //cast if necessary
             cast_llvm_type(type_to_llvm(statement->child->next->type), type_to_llvm(statement->child->type),statement->child->next,2);
 
-                if(isLocalVar(statement->child->tk->value,"Global")){
-                    sprintf(buffer,"\tstore %s ",type_to_llvm(statement->child->type));
-                    strcat(global_vars_code,buffer);
-                    sprintf(buffer,"%s, ",statement->child->next->llvm_name);
-                    strcat(global_vars_code,buffer);
-                    sprintf(buffer,"%s* %%%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
-                    strcat(global_vars_code,buffer);   
-                }
-                else{
                     sprintf(buffer,"\tstore %s ",type_to_llvm(statement->child->type));
                     strcat(global_vars_code,buffer);
                     sprintf(buffer,"%s, ",statement->child->next->llvm_name);
                     strcat(global_vars_code,buffer);
                     sprintf(buffer,"%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
                     strcat(global_vars_code,buffer);
-                }
+                
                 
             
         }
@@ -1416,14 +1407,9 @@ void handle_Global_varDef(node* statement){
         else if(isTerminal(statement)){
             if(strncmp(statement->str,"Id",2)==0){
                 //se for ID
-                    if(isLocalVar(statement->tk->value,"Global")){
-                        sprintf(buffer,"\t%%%d = load %s, %s* %%%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
-                        strcat(global_vars_code,buffer);
-                    }
-                    else{
                         sprintf(buffer,"\t%%%d = load %s, %s* @%s\n",count,type_to_llvm(statement->type),type_to_llvm(statement->type),statement->tk->value);
                         strcat(global_vars_code,buffer);
-                    }
+                    
                 sprintf(buffer,"%%%d",count);
                 assign_llvm_name(statement, buffer);
                 count++;
