@@ -900,7 +900,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     count++;
 
     //if output da 1ª condicao==0 e AND, valor ==0
-    if(strcmp(and_or->str,"And")==0){   //AND
+    if(strcmp(and_or->str,"Or")==0){   //OR
         savedCount=count;
         print_2nd_op_AndOr(and_or,op1,0);
         labelCount=count+1; //count zext command!
@@ -942,11 +942,9 @@ void print_and_or_condition(node *and_or, int printFlag){
             sprintf(buffer,"\tbr label %%%d\n\n",labelCount+1+1);
             strcat(global_vars_code,buffer);
         }
-        
         count++;
     }
-    else{   //OR
-
+    else{   //AND
         if(printFlag==1){
             printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,count+2);
         }
@@ -954,7 +952,6 @@ void print_and_or_condition(node *and_or, int printFlag){
             sprintf(buffer,"\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,count+2);
             strcat(global_vars_code,buffer);
         }
-         
         count++;
         //if
         if(printFlag==1){
@@ -1112,14 +1109,7 @@ void alloca_params(node *paramList){
     _type t;
     node *paramDec=paramList->child;
     int i=0;
-    /*
-    funcCountParams=count_params(paramList);
-    count+=funcCountParams;
-    if(funcCountParams!=0){
-        printf("\t%%%d = alloca %s\n",count,type_to_llvm(funcRetType)); //alocca return pointer
-        count++;
-    }
-    */
+
     while(paramDec!=NULL){
         t=str_to_type(paramDec->child->str);
         if(t!=voidlit&&paramDec->child->next!=NULL){
