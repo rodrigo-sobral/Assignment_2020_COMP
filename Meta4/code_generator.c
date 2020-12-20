@@ -65,7 +65,7 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     //funcBody
     printf("{\n");
     if(strcmp(n->next->tk->value,"main")==0){
-        printf("call void @_INIT_GLOBAL_VARS()\n");
+        printf("\tcall void @_INIT_GLOBAL_VARS()\n");
     }
     //alocar parametros
     alloca_params(n->next->next);
