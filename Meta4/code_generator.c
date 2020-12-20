@@ -9,7 +9,7 @@
 
 #define MAX_SIZE 4086 //bytes
 
-int count=1, savedLabel=0, global_vars_count=1; //para variáveis intermédias
+int count=1, and_or_Flag=0, global_vars_count=1; //para variáveis intermédias
 char buffer[1024]; //aux
 char global_vars_code[MAX_SIZE]="";
 _type funcRetType;
@@ -764,29 +764,45 @@ void print_while(node *whileNode,int printFlag){
     //whileNode has 2 child nodes
     node *aux=whileNode->child; //condition node
     int savedCount;
-    int statCount, initCount;
+    int statCount,initCount;
+    int x;
+
+    handle_statement(aux,printFlag); //handle while condition
     if(printFlag){
-        printf("\tbr label %%%d\n\n",count);
+        printf("\t%%%d = alloca i32\n",count);
+        x=count;
+        printf("\tstore i32 %s, i32* %%%d\n",aux->llvm_name,count);
+        printf("\tbr label %%%d\n\n",count+1);
     }
+    count++;
     initCount=count;
     count++;
-    handle_statement(aux,printFlag); //handle while condition
+    if(printFlag){
+        printf("\t%%%d = load i32, i32* %%%d\n",count,x);
+    }
+    count++;
+    if(aux->type==reallit){
+        if(printFlag){
+            printf("\t%%%d = fcmp une %s %%%d, 0\n",count,type_to_llvm(aux->type),count-1);
+        }
+    }
+    else{
+        if(printFlag){
+            printf("\t%%%d = icmp ne %s %%%d, 0\n",count,type_to_llvm(aux->type),count-1);
+        }
+    }
+    sprintf(buffer,"%%%d", count);
+    assign_llvm_name(whileNode->child, buffer);
+    count++;
 
-        if(aux->type==reallit){
-            if(printFlag){
-                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
-            }
-        }
-        else{
-            if(printFlag){
-                printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
-            }
-        }
-        sprintf(buffer,"%%%d", count);
-        assign_llvm_name(whileNode->child, buffer);
-        count++;
+
+
+
+
+
 
     savedCount=count;
+    handle_statement(aux,0);
     handle_statement(aux->next,0); //counting
     statCount=count;
     count=savedCount;
@@ -795,6 +811,11 @@ void print_while(node *whileNode,int printFlag){
     }
     count++;
     handle_statement(aux->next,printFlag);
+    handle_statement(aux,printFlag);
+    if(printFlag){
+        printf("\tstore i32 %%%d, i32* %%%d\n",count-1,x);
+    }
+    
     if(printFlag){
         printf("\tbr label %%%d\n\n",initCount);
     }
@@ -849,11 +870,13 @@ void print_if(node* ifNode,int printFlag){
     }
     count++;
 }
-/**********************************************************************************/
+/********************************************************************************TODO:**/
 void print_and_or_condition(node *and_or, int printFlag){
     node *aux=and_or; //AND or OR
     int op1;
     int savedCount,labelCount,result;
+
+    and_or_Flag=1; //set flag
 
     if(printFlag==1){
         printf("\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
@@ -1017,6 +1040,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         sprintf(buffer,"\t%%%d = load i32, i32* %s\n",count, and_or->llvm_name);
         strcat(global_vars_code,buffer);
     }
+
     sprintf(buffer,"%%%d", count);
     assign_llvm_name(and_or, buffer);
     count++;
