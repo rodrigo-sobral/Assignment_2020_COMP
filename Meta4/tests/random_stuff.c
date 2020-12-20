@@ -42,7 +42,7 @@ char recebeLetraSeguinte(char letra) {
     putchar(':');
     return getchar()+1;
 }
-
+int a23;
 int main(void) {
     double t= 5.0;
     double resultado= 5*10.0;
@@ -105,7 +105,55 @@ int main(void) {
         cont2=cont2+1;
     }
 
+    if (1&&1) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
 
+    if (0&&1) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+
+    if (1&&0) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+
+    if (0&&0) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+    putchar('\n');
+
+    if (1||1) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+
+    if (0||1) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+    
+    if (1||0) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+
+    if (0||0) {
+        putchar('1');
+    } else {
+        putchar('0');
+    }
+    putchar('\n');
 
     return 0;
 }
