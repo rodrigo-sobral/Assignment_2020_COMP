@@ -7,12 +7,11 @@
 #include <string.h>
 #include "code_generator.h"
 
-#define MAX_SIZE 4086
+#define MAX_SIZE 4086 //bytes
 
 int count=1, savedLabel=0, global_vars_count=1; //para variáveis intermédias
 char buffer[1024]; //aux
 char global_vars_code[MAX_SIZE]="";
-int retFlag=0;
 _type funcRetType;
 char *currFuncName;
 //int funcCountParams;
@@ -50,7 +49,6 @@ void start_gen(node* ast_root){
 }
 /***************************************************************************************************************/
 void get_funcDefs_code(node *n){ //FUNC DEFS
-    retFlag=0; //reset retFlag
     //receives typedef node as n
     node *aux=n; //typedef node
     _type t=str_to_type(aux->str);
@@ -70,19 +68,7 @@ void get_funcDefs_code(node *n){ //FUNC DEFS
     //alocar parametros
     alloca_params(n->next->next);
     print_funcBody_code(aux,1);
-    if(!retFlag){
-        if(t!=voidlit){
-            printf("\tret %s 0\n", type_to_llvm(t));
-
-            /*printf("\tstore %s 0, %s* %%%d\n",type_to_llvm(t),type_to_llvm(t),funcCountParams);
-            printf("\t%%%d = load %s, %s* %%%d\n",count,type_to_llvm(t),type_to_llvm(t),funcCountParams);
-            printf("\tret %s %%%d\n", type_to_llvm(t),count);
-            count++;*/
-        } 
-        else
-            printf("\tret void\n");
-        
-    }
+    
     printf("}\n\n");
     count=1; //reset counter
 }
@@ -142,6 +128,7 @@ void get_varDecs_code(node *n){ //VAR DECS
 void print_funcBody_code(node* funcBody, int printFlag){
     //count==1 se funcao n devolver nada, count==2 se a função tiver um tipo de retorno diferente de void 
     node *funcDecAndStats=funcBody->child,*aux; 
+    node *before_node=NULL;
     // ^^lista ligada de declarations and statements do func body
     _type t;
     while(funcDecAndStats){
@@ -176,14 +163,40 @@ void print_funcBody_code(node* funcBody, int printFlag){
         else{
             //pode ser:
             //while, if else, statlist, return
-            if(strcmp(funcDecAndStats->str,"Return")==0){
-                retFlag=1; //set retFlag
-            } 
             //STATEMENTS
             handle_statement(funcDecAndStats,printFlag);
         }
-
+        before_node=funcDecAndStats;
         funcDecAndStats=funcDecAndStats->next;
+    }
+
+    if(before_node==NULL){
+        if(funcRetType!=voidlit){
+            if(funcRetType==reallit){
+                printf("\tret double 0.0\n");
+            }
+            else{
+                printf("\tret %s 0\n", type_to_llvm(funcRetType));
+            }
+        } 
+        else{
+            printf("\tret void\n");
+        }    
+    }
+    else{
+        if(strcmp(before_node->str,"Return")!=0){
+            if(funcRetType!=voidlit){
+                if(funcRetType==reallit){
+                    printf("\tret double 0.0\n");
+                }
+                else{
+                    printf("\tret %s 0\n", type_to_llvm(funcRetType));
+                }
+            } 
+            else{
+                printf("\tret void\n");
+            }
+        }
     }
 
 }
@@ -629,7 +642,7 @@ void handle_statement(node* statement, int printFlag){
                     }
                 }
                 else{ //reallit
-                   assign_llvm_name(statement, statement->tk->value); 
+                   assign_llvm_name(statement,adapt_double_value(statement)); 
                 }
             }
         }
@@ -839,7 +852,8 @@ void print_if(node* ifNode,int printFlag){
 
 void print_and_or_condition(node *and_or, int printFlag){
     node *aux=and_or; //AND or OR
-    int op1, op2;
+    int op1;
+    int savedCount,labelCount;
     /*************************_1ST_OP_********************************/
     handle_statement(aux->child,printFlag); //1st condition`
 
@@ -873,11 +887,119 @@ void print_and_or_condition(node *and_or, int printFlag){
         sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
         strcat(global_vars_code,buffer);
     }
+    count++;
+    //________________Compare_1ST_OP_with_zero_________________//
+    if(printFlag==1){
+        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
+    }
+    else if(printFlag==2){
+        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
+        strcat(global_vars_code,buffer);
+    }
     op1=count;
     count++;
 
+    //if output da 1ª condicao==0 e AND, valor ==0
+    if(strcmp(and_or->str,"And")==0){   //AND
+        savedCount=count;
+        print_2nd_op_AndOr(and_or,op1,0);
+        labelCount=count+1; //count zext command!
+        count=savedCount;
+        if(printFlag==1){
+            printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",savedCount-1,savedCount,labelCount); 
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\tbr i1 %%%d, label %%%d, label %%%d\n\n",savedCount-1,savedCount,labelCount); 
+            strcat(global_vars_code,buffer);
+        }
+        
+        count++;
+        //if
+        print_2nd_op_AndOr(and_or,op1,printFlag);
+        if(printFlag==1){
+            printf("\tbr label %%%d\n\n",labelCount+1+1);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\tbr label %%%d\n\n",labelCount+1+1);
+            strcat(global_vars_code,buffer);
+        }
+        count++;
+        //else
+        if(printFlag==1){
+            printf("\t%%%d = zext i1 %%%d to i32\n",count,op1);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            strcat(global_vars_code,buffer);
+        }
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(and_or, buffer);
+        count++;
+        if(printFlag==1){
+            printf("\tbr label %%%d\n\n",labelCount+1+1);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\tbr label %%%d\n\n",labelCount+1+1);
+            strcat(global_vars_code,buffer);
+        }
+        
+        count++;
+    }
+    else{   //OR
+
+        if(printFlag==1){
+            printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,count+2);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\tbr i1 %%%d, label %%%d, label %%%d\n\n",count-1,count,count+2);
+            strcat(global_vars_code,buffer);
+        }
+         
+        count++;
+        //if
+        if(printFlag==1){
+            printf("\t%%%d = zext i1 %%%d to i32\n",count,op1);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,op1);
+            strcat(global_vars_code,buffer);
+        }
+        sprintf(buffer,"%%%d", count);
+        assign_llvm_name(and_or, buffer);
+        count++;
+        /****/
+        savedCount=count;
+        print_2nd_op_AndOr(and_or,op1,0);
+        labelCount=count+1;
+        count=savedCount;
+        /*****/
+        if(printFlag==1){
+            printf("\tbr label %%%d\n\n",labelCount);
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\tbr label %%%d\n\n",labelCount);
+            strcat(global_vars_code,buffer);
+        }
+        count++;
+        //else
+        print_2nd_op_AndOr(and_or,op1,printFlag);
+        if(printFlag==1){
+            printf("\tbr label %%%d\n\n",labelCount);
+        }
+        else if(printFlag==2)
+        {
+            sprintf(buffer,"\tbr label %%%d\n\n",labelCount);
+            strcat(global_vars_code,buffer);
+        }
+        
+        count++;
+    }
+}
+
+void print_2nd_op_AndOr(node *and_or, int op1,int printFlag){
+    node *aux=and_or;
     /*************************_2ND_OP_********************************/
-    handle_statement(aux->child->next,printFlag==1); //1st condition`
+    handle_statement(aux->child->next,printFlag); //2nd condition`
         if(aux->child->next->type==reallit){
             if(printFlag==1){
                 printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
@@ -905,35 +1027,31 @@ void print_and_or_condition(node *and_or, int printFlag){
         sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
         strcat(global_vars_code,buffer);
     }
-    op2=count;
     count++;
     //________________Compare_with_zero_________________//
     if(printFlag==1){
-        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
-        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
+        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
     }
     else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,op1);
-        strcat(global_vars_code,buffer);
-        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count+1,op2);
+        sprintf(buffer,"\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
         strcat(global_vars_code,buffer);
     }
-    count+=2;
+    count++;
     if(strcmp(and_or->str,"And")==0){ //AND
         if(printFlag==1){
-            printf("\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+            printf("\t%%%d = and i1 %%%d, %%%d\n",count,op1,count-1);
         }
         else if(printFlag==2){
-            sprintf(buffer,"\t%%%d = and i1 %%%d, %%%d\n",count,count-2,count-1);
+            sprintf(buffer,"\t%%%d = and i1 %%%d, %%%d\n",count,op1,count-1);
             strcat(global_vars_code,buffer);
         }
     }
     else{ //OR
         if(printFlag==1){
-            printf("\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+            printf("\t%%%d = or i1 %%%d, %%%d\n",count,op1,count-1);
         }
         else if(printFlag==2){
-            printf(buffer,"\t%%%d = or i1 %%%d, %%%d\n",count,count-2,count-1);
+            printf(buffer,"\t%%%d = or i1 %%%d, %%%d\n",count,op1,count-1);
             strcat(global_vars_code,buffer);
         }
     }
@@ -945,14 +1063,10 @@ void print_and_or_condition(node *and_or, int printFlag){
         sprintf(buffer,"\t%%%d = zext i1 %%%d to i32\n",count,count-1);
         strcat(global_vars_code,buffer);
     }
-    /*
-    if(printFlag){
-        printf("\t%%%d = icmp ne i32 %%%d, 0\n",count,count-1);
-    }*/
+
     sprintf(buffer,"%%%d", count);
     assign_llvm_name(and_or, buffer);
     count++;
-    
 }
 
 void print_params_types(node *paramList){ //types only..for func declarations
@@ -969,7 +1083,7 @@ void print_params_types(node *paramList){ //types only..for func declarations
     }
 
 }
-
+/*
 void print_params(node *paramList){ //types and var names...for func definitions
     _type t;
     node *paramDec=paramList->child;
@@ -992,7 +1106,7 @@ void print_params(node *paramList){ //types and var names...for func definitions
         paramDec=paramDec->next; //next paramDec
     }
 
-}
+} */
 
 void alloca_params(node *paramList){
     _type t;
@@ -1106,6 +1220,19 @@ char* type_to_llvm(_type t){
         case voidlit: return "void";
         case shortlit: return "i32";
         default: return "";
+    }
+}
+char* adapt_double_value(node *num){
+    size_t len = strlen(num->tk->value);
+    char *aux=(char*)malloc((len+2)*sizeof(char));
+    strcpy(aux,"0");
+    if(num->tk->value[0]=='.'){
+        strcat(aux,num->tk->value);
+        return aux;
+    }
+    else{
+        free(aux);
+        return num->tk->value;
     }
 }
 
@@ -1434,11 +1561,12 @@ void handle_Global_varDef(node* statement){
                     }
                 }
                 else{ //reallit
-                   assign_llvm_name(statement, statement->tk->value); 
+                   assign_llvm_name(statement, adapt_double_value(statement)); 
                 }
             }
         }
 
     }
 }
+
 
