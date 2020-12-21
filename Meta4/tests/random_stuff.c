@@ -115,8 +115,8 @@ int main(void) {
     }
 
     putchar('\n');
-    //putchar(recebeLetraSeguinte('1'));
-    //putchar('\n');
+    putchar(recebeLetraSeguinte('1'));
+    putchar('\n');
     putchar(somarNumeros(49+1,1*1,2-1));
     putchar('\n');
     putchar(subtrairNumeros('9', 3));

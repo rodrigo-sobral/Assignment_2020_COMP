@@ -38,11 +38,6 @@ int main(void) {
       putchar(fibbonacci(i)+'0');
    }
    putchar('\n');
-   
-   int j, a='A';
-   while(i<20&&(j=factorial(i))&&(i=i+1)) {
-      putchar(a);
-      a=a+1;
-   }
-   putchar('\n');
+   gcd(64, 34);
+   putchar(factorial(5));
 }
