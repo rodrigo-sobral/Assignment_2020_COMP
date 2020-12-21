@@ -19,7 +19,7 @@ void get_varDecs_code(node *n);
 /******************************************************************************************/
 void print_funcBody_code(node* funcBody,int);
 void print_statList(node* statList, int);
-void handle_statement(node* statement,int);
+void handle_statement(node* statement,int,int);
 void print_params_types(node *paramList);
 /*void print_params(node *paramList);*/
 void alloca_params(node *paramList);
@@ -28,8 +28,8 @@ void cast_llvm_type(char* got, char *expected, node *n,int);
 void handle_funcCall(node * callNode,int);
 void print_if(node* ifNode,int);
 void print_while(node *whileNode,int printFlag);
-void print_and_or_condition(node *and_or, int printFlag);
-void print_2nd_op_AndOr(node *and_or,int printFlag);
+void print_and_or_condition(node *and_or, int printFlag, int);
+void print_2nd_op_AndOr(node *and_or,int printFlag, int);
 int count_params(node *paramList);
 int isComparison(node *n);
 int get_chrlit_ascii_value(char* value);

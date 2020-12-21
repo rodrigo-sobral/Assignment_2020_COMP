@@ -9,7 +9,7 @@
 
 #define MAX_SIZE 4086 //bytes
 
-int count=1, and_or_Flag=0, global_vars_count=1; //para variáveis intermédias
+int count=1, global_vars_count=1; //para variáveis intermédias
 char buffer[1024]; //aux
 char global_vars_code[MAX_SIZE]="";
 _type funcRetType;
@@ -148,7 +148,7 @@ void print_funcBody_code(node* funcBody, int printFlag){
                 //expressões...func calls...
                 //traduzir as expressões todas e no final fazer o store com o valor resultante
                 //...
-                handle_statement(aux->next,printFlag);
+                handle_statement(aux->next,printFlag,0);
                 //FAZER CASTING!!!!!!!!!!!
                 cast_llvm_type(type_to_llvm(aux->next->type), type_to_llvm(t),aux->next,printFlag);
                 if(printFlag){
@@ -164,7 +164,7 @@ void print_funcBody_code(node* funcBody, int printFlag){
             //pode ser:
             //while, if else, statlist, return
             //STATEMENTS
-            handle_statement(funcDecAndStats,printFlag);
+            handle_statement(funcDecAndStats,printFlag,0);
         }
         before_node=funcDecAndStats;
         funcDecAndStats=funcDecAndStats->next;
@@ -223,7 +223,7 @@ void print_statList(node* statList, int printFlag){
                 //expressões...func calls...
                 //traduzir as expressões todas e no final fazer o store com o valor resultante
                 //...
-                handle_statement(aux->next,printFlag);
+                handle_statement(aux->next,printFlag,0);
                 //FAZER CASTING!!!!!!!!!!!
                 cast_llvm_type(type_to_llvm(aux->next->type), type_to_llvm(t),aux->next,printFlag);
                 if(printFlag){
@@ -239,7 +239,7 @@ void print_statList(node* statList, int printFlag){
             //pode ser:
             //while, if else, statlist, return 
             //STATEMENTS
-            handle_statement(funcDecAndStats,printFlag);
+            handle_statement(funcDecAndStats,printFlag,0);
         }
 
         funcDecAndStats=funcDecAndStats->next;
@@ -247,19 +247,19 @@ void print_statList(node* statList, int printFlag){
 
 }
 
-void handle_statement(node* statement, int printFlag){
+void handle_statement(node* statement, int printFlag,int allocaAddr){
     //node* aux=statement;
     if(statement!=NULL){
         //PLUS
         if(strcmp(statement->str,"Plus")==0){
             //1 nó filho
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             assign_llvm_name(statement, statement->child->llvm_name);
         }
         //MINUS
         else if(strcmp(statement->str,"Minus")==0){
             //1 nó filho
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             if(statement->type==reallit){
                 if(printFlag){
                     printf("\t%%%d = fsub double 0.0, %s\n", count, statement->child->llvm_name);
@@ -278,7 +278,7 @@ void handle_statement(node* statement, int printFlag){
         //NOT
         else if(strcmp(statement->str,"Not")==0){
             //1 nó filho
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             //statement->type sempre igual a int
             if(printFlag){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(statement->type),statement->child->llvm_name);
@@ -295,7 +295,7 @@ void handle_statement(node* statement, int printFlag){
         }
         //STORE
         else if(strcmp(statement->str,"Store")==0){
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             //cast if necessary
             cast_llvm_type(type_to_llvm(statement->child->next->type), type_to_llvm(statement->child->type),statement->child->next,printFlag);
             if(printFlag){
@@ -310,22 +310,22 @@ void handle_statement(node* statement, int printFlag){
                     printf("%s* @%s\n",type_to_llvm(statement->child->type),statement->child->tk->value);
                 }
             }
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             assign_llvm_name(statement,statement->child->llvm_name);
         }
         //COMMA
         else if(strcmp(statement->str,"Comma")==0){
             //evaluates first expr and discard result, evaluates second expr and returns result
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             assign_llvm_name(statement, statement->child->next->llvm_name);
             //TODO:?
         }
         //OPERATIONS
         else if(strcmp(statement->str,"Add")==0){
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             if(statement->type==reallit){
                 if(printFlag){
@@ -343,9 +343,9 @@ void handle_statement(node* statement, int printFlag){
             count++;
         }
         else if(strcmp(statement->str,"Mul")==0){
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             
             if(statement->type==reallit){
@@ -363,9 +363,9 @@ void handle_statement(node* statement, int printFlag){
             count++;
         }
         else if(strcmp(statement->str,"Div")==0){
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             if(statement->type==reallit){
                 if(printFlag){
@@ -382,9 +382,9 @@ void handle_statement(node* statement, int printFlag){
             count++;
         }
         else if(strcmp(statement->str,"Sub")==0){
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             if(statement->type==reallit){
                 if(printFlag){
@@ -402,9 +402,9 @@ void handle_statement(node* statement, int printFlag){
         }
         else if(strcmp(statement->str,"Mod")==0){
             //urem ou srem ?
-            handle_statement(statement->child,printFlag);
+            handle_statement(statement->child,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(statement->type),statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child->next,printFlag,0);
             cast_llvm_type(type_to_llvm(statement->child->next->type),type_to_llvm(statement->type),statement->child->next,printFlag);
             if(printFlag){
                 printf("\t%%%d = srem %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
@@ -415,8 +415,8 @@ void handle_statement(node* statement, int printFlag){
         }
         //COMPARISONS
         else if(strcmp(statement->str,"Eq")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -436,8 +436,8 @@ void handle_statement(node* statement, int printFlag){
             sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Ne")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -457,8 +457,8 @@ void handle_statement(node* statement, int printFlag){
             sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Le")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -478,8 +478,8 @@ void handle_statement(node* statement, int printFlag){
             sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Ge")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -499,8 +499,8 @@ void handle_statement(node* statement, int printFlag){
             sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Lt")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -522,8 +522,8 @@ void handle_statement(node* statement, int printFlag){
             sprintf(buffer,"%%%d",count); assign_llvm_name(statement,buffer); count++;
         }
         else if(strcmp(statement->str,"Gt")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(statement->child->type==reallit||statement->child->next->type==reallit){
                 cast_llvm_type(type_to_llvm(statement->child->type),"double",statement->child,printFlag);
                 cast_llvm_type(type_to_llvm(statement->child->next->type),"double",statement->child->next,printFlag);
@@ -546,8 +546,8 @@ void handle_statement(node* statement, int printFlag){
         }
         //BITWISE OPERATORS
         else if(strcmp(statement->str,"BitWiseAnd")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(printFlag){
                  printf("\t%%%d = and %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
@@ -556,8 +556,8 @@ void handle_statement(node* statement, int printFlag){
             count++;
         }
         else if(strcmp(statement->str,"BitWiseOr")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(printFlag){
                  printf("\t%%%d = or %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
@@ -566,8 +566,8 @@ void handle_statement(node* statement, int printFlag){
             count++;
         }
         else if(strcmp(statement->str,"BitWiseXor")==0){
-            handle_statement(statement->child,printFlag);
-            handle_statement(statement->child->next,printFlag);
+            handle_statement(statement->child,printFlag,0);
+            handle_statement(statement->child->next,printFlag,0);
             if(printFlag){
                  printf("\t%%%d = xor %s %s, %s\n",count,type_to_llvm(statement->type),statement->child->llvm_name,statement->child->next->llvm_name);
             }
@@ -577,7 +577,7 @@ void handle_statement(node* statement, int printFlag){
         }
         //CONDITIONAL OPERATIONS
         else if(strcmp(statement->str,"Or")==0 || strcmp(statement->str,"And")==0){
-            print_and_or_condition(statement,printFlag);
+            print_and_or_condition(statement,printFlag,allocaAddr);
         }
         //STATLIST
         else if(strcmp(statement->str,"StatList")==0){
@@ -599,7 +599,7 @@ void handle_statement(node* statement, int printFlag){
                 }
             }
             else{
-                handle_statement(statement->child,printFlag);
+                handle_statement(statement->child,printFlag,0);
                 cast_llvm_type(type_to_llvm(statement->child->type),type_to_llvm(funcRetType),statement->child,printFlag);
                 if(printFlag){
                     printf("\tret %s %s\n", type_to_llvm(funcRetType),statement->child->llvm_name);
@@ -698,7 +698,7 @@ void handle_funcCall(node *callNode, int printFlag){
             handle_Global_varDef(aux);
         }
         else{
-            handle_statement(aux,printFlag);
+            handle_statement(aux,printFlag,0);
         }
         cast_llvm_type(type_to_llvm(aux->type),type_to_llvm(p_aux->type),aux,printFlag); //CAST if necessary
         aux=aux->next;
@@ -765,22 +765,21 @@ void print_while(node *whileNode,int printFlag){
     node *aux=whileNode->child; //condition node
     int savedCount;
     int statCount,initCount;
-    int x;
+    int allocaAddr=count;
 
-    handle_statement(aux,printFlag); //handle while condition
-    if(printFlag){
-        printf("\t%%%d = alloca i32\n",count);
-        x=count;
-        printf("\tstore i32 %s, i32* %%%d\n",aux->llvm_name,count);
-        printf("\tbr label %%%d\n\n",count+1);
+    //
+    if(printFlag==1){
+            printf("\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
     }
     count++;
+
+    if(printFlag){
+        printf("\tbr label %%%d\n\n",count);
+    }
     initCount=count;
     count++;
-    if(printFlag){
-        printf("\t%%%d = load i32, i32* %%%d\n",count,x);
-    }
-    count++;
+    handle_statement(aux,printFlag,allocaAddr); //handle while condition
+    
     if(aux->type==reallit){
         if(printFlag){
             printf("\t%%%d = fcmp une %s %%%d, 0\n",count,type_to_llvm(aux->type),count-1);
@@ -802,19 +801,14 @@ void print_while(node *whileNode,int printFlag){
 
 
     savedCount=count;
-    handle_statement(aux,0);
-    handle_statement(aux->next,0); //counting
+    handle_statement(aux->next,0,0); //counting
     statCount=count;
     count=savedCount;
     if(printFlag){
         printf("\tbr i1 %%%d, label %%%d, label %%%d\n\n",savedCount-1,savedCount,statCount+1);
     }
     count++;
-    handle_statement(aux->next,printFlag);
-    handle_statement(aux,printFlag);
-    if(printFlag){
-        printf("\tstore i32 %%%d, i32* %%%d\n",count-1,x);
-    }
+    handle_statement(aux->next,printFlag,0);
     
     if(printFlag){
         printf("\tbr label %%%d\n\n",initCount);
@@ -831,7 +825,7 @@ void print_if(node* ifNode,int printFlag){
     //2nd node=if stat body dec/stat ou statlist
     //3rd node=else condition (if Null..there's no else stat)
 
-    handle_statement(aux,printFlag); //handle conditions
+    handle_statement(aux,printFlag,0); //handle conditions
         if(aux->type==reallit){
             if(printFlag){
                 printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->type),aux->llvm_name);
@@ -848,9 +842,9 @@ void print_if(node* ifNode,int printFlag){
     //IF
     aux=aux->next; //if statement 2nd node
     savedCount=count;
-    handle_statement(aux,0);//if
+    handle_statement(aux,0,0);//if
     ifCount=count;
-    handle_statement(aux->next,0);//else
+    handle_statement(aux->next,0,0);//else
     elseCount=count+1;
     count=savedCount;
 
@@ -858,50 +852,42 @@ void print_if(node* ifNode,int printFlag){
         printf("\tbr i1 %s, label %%%d, label %%%d\n\n",ifNode->child->llvm_name, savedCount,ifCount+1);
     }
     count++;
-    handle_statement(aux,printFlag); //IF
+    handle_statement(aux,printFlag,0); //IF
     if(printFlag){
         printf("\tbr label %%%d\n\n",elseCount+1);
     }
     aux=aux->next; //else statement 3rd node
     count++;
-    handle_statement(aux,printFlag); //ELSE
+    handle_statement(aux,printFlag,0); //ELSE
     if(printFlag){
         printf("\tbr label %%%d\n\n",elseCount+1);
     }
     count++;
 }
 /********************************************************************************TODO:**/
-void print_and_or_condition(node *and_or, int printFlag){
+void print_and_or_condition(node *and_or, int printFlag, int allocaAddr){
     node *aux=and_or; //AND or OR
-    int savedCount,labelCount,result;
+    int savedCount,labelCount;
 
-    and_or_Flag=1; //set flag
 
-    if(printFlag==1){
-        printf("\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
+    if(!allocaAddr){
+        if(printFlag==1){
+            printf("\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
+        }
+        else if(printFlag==2){
+            sprintf(buffer,"\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
+            strcat(global_vars_code,buffer);
+        }
+        allocaAddr=count;
+        
+        count++;
     }
-    else if(printFlag==2){
-        sprintf(buffer,"\t%%%d = alloca i32\n",count); //aux to save value from operation && or ||
-        strcat(global_vars_code,buffer);
-    }
-    result=count;
-    sprintf(buffer,"%%%d", result);
+    sprintf(buffer,"%%%d", allocaAddr);
     assign_llvm_name(and_or, buffer);
-    count++;
 
     /*************************_1ST_OP_********************************/
-    handle_statement(aux->child,printFlag); //1st condition`
+    handle_statement(aux->child,printFlag,allocaAddr); //1st condition`
 
-        if(aux->child->type==reallit){
-            if(printFlag==1){
-                printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
-            }
-            else if(printFlag==2){
-                sprintf(buffer,"\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
-                strcat(global_vars_code,buffer);
-            }
-        }
-        else{
             if(printFlag==1){
                 printf("\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
             }
@@ -909,7 +895,6 @@ void print_and_or_condition(node *and_or, int printFlag){
                 sprintf(buffer,"\t%%%d = icmp ne %s %s, 0\n",count,type_to_llvm(aux->child->type),aux->child->llvm_name);
                 strcat(global_vars_code,buffer);
             }
-        }
         sprintf(buffer,"%%%d", count); 
         assign_llvm_name(and_or->child, buffer);
         count++;
@@ -917,7 +902,7 @@ void print_and_or_condition(node *and_or, int printFlag){
     //if output da 1ª condicao==0 e AND, valor ==0
     if(strcmp(and_or->str,"And")==0){   //AND
         savedCount=count;
-        print_2nd_op_AndOr(and_or,0);
+        print_2nd_op_AndOr(and_or,0,allocaAddr);
         labelCount=count+1; //count zext command!
         count=savedCount;
         if(printFlag==1){
@@ -930,7 +915,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         
         count++;
         //if
-        print_2nd_op_AndOr(and_or,printFlag);
+        print_2nd_op_AndOr(and_or,printFlag,allocaAddr);
         if(printFlag==1){
             printf("\tbr label %%%d\n\n",labelCount+1+1);
         }
@@ -987,7 +972,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         count++;
         /****/
         savedCount=count;
-        print_2nd_op_AndOr(and_or,0);
+        print_2nd_op_AndOr(and_or,0,allocaAddr);
         labelCount=count+1;
         count=savedCount;
         /*****/
@@ -1000,7 +985,7 @@ void print_and_or_condition(node *and_or, int printFlag){
         }
         count++;
         //else
-        print_2nd_op_AndOr(and_or,printFlag);
+        print_2nd_op_AndOr(and_or,printFlag,allocaAddr);
         if(printFlag==1){
             printf("\tbr label %%%d\n\n",labelCount);
         }
@@ -1025,10 +1010,10 @@ void print_and_or_condition(node *and_or, int printFlag){
     count++;
 }
 
-void print_2nd_op_AndOr(node *and_or, int printFlag){
+void print_2nd_op_AndOr(node *and_or, int printFlag, int allocaAddr){
     node *aux=and_or;
     /*************************_2ND_OP_********************************/
-    handle_statement(aux->child->next,printFlag); //2nd condition`
+    handle_statement(aux->child->next,printFlag,allocaAddr); //2nd condition`
         if(aux->child->next->type==reallit){
             if(printFlag==1){
                 printf("\t%%%d = fcmp une %s %s, 0\n",count,type_to_llvm(aux->child->next->type),aux->child->next->llvm_name);
@@ -1243,6 +1228,7 @@ char* adapt_double_value(node *num){
 
 void handle_Global_varDef(node* statement){
     //node* aux=statement;
+    int allocaAddr=0;
     if(statement!=NULL){
         //PLUS
         if(strcmp(statement->str,"Plus")==0){
@@ -1537,7 +1523,7 @@ void handle_Global_varDef(node* statement){
         }
         //CONDITIONAL OPERATIONS
         else if(strcmp(statement->str,"Or")==0 || strcmp(statement->str,"And")==0){
-            print_and_or_condition(statement,2);
+            print_and_or_condition(statement,2,allocaAddr);
         }
         //TERMINALS
         else if(isTerminal(statement)){
