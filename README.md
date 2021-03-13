@@ -1,4 +1,4 @@
-# Compilers Project
+# Compilers Assignment
 
 ___
 
