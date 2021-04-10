@@ -2,7 +2,7 @@
 
 ___
 
-## Technologies Used :computer:
+## Used Technologies :computer:
 
 1. **Linux Distribution OS (*Ubuntu 20.04*)**
 2. ***Flex* Package** 
